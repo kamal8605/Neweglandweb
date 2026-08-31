@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* ── Forge & Co. theme (default) ─────────────────────────────── */
+html[data-theme="forge"] {
+  --brand-bg:          #F7F4EE;
+  --brand-bg-alt:      #EFEAE0;
+  --brand-ink:         #0A0A0A;
+  --brand-navy:        #0B1F3A;
+  --brand-muted:       #5A5751;
+  --brand-line:        #D9D3C5;
+  --brand-blue:        #1E5BFF;
+  --brand-blue-deep:   #0E3FCC;
+  --brand-orange:      #FF6B1A;
+  --brand-orange-soft: #FFE8D6;
+  --brand-white:       #FFFFFF;
+  --brand-radius:      2px;
+}
+
+/* ── Pallet theme ─────────────────────────────────────────────── */
+html[data-theme="pallet"] {
+  --brand-bg:          #F7F8FB;
+  --brand-bg-alt:      #EEF2FB;
+  --brand-ink:         #0F172A;
+  --brand-navy:        #1B3A8A;
+  --brand-muted:       #475569;
+  --brand-line:        #E5E9F0;
+  --brand-blue:        #1B3A8A;
+  --brand-blue-deep:   #0E2466;
+  --brand-orange:      #F26B1F;
+  --brand-orange-soft: #FFF1E6;
+  --brand-white:       #FFFFFF;
+  --brand-radius:      10px;
+}
+
+/* ── Tailwind v4 theme tokens ─────────────────────────────────── */
+@theme inline {
+  --font-sans:  var(--font-sans);
+  --font-mono:  var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --color-brand-bg:          var(--brand-bg);
+  --color-brand-bg-alt:      var(--brand-bg-alt);
+  --color-brand-ink:         var(--brand-ink);
+  --color-brand-navy:        var(--brand-navy);
+  --color-brand-muted:       var(--brand-muted);
+  --color-brand-line:        var(--brand-line);
+  --color-brand-blue:        var(--brand-blue);
+  --color-brand-blue-deep:   var(--brand-blue-deep);
+  --color-brand-orange:      var(--brand-orange);
+  --color-brand-orange-soft: var(--brand-orange-soft);
+  --color-brand-white:       var(--brand-white);
+
+  /* shadcn/ui compatible variables */
+  --color-background: var(--brand-bg);
+  --color-foreground: var(--brand-ink);
+  --color-border:     var(--brand-line);
+  --color-input:      var(--brand-line);
+  --color-ring:       var(--brand-blue);
+  --color-primary:    var(--brand-orange);
+  --color-primary-foreground: var(--brand-white);
+  --color-secondary: var(--brand-bg-alt);
+  --color-secondary-foreground: var(--brand-ink);
+  --color-muted:     var(--brand-bg-alt);
+  --color-muted-foreground: var(--brand-muted);
+  --color-accent:    var(--brand-orange-soft);
+  --color-accent-foreground: var(--brand-orange);
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --radius: var(--brand-radius, 2px);
+}
+
+body {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
