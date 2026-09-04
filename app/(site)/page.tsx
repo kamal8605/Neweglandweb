@@ -1,12 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Send, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useProducts, type Product } from "@/hooks/useProducts";
+
+const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbook"), { ssr: false });
 
 const HERO_SLIDES = [
   { image: "/images/banners/tobacco-products-hero.png", alt: "Tobacco Products", href: "/shop" },
@@ -26,6 +29,12 @@ const CATEGORIES = [
 const TOP_BRANDS = [
   "Naked 100", "RAZ", "Pod Salt", "Brixz", "Silver Fox", "Geek Bar", "Sora",
   "Starmax", "Space Ultra", "Halo", "7OHMZ", "Crave", "Pod Juice", "Elysian Labs",
+] as const;
+
+const CATALOG_WORDS = ["Our Catalogs", "Premium Tobacco"] as const;
+const CATALOGS = [
+  { title: "Cigar Catalog", image: "/images/catalogs/cigar-catalog.jpg", pdf: "/catalogs/cigar-catalog.pdf" },
+  { title: "Product Catalog", image: "/images/catalogs/product-catalog.webp", pdf: "/catalogs/product-catalog.pdf" },
 ] as const;
 
 function HeroCarousel() {
@@ -205,9 +214,77 @@ function BrandStrip() {
           </Link>
         ))}
       </div>
-      <Link href="/shop" className="relative mx-auto mt-8 block aspect-[3/1] max-w-[1600px] overflow-hidden bg-brand-navy">
+      <Link href="/shop" className="hidden">
         <Image src="/images/banners/our-catalogs.png" alt="Our Catalogs — explore our wholesale collections" fill className="object-cover" sizes="(max-width: 1600px) 100vw, 1600px" />
       </Link>
+    </section>
+  );
+}
+
+function CatalogSection() {
+  const [wordIndex, setWordIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [openCatalog, setOpenCatalog] = useState<(typeof CATALOGS)[number] | null>(null);
+
+  useEffect(() => {
+    const word = CATALOG_WORDS[wordIndex];
+    const isComplete = typedText === word;
+    const isEmpty = typedText.length === 0;
+    const delay = isComplete && !isDeleting ? 1800 : isDeleting ? 45 : 95;
+    const timer = window.setTimeout(() => {
+      if (isComplete && !isDeleting) setIsDeleting(true);
+      else if (isDeleting && isEmpty) {
+        setIsDeleting(false);
+        setWordIndex((index) => (index + 1) % CATALOG_WORDS.length);
+      } else setTypedText(word.slice(0, typedText.length + (isDeleting ? -1 : 1)));
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [isDeleting, typedText, wordIndex]);
+
+  return (
+    <section className="bg-gradient-to-br from-brand-navy via-brand-blue-deep to-brand-navy px-5 py-10 md:px-10 md:py-14">
+      <div className="mx-auto grid max-w-[1513px] items-center gap-10 lg:grid-cols-[1.35fr_0.7fr_0.7fr] lg:gap-14">
+        <div className="text-white">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-brand-orange">Wholesale collections</p>
+          <h2 className="flex min-h-16 items-center text-4xl font-black uppercase italic tracking-tight sm:text-5xl">
+            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-11 w-1 animate-pulse bg-brand-orange" />
+          </h2>
+          <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
+          <div className="mt-7 h-1 w-20 bg-brand-orange" />
+        </div>
+        {CATALOGS.map((catalog) => (
+          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[260px] text-left">
+            <div className="catalog-book-body relative aspect-[210/297]">
+              <div aria-hidden="true" className="catalog-book-pages" />
+              <div className="catalog-book-cover">
+                <Image src={catalog.image} alt={catalog.title} fill sizes="(max-width: 1024px) 70vw, 260px" className="object-cover" />
+                <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-navy">{catalog.title}</span>
+              </div>
+              <span aria-hidden="true" className="catalog-book-spine" />
+            </div>
+          </button>
+        ))}
+      </div>
+      {openCatalog && <CatalogFlipbook file={openCatalog.pdf} title={openCatalog.title} onClose={() => setOpenCatalog(null)} />}
+    </section>
+  );
+}
+
+function NewsletterSection() {
+  return (
+    <section className="border-y border-brand-line bg-gradient-to-r from-brand-bg via-brand-white to-brand-orange-soft px-5 py-5 md:px-10">
+      <div className="mx-auto flex max-w-[1513px] flex-col items-center gap-4 md:flex-row md:justify-between md:gap-10">
+        <div className="flex shrink-0 items-center gap-3 text-brand-navy">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-orange-soft text-brand-orange"><Send size={19} strokeWidth={2} /></span>
+          <h2 className="text-base font-bold md:text-lg">Signup To Newsletter</h2>
+        </div>
+        <form className="flex w-full max-w-2xl overflow-hidden rounded-full bg-white shadow-[0_6px_20px_rgba(11,31,58,0.09)] ring-1 ring-brand-line" onSubmit={(event) => event.preventDefault()}>
+          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
+          <input id="newsletter-email" name="email" type="email" required placeholder="Enter your email address" className="min-w-0 flex-1 bg-transparent px-6 py-3 text-sm text-brand-navy outline-none placeholder:text-brand-muted" />
+          <button type="submit" className="shrink-0 bg-brand-orange px-6 py-3 text-xs font-bold text-white transition hover:bg-brand-navy">SignUp</button>
+        </form>
+      </div>
     </section>
   );
 }
@@ -226,6 +303,8 @@ export default function HomePage() {
       <ProductSection title="Top Cigar" products={products.slice(42, 56)} />
       <ProductSection title="7-Hydroxymitragynine" products={products.slice(56, 70)} />
       <BrandStrip />
+      <CatalogSection />
+      <NewsletterSection />
     </main>
   );
 }

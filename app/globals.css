@@ -86,3 +86,112 @@ textarea {
   outline-color: var(--brand-orange);
   outline-offset: 2px;
 }
+
+/* Catalog covers open from the spine like a physical book on pointer hover. */
+.catalog-book {
+  perspective: 1400px;
+  padding: 18px 22px 28px 10px;
+}
+
+.catalog-book-body {
+  transform: none;
+  transform-style: preserve-3d;
+  transition: transform 500ms cubic-bezier(.2, .75, .2, 1), filter 500ms ease;
+  filter: drop-shadow(10px 16px 14px rgba(0, 0, 0, .22));
+}
+
+.catalog-book-pages {
+  position: absolute;
+  inset: 5px 2px 5px 9px;
+  opacity: 0;
+  background: repeating-linear-gradient(90deg, #fff 0 3px, #e7e2da 3px 4px);
+  transform: translateZ(-10px);
+  box-shadow: 8px 7px 0 #d8d2c8, 13px 11px 22px rgba(0, 0, 0, .3);
+  transition: inset 500ms cubic-bezier(.2, .75, .2, 1), opacity 180ms ease;
+}
+
+.catalog-book-cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform-origin: left center;
+  transform: translateZ(3px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  box-shadow: 3px 0 0 color-mix(in srgb, var(--brand-orange) 65%, #000);
+  transition: transform 650ms cubic-bezier(.2, .8, .2, 1), box-shadow 650ms ease;
+}
+
+.catalog-book-spine {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 8px;
+  z-index: 3;
+  background: linear-gradient(90deg, rgba(0, 0, 0, .5), rgba(255, 255, 255, .16), rgba(0, 0, 0, .18));
+  transform: translateZ(7px);
+}
+
+.catalog-book-title {
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 300ms ease 140ms, transform 350ms ease 120ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .catalog-book:hover .catalog-book-body {
+    transform: translateY(-8px) rotateY(-2deg);
+    filter: drop-shadow(24px 30px 20px rgba(0, 0, 0, .38));
+  }
+
+  .catalog-book:hover .catalog-book-pages {
+    inset-right: -12px;
+    opacity: 1;
+  }
+
+  .catalog-book:hover .catalog-book-cover {
+    transform: translateZ(9px) rotateY(-31deg);
+    box-shadow: 14px 5px 22px rgba(0, 0, 0, .32);
+  }
+
+  .catalog-book:hover .catalog-book-title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-book-body,
+  .catalog-book-cover {
+    transition: none;
+  }
+}
+
+.react-pdf__Document {
+  display: flex;
+  max-height: 100%;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.catalog-pdf-book {
+  margin: auto;
+}
+
+.catalog-pdf-page {
+  overflow: hidden;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(11, 31, 58, .08);
+}
+
+.catalog-pdf-page .react-pdf__Page,
+.catalog-pdf-page .react-pdf__Page__canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.catalog-pdf-page .react-pdf__Page__canvas {
+  object-fit: contain;
+  background: #fff;
+}
