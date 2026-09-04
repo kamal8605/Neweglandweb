@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 /* ── Forge & Co. theme (default) ─────────────────────────────── */
@@ -13,7 +14,7 @@ html[data-theme="forge"] {
   --brand-orange:      #FF6B1A;
   --brand-orange-soft: #FFE8D6;
   --brand-white:       #FFFFFF;
-  --brand-radius:      2px;
+  --brand-radius:      0px;
 }
 
 /* ── Pallet theme ─────────────────────────────────────────────── */
@@ -29,7 +30,7 @@ html[data-theme="pallet"] {
   --brand-orange:      #F26B1F;
   --brand-orange-soft: #FFF1E6;
   --brand-white:       #FFFFFF;
-  --brand-radius:      10px;
+  --brand-radius:      0px;
 }
 
 /* ── Tailwind v4 theme tokens ─────────────────────────────────── */
@@ -67,9 +68,21 @@ html[data-theme="pallet"] {
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
 
-  --radius: var(--brand-radius, 2px);
+  --radius: var(--brand-radius, 0px);
 }
 
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: 0;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline-color: var(--brand-orange);
+  outline-offset: 2px;
 }

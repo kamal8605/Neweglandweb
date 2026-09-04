@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const MENU_ITEMS = [
@@ -17,7 +16,6 @@ export function UserAccountMenu() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -32,7 +30,6 @@ export function UserAccountMenu() {
   async function handleLogout() {
     setOpen(false);
     await logout();
-    router.push("/login");
   }
 
   return (

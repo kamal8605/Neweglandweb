@@ -8,6 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 
 export interface User {
@@ -36,6 +37,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,13 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem("auth_token");
     if (!stored) {
-      setIsLoading(false);
+      queueMicrotask(() => setIsLoading(false));
       return;
     }
-    setToken(stored);
     api
       .get<User>("/users/me")
-      .then((res) => setUser(res.data))
+      .then((res) => {
+        setToken(stored);
+        setUser(res.data);
+      })
       .catch(() => {
         localStorage.removeItem("auth_token");
         setToken(null);
@@ -67,7 +71,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("auth_token", access_token);
     setToken(access_token);
     setUser(userData);
-  }, []);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["products"] }),
+      queryClient.invalidateQueries({ queryKey: ["product"] }),
+    ]);
+  }, [queryClient]);
 
   const logout = useCallback(async () => {
     try {
@@ -78,7 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("auth_token");
     setToken(null);
     setUser(null);
-  }, []);
+    queryClient.removeQueries({ queryKey: ["products"] });
+    queryClient.removeQueries({ queryKey: ["product"] });
+  }, [queryClient]);
 
   const updateUser = useCallback((patch: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...patch } : prev));

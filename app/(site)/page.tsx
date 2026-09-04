@@ -1,434 +1,231 @@
 "use client";
 
-import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
-import { useCategories } from "@/hooks/useCategories";
-import { useBrands } from "@/hooks/useBrands";
+import Link from "next/link";
+import { ArrowRight, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import { useProducts, type Product } from "@/hooks/useProducts";
 
-// ── Stripe placeholder (matches reference design) ───────────────
-function Placeholder({
-  label,
-  tone = "warm",
-  className = "",
-}: {
-  label?: string;
-  tone?: "warm" | "cool" | "orange";
-  className?: string;
-}) {
-  const [a, b] =
-    tone === "cool"
-      ? ["#D6DEEC", "#C6D0E2"]
-      : tone === "orange"
-      ? ["#FFD9BD", "#FFC499"]
-      : ["#E5DFD0", "#D9D3C5"];
-  const fg =
-    tone === "cool" ? "#3A4866" : tone === "orange" ? "#7A3B12" : "#5A5751";
-
-  return (
-    <div
-      className={`w-full h-full flex items-center justify-center ${className}`}
-      style={{
-        background: `repeating-linear-gradient(135deg, ${a} 0 14px, ${b} 14px 28px)`,
-      }}
-    >
-      {label && (
-        <span
-          className="font-mono text-[10px] tracking-[0.08em] uppercase px-2 py-1 rounded-[2px]"
-          style={{ color: fg, background: "rgba(247,244,238,0.9)" }}
-        >
-          {label}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// ── Section A — Hero ─────────────────────────────────────────────
-function HeroSection() {
-  return (
-    <div className="grid border-b border-brand-line" style={{ gridTemplateColumns: "1.1fr 1fr" }}>
-      {/* Left — copy */}
-      <div className="px-16 py-20 relative">
-        {/* Eyebrow */}
-        <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.12em] uppercase text-brand-orange mb-7">
-          <span className="w-6 h-px bg-brand-orange shrink-0" />
-          SS26 WHOLESALE PREVIEW · OPEN NOW
-        </div>
-
-        {/* Headline */}
-        <h1 className="font-serif text-[82px] leading-[0.96] text-brand-ink m-0 tracking-[-0.02em] font-normal">
-          The wholesale
-          <br />
-          <em className="text-brand-blue not-italic">back-of-house</em>
-          <br />
-          for indie retail.
-        </h1>
-
-        {/* Sub-copy */}
-        <p className="text-[17px] leading-[1.55] text-brand-muted max-w-[480px] mt-8">
-          Six hundred vetted brands. One purchase order. Sixty-day terms.
-          Stock your shelves without stocking your spreadsheet.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex gap-3 mt-9">
-          <Link
-            href="/register"
-            className="flex items-center gap-2.5 bg-brand-ink text-brand-white px-7 py-4 text-[14px] font-medium rounded-[var(--brand-radius)] hover:bg-brand-navy transition-colors no-underline"
-          >
-            Apply for a buyer account
-            <ArrowRight size={14} className="text-brand-orange" />
-          </Link>
-          <Link
-            href="/shop"
-            className="flex items-center px-6 py-4 text-[14px] font-medium text-brand-ink border border-brand-ink rounded-[var(--brand-radius)] hover:bg-brand-ink hover:text-brand-white transition-colors no-underline"
-          >
-            Browse the catalog
-          </Link>
-        </div>
-
-        {/* Stat strip */}
-        <div className="mt-18 pt-7 border-t border-brand-line grid grid-cols-3" style={{ marginTop: "4.5rem" }}>
-          {[
-            { n: "612", l: "Vetted brands" },
-            { n: "12.4k", l: "SKUs in stock" },
-            { n: "Net-60", l: "Standard terms" },
-          ].map((s) => (
-            <div key={s.l}>
-              <div className="font-serif text-[44px] text-brand-navy leading-none font-normal">
-                {s.n}
-              </div>
-              <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted mt-2">
-                {s.l}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Right — imagery composition */}
-      <div className="bg-brand-bg-alt relative min-h-[680px]">
-        <div className="absolute inset-12">
-          <Placeholder label="Lifestyle · workshop scene" tone="warm" className="h-full" />
-        </div>
-
-        {/* "This week's drop" blue card */}
-        <div className="absolute bottom-12 left-12 right-40 bg-brand-blue text-white p-6 flex items-center justify-between">
-          <div>
-            <div className="font-mono text-[10px] tracking-[0.08em] uppercase opacity-70 mb-1">
-              This week&apos;s drop
-            </div>
-            <div className="text-[18px] font-medium">
-              Hudson Falls Pottery — 14 new stoneware pieces
-            </div>
-          </div>
-          <ArrowRight size={20} className="shrink-0 ml-4" />
-        </div>
-
-        {/* "Opening order $150" orange badge */}
-        <div className="absolute top-12 right-12 w-[140px] h-[140px] bg-brand-orange text-white flex flex-col justify-center p-4 font-mono">
-          <div className="text-[10px] tracking-[0.1em] opacity-85">OPENING ORDER</div>
-          <div className="font-serif text-[36px] leading-none mt-1.5">$150</div>
-          <div className="text-[10px] tracking-[0.06em] mt-1">FOR ALL BRANDS</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Section B — Category Grid ────────────────────────────────────
-const TONES: Array<"warm" | "orange" | "cool"> = [
-  "warm", "orange", "cool", "warm", "orange", "cool", "warm", "orange",
+const HERO_SLIDES = [
+  { image: "/images/banners/tobacco-products-hero.png", alt: "Tobacco Products", href: "/shop" },
+  { image: "/images/banners/disposable-vapes-hero.png", alt: "Disposable Vapes", href: "/shop?search=Disposable%20Vapes" },
+  { image: "/images/banners/premium-cigars-hero.png", alt: "Premium Cigars", href: "/shop?search=Cigars" },
 ];
+
+const CATEGORIES = [
+  ["Cigars", "/images/categories/cigars.png"], ["Detox & Synthetic", "/images/categories/detox-synthetic.png"],
+  ["Disposable Vapes", "/images/categories/disposable-vapes.png"], ["Kratom", "/images/categories/kratom.png"],
+  ["Nicotine Pouches", "/images/categories/nicotine-pouches.png"], ["Rolling Paper & Filters", "/images/categories/rolling-paper-filters.png"],
+  ["Salt E-Liquid", "/images/categories/salt-e-liquid.png"], ["Tobacco Products", "/images/categories/tobacco-products.png"],
+  ["Whip Cream Chargers", "/images/categories/whip-cream-chargers.png"], ["Big Torches", "/images/categories/big-torches.png"],
+  ["510 Batteries", "/images/categories/510-batteries.png"], ["Delta Products", "/images/categories/delta-products.png"],
+] as const;
+
+const TOP_BRANDS = [
+  "Naked 100", "RAZ", "Pod Salt", "Brixz", "Silver Fox", "Geek Bar", "Sora",
+  "Starmax", "Space Ultra", "Halo", "7OHMZ", "Crave", "Pod Juice", "Elysian Labs",
+] as const;
+
+function HeroCarousel() {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % HERO_SLIDES.length), 5000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const move = (direction: number) => setActive((value) => (value + direction + HERO_SLIDES.length) % HERO_SLIDES.length);
+
+  return (
+    <section className="relative overflow-hidden border-b border-brand-line bg-brand-navy" aria-label="Featured promotions">
+      <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
+        {HERO_SLIDES.map((slide, index) => (
+          <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
+            <Image src={slide.image} alt={slide.alt} fill priority={index === 0} unoptimized className="object-cover" sizes="100vw" />
+          </Link>
+        ))}
+        <button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
+        <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronRight size={24} /></button>
+      </div>
+    </section>
+  );
+}
+
+function ImageHeading({ image, title }: { image?: string; title: string }) {
+  if (!image) return <div className="my-6 bg-gradient-to-r from-brand-navy via-brand-blue to-brand-orange px-4 py-3 text-center"><h2 className="text-2xl font-black uppercase italic tracking-wide text-white md:text-4xl">{title}</h2></div>;
+  return <div className="relative my-6 aspect-[3/1] max-h-[430px] min-h-[150px] overflow-hidden bg-brand-navy"><Image src={image} alt={title} fill className="object-cover" sizes="100vw" /><h2 className="sr-only">{title}</h2></div>;
+}
 
 function CategoryGrid() {
-  const { data: categories, isLoading } = useCategories();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const physicalIndexRef = useRef<number>(CATEGORIES.length);
+  const loopResetRef = useRef<number | null>(null);
+  const [active, setActive] = useState(0);
 
-  const topLevel = (categories ?? []).filter((c) => !("parent_id" in c && (c as { parent_id?: number }).parent_id));
-  const displayed = topLevel.slice(0, 8);
+  const scrollToPhysicalIndex = useCallback((physicalIndex: number, behavior: ScrollBehavior = "smooth") => {
+    const track = trackRef.current;
+    if (!track) return;
 
-  return (
-    <section className="px-16 py-18" style={{ paddingTop: "4.5rem", paddingBottom: "3.5rem" }}>
-      {/* Section header */}
-      <div className="flex justify-between items-end mb-8">
-        <div>
-          <div className="font-mono text-[11px] tracking-[0.1em] uppercase text-brand-muted mb-2">
-            SECTION 01 · DEPARTMENTS
-          </div>
-          <h2 className="font-serif text-[44px] text-brand-ink font-normal tracking-tight m-0">
-            Stock the entire store.
-          </h2>
-        </div>
-        <Link
-          href="/shop"
-          className="font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted hover:text-brand-ink transition-colors no-underline"
-        >
-          VIEW ALL DEPARTMENTS →
-        </Link>
-      </div>
+    const card = track.children.item(physicalIndex) as HTMLElement | null;
+    if (!card) return;
 
-      {/* Grid */}
-      <div className="grid grid-cols-4 gap-4">
-        {isLoading
-          ? Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-brand-white border border-brand-line animate-pulse">
-                <div className="aspect-square bg-brand-bg-alt" />
-                <div className="p-4">
-                  <div className="h-4 bg-brand-bg-alt rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-brand-bg-alt rounded w-1/2" />
-                </div>
-              </div>
-            ))
-          : displayed.map((cat, i) => (
-              <Link
-                key={cat.id}
-                href={`/category/${cat.id}`}
-                className="bg-brand-white border border-brand-line hover:border-brand-blue transition-colors no-underline group"
-              >
-                <div className="aspect-square relative overflow-hidden">
-                  {cat.image ? (
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      sizes="25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <Placeholder label={cat.name} tone={TONES[i % TONES.length]} className="h-full" />
-                  )}
-                  <span className="absolute top-3 left-3 font-mono text-[10px] tracking-[0.08em] bg-brand-ink text-brand-white px-1.5 py-0.5">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <div className="px-4 py-3.5 flex justify-between items-center">
-                  <div>
-                    <div className="text-[15px] font-medium text-brand-ink">{cat.name}</div>
-                    {cat.products_count !== undefined && (
-                      <div className="font-mono text-[10px] tracking-[0.06em] text-brand-muted uppercase mt-1">
-                        {cat.products_count.toLocaleString()} SKUs
-                      </div>
-                    )}
-                  </div>
-                  <ArrowRight size={16} className="text-brand-blue shrink-0" />
-                </div>
-              </Link>
-            ))}
-      </div>
-    </section>
-  );
-}
+    const centeredLeft = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    track.scrollTo({ left: centeredLeft, behavior });
+    physicalIndexRef.current = physicalIndex;
+  }, []);
 
-// ── Section C — Featured Brands ──────────────────────────────────
-function FeaturedBrands() {
-  const { data: brands, isLoading } = useBrands();
-  const displayed = (brands ?? []).slice(0, 3);
+  const goToCategory = useCallback((index: number) => {
+    if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
+    scrollToPhysicalIndex(CATEGORIES.length + index);
+    setActive(index);
+  }, [scrollToPhysicalIndex]);
+
+  const move = useCallback((direction: number) => {
+    if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
+
+    const nextPhysical = physicalIndexRef.current + direction;
+    const next = ((nextPhysical % CATEGORIES.length) + CATEGORIES.length) % CATEGORIES.length;
+    scrollToPhysicalIndex(nextPhysical);
+    setActive(next);
+
+    if (nextPhysical < CATEGORIES.length || nextPhysical >= CATEGORIES.length * 2) {
+      loopResetRef.current = window.setTimeout(() => {
+        scrollToPhysicalIndex(CATEGORIES.length + next, "auto");
+      }, 500);
+    }
+  }, [scrollToPhysicalIndex]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => scrollToPhysicalIndex(CATEGORIES.length, "auto"));
+    return () => {
+      window.cancelAnimationFrame(frame);
+      if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
+    };
+  }, [scrollToPhysicalIndex]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => move(1), 5000);
+    return () => window.clearInterval(timer);
+  }, [move]);
 
   return (
-    <section className="px-16 bg-brand-bg-alt" style={{ paddingTop: "2.5rem", paddingBottom: "4.5rem" }}>
-      {/* Section header */}
-      <div className="pt-10 mb-8">
-        <div className="font-mono text-[11px] tracking-[0.1em] uppercase text-brand-muted mb-2">
-          SECTION 02 · MAKERS
-        </div>
-        <div className="flex justify-between items-end">
-          <h2 className="font-serif text-[44px] text-brand-ink font-normal tracking-tight m-0 max-w-[600px]">
-            Brands worth introducing your customers to.
-          </h2>
-          <span className="font-mono text-[11px] tracking-[0.06em] text-brand-muted uppercase">
-            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}
-          </span>
-        </div>
-      </div>
-
-      {/* 3-column editorial grid */}
-      {isLoading ? (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-brand-white border border-brand-line animate-pulse">
-              <div className={i === 0 ? "aspect-[16/11]" : "aspect-[4/3]"} style={{ background: "#E5DFD0" }} />
-              <div className="p-6">
-                <div className="h-3 bg-brand-bg rounded w-1/3 mb-3" />
-                <div className="h-6 bg-brand-bg rounded w-2/3 mb-2" />
-                <div className="h-3 bg-brand-bg rounded w-full" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
-          {/* Spotlight — first brand */}
-          {displayed[0] && (
-            <Link
-              href={`/brand/${displayed[0].id}`}
-              className="bg-brand-white border border-brand-line hover:border-brand-blue transition-colors no-underline group block"
-            >
-              <div className="aspect-[16/11] relative overflow-hidden">
-                {displayed[0].image ? (
-                  <Image
-                    src={displayed[0].image}
-                    alt={displayed[0].name}
-                    fill
-                    sizes="(max-width: 1440px) 50vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <Placeholder label={`${displayed[0].name} · studio`} tone="cool" className="h-full" />
-                )}
-                <span className="absolute top-4 left-4 bg-brand-orange text-white font-mono text-[10px] tracking-[0.08em] px-2 py-1">
-                  SPOTLIGHT
-                </span>
-              </div>
-              <div className="px-7 pt-6 pb-7">
-                <div className="font-mono text-[10px] tracking-[0.08em] text-brand-muted uppercase">
-                  {displayed[0].location ?? "USA"}
-                </div>
-                <div className="font-serif text-[32px] text-brand-ink mt-1.5 font-normal leading-tight">
-                  {displayed[0].name}
-                </div>
-                {displayed[0].description && (
-                  <p className="text-[14px] text-brand-muted leading-[1.5] mt-2.5 line-clamp-3 max-w-[480px]">
-                    {displayed[0].description}
-                  </p>
-                )}
-                <div className="flex gap-6 mt-4 font-mono text-[11px] tracking-[0.04em] text-brand-ink uppercase">
-                  <span className="text-brand-blue">→ SEE PRODUCTS</span>
-                  {displayed[0].products_count && (
-                    <span className="text-brand-muted">{displayed[0].products_count} SKUs</span>
-                  )}
-                </div>
-              </div>
+    <section className="bg-white pb-8">
+      <ImageHeading title="Our Categories" />
+      <div className="relative mx-auto max-w-[1600px] px-10">
+        <div ref={trackRef} className="flex snap-x snap-mandatory gap-3 overflow-x-hidden scroll-smooth">
+          {Array.from({ length: 3 }, (_, copyIndex) => CATEGORIES.map(([name, image]) => (
+            <Link key={`${copyIndex}-${name}`} href={`/shop?search=${encodeURIComponent(name)}`} aria-hidden={copyIndex !== 1} tabIndex={copyIndex === 1 ? undefined : -1} className="group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 text-center no-underline lg:w-[calc((100%-72px)/7)]">
+              <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><Image src={image} alt={name} fill sizes="(max-width: 1024px) 50vw, 14vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>
+              <h3 className="mt-3 min-h-8 text-[11px] font-black uppercase leading-4 text-brand-navy group-hover:text-brand-orange">{name}</h3>
             </Link>
-          )}
-
-          {/* Secondary brands */}
-          {displayed.slice(1, 3).map((brand, i) => (
-            <Link
-              key={brand.id}
-              href={`/brand/${brand.id}`}
-              className="bg-brand-white border border-brand-line hover:border-brand-blue transition-colors no-underline group block"
-            >
-              <div className="aspect-[4/3] relative overflow-hidden">
-                {brand.image ? (
-                  <Image
-                    src={brand.image}
-                    alt={brand.name}
-                    fill
-                    sizes="25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <Placeholder
-                    label={brand.name}
-                    tone={i === 0 ? "orange" : "warm"}
-                    className="h-full"
-                  />
-                )}
-              </div>
-              <div className="px-5 pt-5 pb-6">
-                <div className="font-mono text-[10px] tracking-[0.08em] text-brand-muted uppercase">
-                  {brand.location ?? "USA"}
-                </div>
-                <div className="font-serif text-[24px] text-brand-ink mt-1 font-normal leading-tight">
-                  {brand.name}
-                </div>
-                <div className="flex justify-between items-center mt-3 text-[12px] text-brand-muted">
-                  {brand.products_count !== undefined && (
-                    <span>{brand.products_count} SKUs</span>
-                  )}
-                  <ArrowRight size={16} className="text-brand-blue shrink-0" />
-                </div>
-              </div>
-            </Link>
-          ))}
-
-          {/* Empty states if API returns fewer than 3 brands */}
-          {displayed.length < 2 &&
-            Array.from({ length: 2 - Math.max(0, displayed.length - 1) }).map((_, i) => (
-              <div key={`empty-${i}`} className="bg-brand-white border border-brand-line">
-                <div className="aspect-[4/3]">
-                  <Placeholder tone={i === 0 ? "orange" : "warm"} className="h-full" />
-                </div>
-              </div>
-            ))}
+          )).flat())}
         </div>
-      )}
-
-      {/* View all brands */}
-      <div className="mt-8 text-center">
-        <Link
-          href="/brands"
-          className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] uppercase text-brand-muted hover:text-brand-ink transition-colors no-underline"
-        >
-          VIEW ALL BRANDS <ArrowRight size={12} />
-        </Link>
+        <button type="button" onClick={() => move(-1)} aria-label="Previous categories" className="absolute left-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center bg-brand-navy text-white hover:bg-brand-orange"><ChevronLeft size={20} /></button>
+        <button type="button" onClick={() => move(1)} aria-label="Next categories" className="absolute right-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center bg-brand-navy text-white hover:bg-brand-orange"><ChevronRight size={20} /></button>
       </div>
-    </section>
-  );
-}
-
-// ── Section D — Value Props ──────────────────────────────────────
-const VALUE_PROPS = [
-  {
-    n: "I.",
-    h: "Pay net-60, always.",
-    b: "Order today, pay in sixty days. No interest, no factoring fees, no fine print. We carry the float so you carry the inventory.",
-  },
-  {
-    n: "II.",
-    h: "Free returns on openers.",
-    b: "Didn't sell through? Send it back, full credit, on us. We'd rather buy back the box than burn the relationship.",
-  },
-  {
-    n: "III.",
-    h: "No exclusivity nonsense.",
-    b: "Stock our brands wherever else you like. We don't police your floor — we just want to be on it.",
-  },
-];
-
-function ValueProps() {
-  return (
-    <section className="px-16 py-22 bg-brand-navy text-white" style={{ paddingTop: "5.5rem", paddingBottom: "5.5rem" }}>
-      <div className="font-mono text-[11px] tracking-[0.1em] uppercase text-brand-orange mb-2">
-        SECTION 03 · THE FORGE PROMISE
-      </div>
-      <h2 className="font-serif text-[44px] font-normal tracking-tight max-w-[720px] text-white m-0 mb-14">
-        Three rules we don&apos;t bend on.
-      </h2>
-
-      <div
-        className="grid mt-0"
-        style={{
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "1px",
-          background: "#1E3358",
-        }}
-      >
-        {VALUE_PROPS.map((r) => (
-          <div key={r.n} className="bg-brand-navy px-7 py-8">
-            <div className="font-serif text-[56px] text-brand-orange leading-none italic">
-              {r.n}
-            </div>
-            <div className="font-serif text-[26px] mt-4 font-normal leading-[1.15] text-white">
-              {r.h}
-            </div>
-            <p className="text-[14px] leading-[1.6] text-[#9DAAC2] mt-3.5">{r.b}</p>
-          </div>
+      <div className="mt-4 flex justify-center gap-1.5">
+        {CATEGORIES.map(([name], index) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => goToCategory(index)}
+            aria-label={`Show ${name}`}
+            aria-current={index === active ? "true" : undefined}
+            className={`h-1.5 rounded-full transition-all hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────
-export default function HomePage() {
+const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+
+function ProductCard({ product }: { product: Product }) {
+  const { isAuthenticated, isApproved } = useAuth();
+  const { addItem } = useCart();
+  const image = product.image ?? product.images?.find((item) => item.is_primary)?.url;
+  const price = product.current_price ?? product.sale_price ?? product.regular_price;
+  const canShowPrice = isAuthenticated && isApproved && product.prices_visible && price !== null;
+  const canAdd = canShowPrice && price > 0 && product.type === "simple" && product.in_stock;
+  function addToCart() {
+    if (!canAdd || price === null) return;
+    addItem({ product_id: product.id, name: product.name, sku: product.sku, image: image ?? null, price, parent_id: product.parent_id }, 1);
+  }
   return (
-    <div className="bg-brand-bg">
-      <HeroSection />
+    <article className="product-card relative min-h-[390px] bg-white">
+      <div className="group relative z-0 flex min-h-[390px] flex-col bg-white px-4 pb-4 pt-4 transition-shadow duration-200 after:pointer-events-none after:absolute after:bottom-4 after:right-0 after:top-4 after:w-px after:bg-brand-line after:content-[''] hover:z-10 hover:shadow-[0_3px_14px_rgba(0,0,0,0.22)] hover:outline hover:outline-1 hover:outline-brand-line hover:after:opacity-0">
+        <Link href={`/product/${product.id}`} className="no-underline">
+          <div className="mb-2 min-h-[34px] text-[12px] uppercase leading-tight text-[#7A8DA3]">{product.category?.name ?? "Wholesale"}</div>
+          <h3 className="min-h-[72px] text-[15px] font-black uppercase leading-[1.16] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
+        </Link>
+        <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
+          {image ? <Image src={image} alt={product.name} fill unoptimized sizes="(max-width: 768px) 50vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
+        </Link>
+        <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
+          {!isAuthenticated ? (
+            <Link href="/login" className="inline-flex min-h-11 w-full items-center justify-center border-2 border-brand-navy bg-brand-navy px-4 py-2.5 text-[14px] font-bold text-white no-underline shadow-sm transition hover:border-brand-blue hover:bg-brand-blue">Login to Buy</Link>
+          ) : !canShowPrice ? (
+            <span className="inline-flex min-h-11 w-full items-center justify-center bg-brand-bg-alt px-4 py-2.5 text-center text-[12px] font-bold uppercase text-brand-muted">Pending Price Approval</span>
+          ) : (
+            <>
+              <span className="inline-flex flex-col"><span className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-brand-orange">Wholesale</span><span className="mt-1 text-[22px] font-medium leading-none text-[#374151]">{money(price)}</span></span>
+              {canAdd ? <button type="button" onClick={addToCart} aria-label={`Add ${product.name} to cart`} className="grid h-11 w-11 shrink-0 place-items-center border border-brand-navy bg-brand-navy text-white shadow-sm transition hover:border-brand-blue hover:bg-brand-blue"><ShoppingCart size={20} /></button> : <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`} className="grid h-11 w-11 shrink-0 place-items-center bg-[#E7E7E7] text-white no-underline transition group-hover:bg-brand-blue"><ArrowRight size={20} /></Link>}
+            </>
+          )}
+        </div>
+        {!product.in_stock && <span className="absolute left-0 top-0 bg-red-600 px-2 py-1 text-[13px] font-black text-white">Sold Out</span>}
+      </div>
+    </article>
+  );
+}
+
+function ProductSection({ title, art, products }: { title: string; art?: string; products: Product[] }) {
+  return (
+    <section className="bg-white">
+      <ImageHeading image={art} title={title} />
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-t border-brand-line md:grid-cols-3 lg:grid-cols-7">
+        {products.map((product) => <ProductCard key={`${title}-${product.id}`} product={product} />)}
+      </div>
+    </section>
+  );
+}
+
+function BrandStrip() {
+  return (
+    <section className="bg-white pb-10">
+      <ImageHeading title="Top Brands" />
+      <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-7">
+        {TOP_BRANDS.map((name) => (
+          <Link key={name} href={`/shop?search=${encodeURIComponent(name)}`} className="group flex h-20 items-center justify-center px-3 text-center no-underline transition duration-200 hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)] md:h-24">
+            <span className="relative text-base font-black uppercase italic tracking-tight text-brand-navy transition group-hover:-translate-y-0.5 group-hover:text-brand-orange md:text-xl">
+              {name}
+              <span className="absolute -bottom-2 left-1/2 h-0.5 w-5 -translate-x-1/2 bg-brand-orange transition-all duration-200 group-hover:w-full" />
+            </span>
+          </Link>
+        ))}
+      </div>
+      <Link href="/shop" className="relative mx-auto mt-8 block aspect-[3/1] max-w-[1600px] overflow-hidden bg-brand-navy">
+        <Image src="/images/banners/our-catalogs.png" alt="Our Catalogs — explore our wholesale collections" fill className="object-cover" sizes="(max-width: 1600px) 100vw, 1600px" />
+      </Link>
+    </section>
+  );
+}
+
+export default function HomePage() {
+  const { data } = useProducts({ sort: "newest", per_page: 70 });
+  const products = data?.data ?? [];
+  return (
+    <main className="bg-white">
+      <h1 className="sr-only">Wholesale Disposable Vapes in New Hampshire</h1>
+      <HeroCarousel />
       <CategoryGrid />
-      <FeaturedBrands />
-      <ValueProps />
-    </div>
+      <ProductSection title="New Arrivals" products={products.slice(0, 14)} />
+      <ProductSection title="Top Disposables" products={products.slice(14, 28)} />
+      <ProductSection title="Top E-Liquid" products={products.slice(28, 42)} />
+      <ProductSection title="Top Cigar" products={products.slice(42, 56)} />
+      <ProductSection title="7-Hydroxymitragynine" products={products.slice(56, 70)} />
+      <BrandStrip />
+    </main>
   );
 }
