@@ -214,9 +214,6 @@ function BrandStrip() {
           </Link>
         ))}
       </div>
-      <Link href="/shop" className="hidden">
-        <Image src="/images/banners/our-catalogs.png" alt="Our Catalogs — explore our wholesale collections" fill className="object-cover" sizes="(max-width: 1600px) 100vw, 1600px" />
-      </Link>
     </section>
   );
 }
