@@ -243,28 +243,30 @@ function CatalogSection() {
   }, [isDeleting, typedText, wordIndex]);
 
   return (
-    <section className="bg-gradient-to-br from-brand-navy via-brand-blue-deep to-brand-navy px-5 py-10 md:px-10 md:py-14">
-      <div className="mx-auto grid max-w-[1513px] items-center gap-10 lg:grid-cols-[1.35fr_0.7fr_0.7fr] lg:gap-14">
+    <section className="bg-white p-2 sm:p-4 lg:p-6">
+      <div className="relative isolate overflow-hidden rounded-[34px] border-t-4 border-brand-orange bg-gradient-to-br from-brand-navy via-brand-blue-deep to-brand-navy px-5 py-10 shadow-[0_16px_40px_rgba(11,31,58,0.18)] md:px-8 md:py-14 lg:px-10">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "205px 205px" }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_82%_15%,rgba(242,107,31,0.20),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.04),transparent_45%)]" />
+        <div className="mx-auto grid max-w-[1780px] items-center gap-8 lg:grid-cols-[1.15fr_0.9fr_0.9fr] lg:gap-8 xl:gap-12">
         <div className="text-white">
-          <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-brand-orange">Wholesale collections</p>
-          <h2 className="flex min-h-16 items-center text-4xl font-black uppercase italic tracking-tight sm:text-5xl">
-            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-11 w-1 animate-pulse bg-brand-orange" />
+          <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
+            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-12 w-1 animate-pulse bg-white" />
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
-          <div className="mt-7 h-1 w-20 bg-brand-orange" />
         </div>
         {CATALOGS.map((catalog) => (
-          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[260px] text-left">
+          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[420px] text-left">
             <div className="catalog-book-body relative aspect-[210/297]">
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
-                <Image src={catalog.image} alt={catalog.title} fill sizes="(max-width: 1024px) 70vw, 260px" className="object-cover" />
+                <Image src={catalog.image} alt={catalog.title} fill sizes="(max-width: 1024px) 70vw, 420px" className="object-cover" />
                 <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-navy">{catalog.title}</span>
               </div>
               <span aria-hidden="true" className="catalog-book-spine" />
             </div>
           </button>
         ))}
+        </div>
       </div>
       {openCatalog && <CatalogFlipbook file={openCatalog.pdf} title={openCatalog.title} onClose={() => setOpenCatalog(null)} />}
     </section>
