@@ -279,10 +279,10 @@ function NewsletterSection() {
           <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-orange-soft text-brand-orange"><Send size={19} strokeWidth={2} /></span>
           <h2 className="text-base font-bold md:text-lg">Signup To Newsletter</h2>
         </div>
-        <form className="flex w-full max-w-2xl overflow-hidden rounded-full bg-white shadow-[0_6px_20px_rgba(11,31,58,0.09)] ring-1 ring-brand-line" onSubmit={(event) => event.preventDefault()}>
+        <form className="flex min-h-14 w-full max-w-2xl overflow-hidden border border-[#ded2c4] bg-white shadow-[0_8px_24px_rgba(11,31,58,0.10)] transition focus-within:border-brand-orange focus-within:ring-2 focus-within:ring-brand-orange/20" onSubmit={(event) => event.preventDefault()}>
           <label htmlFor="newsletter-email" className="sr-only">Email address</label>
-          <input id="newsletter-email" name="email" type="email" required placeholder="Enter your email address" className="min-w-0 flex-1 bg-transparent px-6 py-3 text-sm text-brand-navy outline-none placeholder:text-brand-muted" />
-          <button type="submit" className="shrink-0 bg-brand-orange px-6 py-3 text-xs font-bold text-white transition hover:bg-brand-navy">SignUp</button>
+          <input id="newsletter-email" name="email" type="email" required placeholder="Enter your email address" className="min-w-0 flex-1 bg-white px-7 py-3 text-base text-brand-navy outline-none placeholder:text-brand-muted" />
+          <button type="submit" className="min-w-28 shrink-0 bg-brand-orange px-7 py-3 text-sm font-extrabold text-white transition hover:bg-brand-navy focus-visible:bg-brand-navy">SignUp</button>
         </form>
       </div>
     </section>
