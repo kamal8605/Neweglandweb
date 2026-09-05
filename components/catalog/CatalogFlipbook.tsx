@@ -10,6 +10,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+const PDF_OPTIONS = { wasmUrl: "/pdfjs/wasm/" };
+
 interface FlipbookProps {
   file: string;
   title: string;
@@ -23,9 +25,13 @@ interface FlipbookHandle {
   };
 }
 
-const PdfPage = forwardRef<HTMLDivElement, { pageNumber: number }>(({ pageNumber }, ref) => (
+const PdfPage = forwardRef<HTMLDivElement, { pageNumber: number; width: number; shouldRender: boolean }>(({ pageNumber, width, shouldRender }, ref) => (
   <div ref={ref} className="catalog-pdf-page bg-white" data-density={pageNumber === 1 ? "hard" : "soft"}>
-    <Page pageNumber={pageNumber} width={600} renderTextLayer={false} renderAnnotationLayer={false} loading={<div className="grid h-full place-items-center bg-white text-brand-muted">Loading page…</div>} />
+    {shouldRender ? (
+      <Page pageNumber={pageNumber} width={width} devicePixelRatio={1} renderMode="canvas" renderTextLayer={false} renderAnnotationLayer={false} loading={<div className="grid h-full place-items-center bg-white text-brand-muted">Loading page…</div>} />
+    ) : (
+      <div className="h-full w-full bg-white" aria-hidden="true" />
+    )}
   </div>
 ));
 PdfPage.displayName = "PdfPage";
@@ -34,6 +40,8 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
   const bookRef = useRef<FlipbookHandle | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageRatio, setPageRatio] = useState(255 / 330);
+  const [bookSize, setBookSize] = useState({ width: 460, height: 598 });
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -46,6 +54,18 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
     };
   }, [onClose]);
 
+  useEffect(() => {
+    const fitBookToViewport = () => {
+      const availableHeight = Math.max(260, window.innerHeight - 190);
+      const availablePageWidth = Math.max(200, (window.innerWidth - 190) / 2);
+      const height = Math.floor(Math.min(780, availableHeight, availablePageWidth / pageRatio));
+      setBookSize({ width: Math.floor(height * pageRatio), height });
+    };
+    fitBookToViewport();
+    window.addEventListener("resize", fitBookToViewport);
+    return () => window.removeEventListener("resize", fitBookToViewport);
+  }, [pageRatio]);
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black/90 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={title}>
       <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/15 px-4 text-white md:px-7">
@@ -54,23 +74,35 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
       </div>
 
       <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden px-12 py-5 md:px-20">
-        <Document file={file} onLoadSuccess={({ numPages }) => setPageCount(numPages)} loading={<LoaderCircle className="animate-spin text-white" size={42} />} error={<p className="text-white">Catalog could not be loaded.</p>}>
+        <Document
+          file={file}
+          options={PDF_OPTIONS}
+          onLoadSuccess={async (document) => {
+            setPageCount(document.numPages);
+            const firstPage = await document.getPage(1);
+            const viewport = firstPage.getViewport({ scale: 1 });
+            setPageRatio(viewport.width / viewport.height);
+          }}
+          loading={<LoaderCircle className="animate-spin text-white" size={42} />}
+          error={<p className="text-white">Catalog could not be loaded.</p>}
+        >
           {pageCount > 0 && (
             <HTMLFlipBook
+              key={`${bookSize.width}-${bookSize.height}`}
               ref={bookRef}
               className="catalog-pdf-book"
               style={{}}
-              width={600}
-              height={780}
-              size="stretch"
-              minWidth={280}
-              maxWidth={600}
-              minHeight={364}
-              maxHeight={780}
+              width={bookSize.width}
+              height={bookSize.height}
+              size="fixed"
+              minWidth={bookSize.width}
+              maxWidth={bookSize.width}
+              minHeight={bookSize.height}
+              maxHeight={bookSize.height}
               startPage={0}
               drawShadow
               flippingTime={900}
-              usePortrait
+              usePortrait={false}
               startZIndex={0}
               autoSize
               maxShadowOpacity={0.65}
@@ -83,7 +115,14 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
               disableFlipByClick={false}
               onFlip={(event) => setCurrentPage(Number(event.data))}
             >
-              {Array.from({ length: pageCount }, (_, index) => <PdfPage key={index + 1} pageNumber={index + 1} />)}
+              {Array.from({ length: pageCount }, (_, index) => (
+                <PdfPage
+                  key={index + 1}
+                  pageNumber={index + 1}
+                  width={bookSize.width}
+                  shouldRender={index >= currentPage - 4 && index <= currentPage + 6}
+                />
+              ))}
             </HTMLFlipBook>
           )}
         </Document>
