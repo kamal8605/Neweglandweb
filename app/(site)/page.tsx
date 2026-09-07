@@ -50,7 +50,7 @@ function HeroCarousel() {
       <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
         {HERO_SLIDES.map((slide, index) => (
           <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-            <Image src={slide.image} alt={slide.alt} fill priority={index === 0} unoptimized className="object-cover" sizes="100vw" />
+            <Image src={slide.image} alt={slide.alt} fill loading={index === 0 ? "eager" : "lazy"} unoptimized className="object-cover" sizes="100vw" />
           </Link>
         ))}
         <button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
@@ -189,9 +189,18 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-function ProductSection({ title, art, products }: { title: string; art?: string; products: Product[] }) {
+function ProductSection({ title, art, promos, products }: { title: string; art?: string; promos?: readonly [string, string]; products: Product[] }) {
   return (
     <section className="bg-white">
+      {promos && (
+        <div className="mx-auto grid max-w-[1900px] grid-cols-1 gap-3 bg-white px-1 py-3 md:grid-cols-2 md:px-2">
+          {promos.map((image, index) => (
+            <div key={image} className="relative aspect-[3/1] min-h-[110px] overflow-hidden bg-brand-navy">
+              <Image src={image} alt={`${title} promotional banner ${index + 1}`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+            </div>
+          ))}
+        </div>
+      )}
       <ImageHeading image={art} title={title} />
       <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-t border-brand-line md:grid-cols-3 lg:grid-cols-7">
         {products.map((product) => <ProductCard key={`${title}-${product.id}`} product={product} />)}
@@ -241,9 +250,9 @@ function CatalogSection() {
 
   return (
     <section className="bg-white p-2 sm:p-4 lg:p-6">
-      <div className="relative isolate overflow-hidden rounded-[34px] border-t-4 border-brand-orange bg-gradient-to-br from-brand-navy via-brand-blue-deep to-brand-navy px-5 py-10 shadow-[0_16px_40px_rgba(11,31,58,0.18)] md:px-8 md:py-14 lg:px-10">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "205px 205px" }} />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_82%_15%,rgba(242,107,31,0.20),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.04),transparent_45%)]" />
+      <div className="relative isolate overflow-hidden rounded-[34px] bg-gradient-to-br from-[#82cae9] via-[#52b2de] to-[#1976c7] px-5 py-10 shadow-[0_16px_40px_rgba(11,31,58,0.18)] md:px-8 md:py-14 lg:px-10">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12] mix-blend-multiply" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "205px 205px" }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-white/15 via-transparent to-brand-blue/15" />
         <div className="mx-auto grid max-w-[1780px] items-center gap-8 lg:grid-cols-[1.15fr_0.9fr_0.9fr] lg:gap-8 xl:gap-12">
         <div className="text-white">
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
@@ -257,7 +266,7 @@ function CatalogSection() {
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
                 <Image src={catalog.image} alt={catalog.title} fill sizes="(max-width: 1024px) 70vw, 420px" className="object-cover" />
-                <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-navy">{catalog.title}</span>
+                <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-medium text-brand-navy">{catalog.title}</span>
               </div>
               <span aria-hidden="true" className="catalog-book-spine" />
             </div>
@@ -298,9 +307,9 @@ export default function HomePage() {
       <CategoryGrid />
       <ProductSection title="New Arrivals" products={products.slice(0, 14)} />
       <ProductSection title="Top Disposables" products={products.slice(14, 28)} />
-      <ProductSection title="Top E-Liquid" products={products.slice(28, 42)} />
-      <ProductSection title="Top Cigar" products={products.slice(42, 56)} />
-      <ProductSection title="7-Hydroxymitragynine" products={products.slice(56, 70)} />
+      <ProductSection title="Top E-Liquid" promos={["/images/banners/e-liquid-tropical.png", "/images/banners/e-liquid-night.png"]} products={products.slice(28, 42)} />
+      <ProductSection title="Top Cigar" promos={["/images/banners/cigar-tropical.png", "/images/banners/cigar-night.png"]} products={products.slice(42, 56)} />
+      <ProductSection title="7-Hydroxymitragynine" promos={["/images/banners/hydroxy-tropical.png", "/images/banners/hydroxy-night.png"]} products={products.slice(56, 70)} />
       <BrandStrip />
       <CatalogSection />
       <NewsletterSection />

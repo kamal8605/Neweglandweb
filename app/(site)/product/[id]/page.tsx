@@ -91,7 +91,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
                 i === active ? "border-brand-orange" : "border-brand-line hover:border-brand-blue"
               }`}
             >
-              <Image src={img.url} alt={`${name} ${i + 1}`} fill className="object-contain" />
+              <Image src={img.url} alt={`${name} ${i + 1}`} fill sizes="(max-width: 1024px) 100vw, 50vw" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
             </button>
           ))}
         </div>

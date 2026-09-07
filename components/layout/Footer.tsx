@@ -21,7 +21,7 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr_1fr_1.15fr] lg:gap-16">
           <div>
             <Link href="/" aria-label="New England Distribution home">
-              <Image src="/images/brand/new-england-logo.png" alt="New England Smoke Distribution" width={180} height={180} className="h-44 w-44 object-contain" />
+              <Image src="/images/brand/new-england-logo.png" alt="New England Smoke Distribution" width={180} height={180} loading="eager" className="h-44 w-44 object-contain" />
             </Link>
             <h3 className="mt-4 text-xl font-bold">Contact Info</h3>
             <address className="mt-2 space-y-1 text-sm not-italic leading-6 text-[#f2f2f2]">
