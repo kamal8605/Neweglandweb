@@ -249,19 +249,22 @@ function CatalogSection() {
   }, [isDeleting, typedText, wordIndex]);
 
   return (
-    <section className="bg-white p-2 sm:p-4 lg:p-6">
-      <div className="relative isolate overflow-hidden rounded-[34px] bg-gradient-to-br from-[#82cae9] via-[#52b2de] to-[#1976c7] px-5 py-10 shadow-[0_16px_40px_rgba(11,31,58,0.18)] md:px-8 md:py-14 lg:px-10">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12] mix-blend-multiply" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "205px 205px" }} />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-white/15 via-transparent to-brand-blue/15" />
-        <div className="mx-auto grid max-w-[1780px] items-center gap-8 lg:grid-cols-[1.15fr_0.9fr_0.9fr] lg:gap-8 xl:gap-12">
-        <div className="text-white">
+    <section className="bg-white px-2 py-6 sm:px-4 lg:px-6 lg:py-10">
+      <div className="relative isolate overflow-hidden border border-brand-navy/10 bg-brand-navy px-5 py-10 shadow-[0_18px_45px_rgba(11,31,58,0.22)] md:px-8 md:py-14 lg:px-12 lg:py-16">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-brand-orange" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue-deep/25 via-transparent to-black/25" />
+        <div className="mx-auto grid max-w-[1600px] items-center gap-10 lg:grid-cols-[1.1fr_0.85fr_0.85fr] lg:gap-10 xl:gap-16">
+        <div className="max-w-xl text-white lg:pr-4">
+          <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">New England Distro</span>
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
-            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-12 w-1 animate-pulse bg-white" />
+            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-11 w-1 animate-pulse bg-brand-orange" />
           </h2>
-          <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
+          <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
+          <div aria-hidden="true" className="mt-7 h-px w-24 bg-brand-orange" />
         </div>
         {CATALOGS.map((catalog) => (
-          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[420px] text-left">
+          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[350px] text-left focus-visible:outline-2 focus-visible:outline-brand-orange">
             <div className="catalog-book-body relative aspect-[210/297]">
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
