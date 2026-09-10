@@ -61,8 +61,8 @@ function HeroCarousel() {
 }
 
 function ImageHeading({ image, title }: { image?: string; title: string }) {
-  if (!image) return <div className="my-6 bg-gradient-to-r from-brand-navy via-brand-blue to-brand-orange px-4 py-3 text-center"><h2 className="text-2xl font-black uppercase italic tracking-wide text-white md:text-4xl">{title}</h2></div>;
-  return <div className="relative my-6 aspect-[3/1] max-h-[430px] min-h-[150px] overflow-hidden bg-brand-navy"><Image src={image} alt={title} fill className="object-cover" sizes="100vw" /><h2 className="sr-only">{title}</h2></div>;
+  if (!image) return <div className="mt-6 bg-gradient-to-r from-brand-navy via-brand-blue to-brand-orange px-4 py-3 text-center"><h2 className="text-2xl font-black uppercase italic tracking-wide text-white md:text-4xl">{title}</h2></div>;
+  return <div className="relative mt-6 aspect-[3/1] max-h-[430px] min-h-[150px] overflow-hidden bg-brand-navy"><Image src={image} alt={title} fill className="object-cover" sizes="100vw" /><h2 className="sr-only">{title}</h2></div>;
 }
 
 function CategoryGrid() {
@@ -202,7 +202,7 @@ function ProductSection({ title, art, promos, products }: { title: string; art?:
         </div>
       )}
       <ImageHeading image={art} title={title} />
-      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-t border-brand-line md:grid-cols-3 lg:grid-cols-7">
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-7">
         {products.map((product) => <ProductCard key={`${title}-${product.id}`} product={product} />)}
       </div>
     </section>
