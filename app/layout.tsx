@@ -23,7 +23,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_COMPANY_NAME ?? "Forge & Co.",
+  title: "Best Disposable Vapes Wholesale - New Hampshire",
   description: "B2B wholesale ecommerce for indie retail buyers.",
 };
 
