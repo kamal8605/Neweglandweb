@@ -27,14 +27,14 @@ export function UtilityBar() {
     return (
       <header className="border-t-[3px] border-brand-ink bg-white">
         <div className="mx-auto flex min-h-[76px] max-w-[1500px] items-center gap-5 px-4 py-3 lg:px-10">
-          <Logo size={36} />
+          <Logo size={88} />
 
           <div className="mx-auto hidden items-center gap-7 text-[12px] text-brand-muted md:flex">
-            <a href="tel:+19145395580" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
-              <Phone size={14} /> +1 (914) 539-5580
+            <a href="tel:+16175486419" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
+              <Phone size={14} /> +1 617-548-6419
             </a>
-            <a href="mailto:info@forgesmokedistro.com" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
-              <Mail size={15} /> info@forgesmokedistro.com
+            <a href="mailto:sales@newenglanddistro.com" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
+              <Mail size={15} /> sales@newenglanddistro.com
             </a>
           </div>
 
@@ -56,11 +56,11 @@ export function UtilityBar() {
       <div className="border-b border-brand-line bg-brand-bg-alt px-4 py-2 text-[11px] text-brand-muted lg:px-10">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4">
           <div className="flex items-center gap-5">
-            <a href="tel:+19145395580" className="inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue">
-              <Phone size={12} /> +1 (914) 539-5580
+            <a href="tel:+16175486419" className="inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue">
+              <Phone size={12} /> +1 617-548-6419
             </a>
-            <a href="mailto:info@forgesmokedistro.com" className="hidden items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex">
-              <Mail size={13} /> info@forgesmokedistro.com
+            <a href="mailto:sales@newenglanddistro.com" className="hidden items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex">
+              <Mail size={13} /> sales@newenglanddistro.com
             </a>
           </div>
           {isAuthenticated ? (
@@ -77,7 +77,7 @@ export function UtilityBar() {
       </div>
 
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-4 px-4 py-5 lg:flex-nowrap lg:gap-8 lg:px-10">
-        <Logo size={48} />
+        <Logo size={88} />
         {isAuthenticated && (
           <form onSubmit={handleSearch} className="order-3 flex w-full overflow-hidden rounded-none border border-brand-line bg-white shadow-sm transition-all focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-brand-blue/15 lg:order-none lg:mx-auto lg:max-w-[720px]">
             <label htmlFor="site-search" className="sr-only">Search products, brands, or categories</label>
