@@ -35,6 +35,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const COOKIE_AUTH_ENABLED = process.env.NEXT_PUBLIC_COOKIE_AUTH === "true";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -42,10 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    const handleExpiredSession = () => {
+      setToken(null);
+      setUser(null);
+      queryClient.clear();
+    };
+    window.addEventListener("auth:expired", handleExpiredSession);
+    return () => window.removeEventListener("auth:expired", handleExpiredSession);
+  }, [queryClient]);
+
   // On mount: validate stored token by fetching current user
   useEffect(() => {
     const stored = localStorage.getItem("auth_token");
-    if (!stored) {
+    if (!stored && !COOKIE_AUTH_ENABLED) {
       queueMicrotask(() => setIsLoading(false));
       return;
     }
@@ -64,12 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await api.post<{
-      access_token: string;
+      access_token?: string;
       user: User;
     }>("/auth/login", { email, password });
     const { access_token, user: userData } = res.data;
-    localStorage.setItem("auth_token", access_token);
-    setToken(access_token);
+    queryClient.clear();
+    if (access_token && !COOKIE_AUTH_ENABLED) localStorage.setItem("auth_token", access_token);
+    setToken(access_token ?? null);
     setUser(userData);
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["products"] }),
@@ -86,8 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("auth_token");
     setToken(null);
     setUser(null);
-    queryClient.removeQueries({ queryKey: ["products"] });
-    queryClient.removeQueries({ queryKey: ["product"] });
+    queryClient.clear();
   }, [queryClient]);
 
   const updateUser = useCallback((patch: Partial<User>) => {

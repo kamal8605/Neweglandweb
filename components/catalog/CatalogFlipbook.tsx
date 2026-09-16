@@ -152,9 +152,12 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
   }, [isSinglePage, pageRatio]);
 
   useEffect(() => {
-    fitBookToViewport();
+    const timer = window.setTimeout(fitBookToViewport, 0);
     window.addEventListener("resize", fitBookToViewport);
-    return () => window.removeEventListener("resize", fitBookToViewport);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", fitBookToViewport);
+    };
   }, [fitBookToViewport]);
 
   // Handle escape key and body overflow lock

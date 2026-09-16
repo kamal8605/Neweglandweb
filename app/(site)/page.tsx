@@ -50,7 +50,7 @@ function HeroCarousel() {
       <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
         {HERO_SLIDES.map((slide, index) => (
           <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-            <Image src={slide.image} alt={slide.alt} fill loading={index === 0 ? "eager" : "lazy"} unoptimized className="object-cover" sizes="100vw" />
+            <Image src={slide.image} alt={slide.alt} fill loading="eager" unoptimized className="object-cover" sizes="100vw" />
           </Link>
         ))}
         <button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
@@ -258,7 +258,7 @@ function CatalogSection() {
         <div className="max-w-xl text-white lg:pr-4">
           <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">New England Distro</span>
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
-            <span>{typedText}</span><span aria-hidden="true" className="ml-2 inline-block h-11 w-1 animate-pulse bg-brand-orange" />
+            <span className="typing-cursor">{typedText}</span>
           </h2>
           <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
           <div aria-hidden="true" className="mt-7 h-px w-24 bg-brand-orange" />

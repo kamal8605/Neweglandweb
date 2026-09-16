@@ -8,6 +8,7 @@ export interface Category {
   description?: string;
   image?: string | null;
   products_count?: number;
+  parent_id?: number | null;
   children?: Category[];
 }
 

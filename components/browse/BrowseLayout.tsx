@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { X, SlidersHorizontal, LayoutList, LayoutGrid } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -155,7 +155,7 @@ export function BrowseLayout({
 
   // ── Cart ───────────────────────────────────────────────────────────────────
 
-  const handleAddToCart = useCallback(() => {
+  const handleAddToCart = () => {
     products.forEach((p) => {
       const qty = qtyMap[p.id];
       if (qty && qty > 0 && p.in_stock) {
@@ -174,7 +174,7 @@ export function BrowseLayout({
       }
     });
     setQtyMap({});
-  }, [products, qtyMap, addItem]);
+  };
 
   const selectedCount = Object.values(qtyMap).filter((q) => q > 0).length;
 

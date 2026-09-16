@@ -125,7 +125,7 @@ export default function LoginPage() {
               <label className="block text-[12px] font-semibold text-brand-ink">
                 Password
               </label>
-              <a href="#" className="text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors">
+              <a href="mailto:sales@newenglanddistro.com?subject=Password%20reset%20request" className="text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors">
                 Forgot password?
               </a>
             </div>

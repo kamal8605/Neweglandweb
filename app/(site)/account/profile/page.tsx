@@ -32,9 +32,9 @@ export default function EditProfilePage() {
       );
       updateUser({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone, address: res.data.user.address });
       setSuccess(true);
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ?? "Failed to update profile. Please try again.";
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message ?? "Failed to update profile. Please try again.";
       setError(msg);
     } finally {
       setSaving(false);

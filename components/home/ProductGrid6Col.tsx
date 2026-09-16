@@ -2,14 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 
 const OFFICIAL_PLACEHOLDER = "https://centralsmokedistro.com/wp-content/uploads/2024/09/placeholder-1-1-1-1-300x300.jpg";
 
 // Exact products from live site screenshot 2
-const ORIGINAL_PRODUCTS_ROW1 = [
+interface LegacyProduct {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  isSoldOut: boolean;
+  isNew: boolean;
+  current_price?: number | null;
+  sale_price?: number | null;
+  sku?: string;
+  parent_id?: number | null;
+}
+
+const ORIGINAL_PRODUCTS_ROW1: LegacyProduct[] = [
   {
     id: 101,
     name: "QUICK FIX PLUS",
@@ -68,7 +80,7 @@ const ORIGINAL_PRODUCTS_ROW1 = [
   },
 ];
 
-const ORIGINAL_PRODUCTS_ROW2 = [
+const ORIGINAL_PRODUCTS_ROW2: LegacyProduct[] = [
   {
     id: 201,
     name: "SMOK NOVO X CLEAR POD 3PCS – DC 0.80 OHMS MTL",
@@ -134,7 +146,6 @@ interface ProductGridProps {
 }
 
 export function ProductGrid6Col({ titleText, showComingSoonRow, showRow2 }: ProductGridProps) {
-  const { data, isLoading } = useProducts({ page: 1, per_page: 7 });
   const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
 
@@ -143,7 +154,7 @@ export function ProductGrid6Col({ titleText, showComingSoonRow, showRow2 }: Prod
     productsToDisplay = ORIGINAL_PRODUCTS_ROW2;
   }
 
-  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+  const handleAddToCart = (e: React.MouseEvent, product: LegacyProduct) => {
     e.preventDefault();
     if (!isAuthenticated) return;
     

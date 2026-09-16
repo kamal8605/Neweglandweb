@@ -141,8 +141,8 @@ export default function CartPage() {
   return (
     <div className="bg-brand-bg min-h-screen pb-20">
       {/* Page header */}
-      <div className="px-8 py-5 border-b border-brand-line bg-brand-white">
-        <div className="flex items-start justify-between">
+      <div className="border-b border-brand-line bg-brand-white px-4 py-5 sm:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="font-serif text-[36px] font-normal text-brand-ink leading-none">
               Cart · draft P.O.
@@ -153,7 +153,7 @@ export default function CartPage() {
                 : "Your cart is empty"}
             </div>
           </div>
-          <StepIndicator step={1} />
+          <div className="max-w-full overflow-x-auto"><StepIndicator step={1} /></div>
         </div>
       </div>
 
@@ -170,7 +170,7 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <div className="px-8 py-6 flex gap-6 max-w-[1400px] mx-auto items-start">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-6 px-4 py-6 sm:px-8 lg:flex-row">
           {/* Left — Cart groups */}
           <div className="flex-1 min-w-0 space-y-6">
             {groups.map((group) => {
@@ -231,7 +231,8 @@ export default function CartPage() {
                   </div>
 
                   {/* Variant rows */}
-                  <table className="w-full">
+                  <div className="overflow-x-auto">
+                  <table className="w-full min-w-[720px]">
                     <thead>
                       <tr>
                         <th className={TH}>SKU</th>
@@ -276,13 +277,14 @@ export default function CartPage() {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               );
             })}
           </div>
 
           {/* Right — Order summary */}
-          <div className="w-[300px] shrink-0 bg-brand-white border border-brand-line">
+          <div className="w-full shrink-0 border border-brand-line bg-brand-white lg:w-[300px]">
             <div className="px-5 py-4 border-b border-brand-ink">
               <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-muted">
                 Order summary

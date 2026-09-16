@@ -114,7 +114,7 @@ export default function RegisterPage() {
               </h2>
               <p className="text-[14px] text-brand-muted leading-relaxed max-w-sm">
                 Registration successful. Your account is pending approval before you can log in.
-                We'll email you at <strong className="text-brand-ink">{form.email}</strong> once
+                We&apos;ll email you at <strong className="text-brand-ink">{form.email}</strong> once
                 your account has been reviewed.
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
               Apply for buyer access
             </h1>
             <p className="text-[13px] text-brand-muted mb-6">
-              Use your business email. We'll review your application within 1–2 business days.
+              Use your business email. We&apos;ll review your application within 1–2 business days.
             </p>
 
             {serverError && (

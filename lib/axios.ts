@@ -1,7 +1,14 @@
 import axios from "axios";
 
+// Only send credentials (cookies) when the backend is running in cookie-auth
+// mode. Combining `withCredentials: true` with a backend that responds
+// `Access-Control-Allow-Origin: *` (no cookie support yet) causes the
+// browser to block every response — see SECURITY_BACKEND_REQUIREMENTS.md.
+const COOKIE_AUTH_ENABLED = process.env.NEXT_PUBLIC_COOKIE_AUTH === "true";
+
 const api = axios.create({
   baseURL: (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000") + "/api",
+  withCredentials: COOKIE_AUTH_ENABLED,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -32,20 +39,20 @@ api.interceptors.response.use(
 
     try {
       if (!refreshPromise) {
+        const storedToken = localStorage.getItem("auth_token");
         refreshPromise = axios
           .post(
             (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000") +
               "/api/auth/refresh",
             {},
             {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-              },
+              withCredentials: COOKIE_AUTH_ENABLED,
+              headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : undefined,
             }
           )
           .then((res) => {
             const token: string = res.data.access_token;
-            localStorage.setItem("auth_token", token);
+            if (token) localStorage.setItem("auth_token", token);
             return token;
           })
           .finally(() => {
@@ -59,7 +66,7 @@ api.interceptors.response.use(
     } catch {
       localStorage.removeItem("auth_token");
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.dispatchEvent(new Event("auth:expired"));
       }
       return Promise.reject(error);
     }

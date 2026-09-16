@@ -232,6 +232,24 @@ textarea {
   animation: slideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Typewriter caret: a solid white bar attached to the text, blinking on/off. */
+@keyframes typingBlink {
+  from, to { border-color: transparent; }
+  50% { border-color: #ffffff; }
+}
+
+.typing-cursor {
+  border-right: 4px solid #ffffff;
+  padding-right: 6px;
+  animation: typingBlink 1s step-end infinite;
+}
+
+@media (max-width: 767px) {
+  .typing-cursor {
+    border-right-width: 3px;
+  }
+}
+
 .df-ui {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }

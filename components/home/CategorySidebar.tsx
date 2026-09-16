@@ -15,7 +15,7 @@ export function CategorySidebar() {
   }
 
   const allCats = categories ?? [];
-  const topLevelCats = allCats.filter((c: any) => !c.parent_id);
+  const topLevelCats = allCats.filter((category) => !category.parent_id);
   
   // Show first 5 categories, hide rest behind toggle
   const visibleCats = showAll ? topLevelCats : topLevelCats.slice(0, 5);
@@ -34,7 +34,7 @@ export function CategorySidebar() {
       
       <ul className="space-y-1">
         {visibleCats.map((cat) => {
-          const subcats = allCats.filter((c: any) => c.parent_id === cat.id);
+          const subcats = allCats.filter((category) => category.parent_id === cat.id);
           const isExpanded = expandedCats[cat.id];
           
           return (

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShoppingCart } from "lucide-react";
-import { useProducts } from "@/hooks/useProducts";
+import { useProducts, type Product } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 
 export function FeaturedProducts() {
@@ -12,7 +12,7 @@ export function FeaturedProducts() {
 
   const products = data?.data ?? [];
 
-  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
     const price = product.current_price ?? product.sale_price ?? 0;
     

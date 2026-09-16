@@ -31,18 +31,19 @@ export default function ChangePasswordPage() {
 
     setSaving(true);
     try {
-      const res = await api.patch<{ access_token: string }>("/users/me/password", {
+      const res = await api.patch<{ access_token?: string }>("/users/me/password", {
         current_password: currentPassword,
         password: newPassword,
         password_confirmation: confirmPassword,
       });
-      localStorage.setItem("auth_token", res.data.access_token);
+      if (res.data.access_token) localStorage.setItem("auth_token", res.data.access_token);
       setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
-      const data = err?.response?.data;
+    } catch (err: unknown) {
+      const data = (err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } })
+        ?.response?.data;
       if (data?.errors) {
         setFieldErrors(data.errors);
       }

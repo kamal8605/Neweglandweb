@@ -11,17 +11,8 @@ import {
 } from "react";
 import api from "@/lib/axios";
 import { useAuth } from "@/context/AuthContext";
-
-export interface CartItem {
-  product_id: number;
-  name: string;
-  sku: string;
-  image: string | null;
-  price: number;
-  quantity: number;
-  parent_id?: number | null;
-  parent_name?: string | null;
-}
+import { MAX_CART_QUANTITY, mergeCarts, sanitizeCart, type CartItem } from "@/lib/cart";
+export type { CartItem } from "@/lib/cart";
 
 interface CartContextValue {
   items: CartItem[];
@@ -37,36 +28,55 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "fastweb_cart";
+const LEGACY_STORAGE_KEY = "fastweb_cart";
+const GUEST_STORAGE_KEY = "fastweb_cart_guest";
+function readCart(key: string): CartItem[] {
+  try {
+    return sanitizeCart(JSON.parse(localStorage.getItem(key) ?? "[]"));
+  } catch {
+    return [];
+  }
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
   const [isSyncingPrices, setIsSyncingPrices] = useState(false);
   const itemsRef = useRef<CartItem[]>([]);
+  const userId = user?.id;
+  const storageKey = userId ? `fastweb_cart_user_${userId}` : GUEST_STORAGE_KEY;
 
-  // Rehydrate from localStorage on mount
+  // Load a cart scoped to the current guest or authenticated account.
   useEffect(() => {
+    if (authLoading) return;
     const timer = window.setTimeout(() => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) setItems(JSON.parse(stored));
-      } catch {
-        // Ignore corrupt storage and start with an empty cart.
+      let nextItems = readCart(storageKey);
+
+      if (userId) {
+        const guestItems = mergeCarts(readCart(GUEST_STORAGE_KEY), readCart(LEGACY_STORAGE_KEY));
+        nextItems = mergeCarts(nextItems, guestItems);
+        localStorage.removeItem(GUEST_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+      } else if (nextItems.length === 0) {
+        nextItems = readCart(LEGACY_STORAGE_KEY);
+        if (nextItems.length > 0) localStorage.removeItem(LEGACY_STORAGE_KEY);
       }
-      setHydrated(true);
+
+      itemsRef.current = nextItems;
+      setItems(nextItems);
+      setLoadedStorageKey(storageKey);
     }, 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [authLoading, storageKey, userId]);
 
-  // Persist to localStorage whenever items change (after hydration)
+  // Persist only after the correct account scope has been loaded.
   useEffect(() => {
-    if (hydrated) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
     itemsRef.current = items;
-  }, [items, hydrated]);
+    if (loadedStorageKey === storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify(items));
+    }
+  }, [items, loadedStorageKey, storageKey]);
 
   const refreshPrices = useCallback(async () => {
     const currentItems = itemsRef.current;
@@ -108,35 +118,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (!hydrated || !isAuthenticated) return;
+    if (loadedStorageKey !== storageKey || !isAuthenticated) return;
     const timer = window.setTimeout(() => void refreshPrices(), 0);
     return () => window.clearTimeout(timer);
-  }, [hydrated, isAuthenticated, refreshPrices]);
+  }, [isAuthenticated, loadedStorageKey, refreshPrices, storageKey]);
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity">, qty: number) => {
+      const safeQty = Math.min(MAX_CART_QUANTITY, Math.max(1, Math.floor(qty)));
       setItems((prev) => {
         const existing = prev.find((i) => i.product_id === item.product_id);
         if (existing) {
           return prev.map((i) =>
             i.product_id === item.product_id
-              ? { ...i, ...item, quantity: i.quantity + qty }
+              ? { ...i, ...item, quantity: Math.min(MAX_CART_QUANTITY, i.quantity + safeQty) }
               : i
           );
         }
-        return [...prev, { ...item, quantity: qty }];
+        return [...prev, { ...item, quantity: safeQty }];
       });
     },
     []
   );
 
   const updateQty = useCallback((product_id: number, qty: number) => {
-    if (qty <= 0) {
+    const safeQty = Math.min(MAX_CART_QUANTITY, Math.floor(qty));
+    if (safeQty <= 0 || !Number.isFinite(safeQty)) {
       setItems((prev) => prev.filter((i) => i.product_id !== product_id));
     } else {
       setItems((prev) =>
         prev.map((i) =>
-          i.product_id === product_id ? { ...i, quantity: qty } : i
+          i.product_id === product_id ? { ...i, quantity: safeQty } : i
         )
       );
     }
