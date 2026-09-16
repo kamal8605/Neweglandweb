@@ -25,7 +25,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push("/");
+      const requestedPath = new URLSearchParams(window.location.search).get("returnTo");
+      const returnTo = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
+        ? requestedPath
+        : "/";
+      router.replace(returnTo);
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number; data?: { message?: string } } })?.response?.status;
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "";
@@ -88,7 +92,7 @@ export default function LoginPage() {
           <div className="mb-4 p-3 bg-brand-orange-soft border border-brand-orange/30 rounded-[var(--brand-radius)]">
             <p className="text-[13px] text-brand-ink font-medium">Account pending approval</p>
             <p className="text-[12px] text-brand-muted mt-0.5">
-              Your account is under review. You'll receive an email once approved.
+              Your account is under review. You&apos;ll receive an email once approved.
             </p>
           </div>
         )}
@@ -147,7 +151,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-[12px] text-brand-muted text-center">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-brand-blue font-semibold hover:text-brand-blue-deep transition-colors">
             Apply for access
           </Link>

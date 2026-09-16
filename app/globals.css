@@ -35,9 +35,9 @@ html[data-theme="pallet"] {
 
 /* ── Tailwind v4 theme tokens ─────────────────────────────────── */
 @theme inline {
-  --font-sans:  var(--font-sans);
-  --font-mono:  var(--font-mono);
-  --font-serif: var(--font-serif);
+  --font-sans:  var(--font-site);
+  --font-mono:  var(--font-site);
+  --font-serif: var(--font-site);
 
   --color-brand-bg:          var(--brand-bg);
   --color-brand-bg-alt:      var(--brand-bg-alt);
@@ -71,8 +71,12 @@ html[data-theme="pallet"] {
   --radius: var(--brand-radius, 0px);
 }
 
-body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-site), "Courier New", monospace;
 }
 
 button,

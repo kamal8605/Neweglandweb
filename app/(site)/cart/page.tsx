@@ -6,7 +6,6 @@ import { X, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRequireAuth } from "@/components/auth/withAuth";
-import { StockDot } from "@/components/shared/StockDot";
 
 // ─── Step Indicator ────────────────────────────────────────────────────────
 
@@ -100,12 +99,12 @@ function QtyStepper({
 export default function CartPage() {
   const { isLoading } = useRequireAuth();
   const { isApproved } = useAuth();
-  const { items, itemCount, subtotal, updateQty, removeItem } = useCart();
+  const { items, itemCount, subtotal, updateQty, removeItem, isSyncingPrices } = useCart();
 
-  if (isLoading) {
+  if (isLoading || isSyncingPrices) {
     return (
       <div className="flex items-center justify-center h-60 font-mono text-[11px] text-brand-muted tracking-widest uppercase">
-        Loading…
+        {isSyncingPrices ? "Updating cart prices…" : "Loading…"}
       </div>
     );
   }

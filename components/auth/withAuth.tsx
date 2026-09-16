@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 /**
@@ -12,12 +12,13 @@ import { useAuth } from "@/context/AuthContext";
 export function useRequireAuth() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
+      router.replace(`/login?returnTo=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, pathname, router]);
 
   return { isLoading, isAuthenticated };
 }
@@ -29,15 +30,16 @@ export function useRequireAuth() {
 export function useRequireApproved() {
   const { isAuthenticated, isApproved, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.replace(`/login?returnTo=${encodeURIComponent(pathname)}`);
     } else if (!isApproved) {
       router.replace("/");
     }
-  }, [isAuthenticated, isApproved, isLoading, router]);
+  }, [isAuthenticated, isApproved, isLoading, pathname, router]);
 
   return { isLoading, isAuthenticated, isApproved };
 }

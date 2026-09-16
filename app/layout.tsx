@@ -1,25 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
 const geistMono = Geist_Mono({
-  variable: "--font-mono",
+  variable: "--font-site",
   subsets: ["latin"],
-  weight: ["400", "500"],
-});
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -36,7 +22,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme={process.env.NEXT_PUBLIC_THEME ?? "forge"}
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-ink">
         <Providers>{children}</Providers>
