@@ -63,10 +63,17 @@ api.interceptors.response.use(
       const newToken = await refreshPromise;
       original.headers.Authorization = `Bearer ${newToken}`;
       return api(original);
-    } catch {
-      localStorage.removeItem("auth_token");
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("auth:expired"));
+    } catch (refreshError) {
+      // Do not log a user out because of an offline/timeout/5xx response.
+      // Clear the session only when the backend definitively rejects it.
+      if (
+        axios.isAxiosError(refreshError) &&
+        (refreshError.response?.status === 401 || refreshError.response?.status === 403)
+      ) {
+        localStorage.removeItem("auth_token");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("auth:expired"));
+        }
       }
       return Promise.reject(error);
     }

@@ -10,7 +10,7 @@ import { UserAccountMenu } from "./UserAccountMenu";
 import { Logo } from "./Logo";
 
 export function UtilityBar() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const { itemCount, subtotal } = useCart();
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -21,6 +21,17 @@ export function UtilityBar() {
     if (!value) return;
     router.push(`/shop?search=${encodeURIComponent(value)}`);
     setSearch("");
+  }
+
+  if (isLoading && !user) {
+    return (
+      <header className="border-t-[3px] border-brand-ink bg-white" aria-label="Loading account">
+        <div className="mx-auto flex min-h-[100px] max-w-[1500px] items-center gap-6 px-4 py-3 lg:px-10">
+          <Logo size={88} />
+          <div className="ml-auto h-10 w-36 animate-pulse bg-brand-bg-alt" aria-hidden="true" />
+        </div>
+      </header>
+    );
   }
 
   if (!isAuthenticated) {
