@@ -50,7 +50,7 @@ function HeroCarousel() {
       <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
         {HERO_SLIDES.map((slide, index) => (
           <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-            <Image src={slide.image} alt={slide.alt} fill loading="eager" unoptimized className="object-cover" sizes="100vw" />
+            <Image src={slide.image} alt={slide.alt} fill loading={index === 0 ? "eager" : "lazy"} unoptimized className="object-cover" sizes="100vw" />
           </Link>
         ))}
         <button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
@@ -169,7 +169,7 @@ function ProductCard({ product }: { product: Product }) {
           <h3 className="min-h-[72px] text-[15px] font-black uppercase leading-[1.16] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
         </Link>
         <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
-          {image ? <Image src={image} alt={product.name} fill quality={75} sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 216px" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
+          {image ? <Image src={image} alt={product.name} fill unoptimized sizes="(max-width: 768px) 50vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
         </Link>
         <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
           {!isAuthenticated ? (
