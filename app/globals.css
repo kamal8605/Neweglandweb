@@ -2,6 +2,7 @@
 @import "tailwindcss";
 
 /* ── Forge & Co. theme (default) ─────────────────────────────── */
+:root,
 html[data-theme="forge"] {
   --brand-bg:          #F7F4EE;
   --brand-bg-alt:      #EFEAE0;

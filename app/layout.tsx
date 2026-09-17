@@ -8,6 +8,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const configuredTheme = process.env.NEXT_PUBLIC_THEME?.trim();
+const siteTheme = configuredTheme === "pallet" ? "pallet" : "forge";
+
 export const metadata: Metadata = {
   title: "Best Disposable Vapes Wholesale - New Hampshire",
   description: "B2B wholesale ecommerce for indie retail buyers.",
@@ -21,7 +24,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme={process.env.NEXT_PUBLIC_THEME ?? "forge"}
+      data-theme={siteTheme}
       className={`${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-ink">
