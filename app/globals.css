@@ -1,6 +1,15 @@
 
 @import "tailwindcss";
 
+.category-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-track::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Forge & Co. theme (default) ─────────────────────────────── */
 :root,
 html[data-theme="forge"] {
@@ -92,27 +101,63 @@ textarea {
   outline-offset: 2px;
 }
 
-/* Catalog covers open from the spine like a physical book on pointer hover. */
+/* Catalog card stays as a clean front cover; book depth appears on hover. */
 .catalog-book {
-  perspective: 1400px;
-  padding: 18px 22px 28px 10px;
+  position: relative;
+  perspective: 1800px;
+  perspective-origin: 45% 42%;
+  padding: 24px 34px 38px 18px;
 }
 
 .catalog-book-body {
   transform: none;
+  transform-origin: left center;
   transform-style: preserve-3d;
-  transition: transform 500ms cubic-bezier(.2, .75, .2, 1), filter 500ms ease;
-  filter: drop-shadow(10px 16px 14px rgba(0, 0, 0, .22));
+  transition: transform 650ms cubic-bezier(.2, .75, .2, 1), filter 650ms ease;
+  filter: drop-shadow(8px 12px 12px rgba(0, 0, 0, .24));
+}
+
+.catalog-book-body::before {
+  content: "";
+  position: absolute;
+  inset: 4px -17px 4px 7px;
+  z-index: -3;
+  border-radius: 0 3px 3px 0;
+  background: color-mix(in srgb, var(--brand-navy) 86%, #000);
+  opacity: 0;
+  box-shadow: 5px 7px 0 rgba(0, 0, 0, .5), 18px 22px 32px rgba(0, 0, 0, .35);
+  transform: translateZ(-20px);
+  transition: opacity 250ms ease;
+}
+
+.catalog-book-body::after {
+  content: "";
+  position: absolute;
+  right: -13px;
+  bottom: -13px;
+  left: 16px;
+  height: 18px;
+  z-index: -4;
+  background: linear-gradient(180deg, #c9c4ba, #80796e 55%, #302c28);
+  opacity: 0;
+  clip-path: polygon(0 0, 96% 0, 100% 35%, 100% 100%, 3% 100%);
+  transform: rotateX(-72deg) translateZ(-8px);
+  transform-origin: top;
+  transition: opacity 250ms ease;
 }
 
 .catalog-book-pages {
   position: absolute;
-  inset: 5px 2px 5px 9px;
+  inset: 7px -13px 8px 11px;
+  z-index: -1;
   opacity: 0;
-  background: repeating-linear-gradient(90deg, #fff 0 3px, #e7e2da 3px 4px);
+  border-radius: 0 3px 3px 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(112, 104, 91, .2) 3px 4px),
+    linear-gradient(90deg, #f4f1e9 0%, #fff 42%, #d9d3c8 100%);
   transform: translateZ(-10px);
-  box-shadow: 8px 7px 0 #d8d2c8, 13px 11px 22px rgba(0, 0, 0, .3);
-  transition: inset 500ms cubic-bezier(.2, .75, .2, 1), opacity 180ms ease;
+  box-shadow: 5px 0 0 #bdb6aa, 10px 4px 0 #ece8df, 14px 9px 20px rgba(0, 0, 0, .38);
+  transition: inset 650ms cubic-bezier(.2, .75, .2, 1), box-shadow 650ms ease, opacity 250ms ease;
 }
 
 .catalog-book-cover {
@@ -120,21 +165,36 @@ textarea {
   inset: 0;
   overflow: hidden;
   transform-origin: left center;
-  transform: translateZ(3px);
+  z-index: 2;
+  transform: translateZ(12px);
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  box-shadow: 3px 0 0 color-mix(in srgb, var(--brand-orange) 65%, #000);
+  border-right: 0 solid color-mix(in srgb, var(--brand-orange) 58%, #111);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .2);
   transition: transform 650ms cubic-bezier(.2, .8, .2, 1), box-shadow 650ms ease;
+}
+
+.catalog-book-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, rgba(255, 255, 255, .2), transparent 18%, transparent 72%, rgba(255, 255, 255, .08));
+  mix-blend-mode: screen;
+  opacity: .48;
 }
 
 .catalog-book-spine {
   position: absolute;
   inset-block: 0;
   left: 0;
-  width: 8px;
-  z-index: 3;
-  background: linear-gradient(90deg, rgba(0, 0, 0, .5), rgba(255, 255, 255, .16), rgba(0, 0, 0, .18));
-  transform: translateZ(7px);
+  width: 12px;
+  z-index: 4;
+  background: linear-gradient(90deg, rgba(0, 0, 0, .72), rgba(255, 255, 255, .18) 42%, rgba(0, 0, 0, .28));
+  box-shadow: 3px 0 6px rgba(0, 0, 0, .35);
+  transform: translateZ(17px);
+  opacity: 0;
+  transition: opacity 250ms ease;
 }
 
 .catalog-book-title {
@@ -145,18 +205,26 @@ textarea {
 
 @media (hover: hover) and (pointer: fine) {
   .catalog-book:hover .catalog-book-body {
-    transform: translateY(-8px) rotateY(-2deg);
-    filter: drop-shadow(24px 30px 20px rgba(0, 0, 0, .38));
+    transform: translateY(-12px) rotateX(2deg) rotateY(-13deg) scale(1.025);
+    filter: drop-shadow(27px 35px 23px rgba(0, 0, 0, .52));
   }
 
-  .catalog-book:hover .catalog-book-pages {
-    inset-right: -12px;
+  .catalog-book:hover .catalog-book-body::before,
+  .catalog-book:hover .catalog-book-body::after,
+  .catalog-book:hover .catalog-book-spine {
     opacity: 1;
   }
 
+  .catalog-book:hover .catalog-book-pages {
+    inset-right: -20px;
+    opacity: 1;
+    box-shadow: 7px 0 0 #bdb6aa, 13px 5px 0 #f1eee7, 21px 14px 28px rgba(0, 0, 0, .44);
+  }
+
   .catalog-book:hover .catalog-book-cover {
-    transform: translateZ(9px) rotateY(-31deg);
-    box-shadow: 14px 5px 22px rgba(0, 0, 0, .32);
+    transform: translateZ(18px) rotateY(-18deg);
+    border-right-width: 2px;
+    box-shadow: inset -11px 0 20px rgba(0, 0, 0, .28), 18px 7px 24px rgba(0, 0, 0, .42);
   }
 
   .catalog-book:hover .catalog-book-title {

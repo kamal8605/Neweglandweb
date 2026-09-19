@@ -8,12 +8,16 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { UserAccountMenu } from "./UserAccountMenu";
 import { Logo } from "./Logo";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 export function UtilityBar() {
   const { isAuthenticated, user } = useAuth();
   const { itemCount, subtotal } = useCart();
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const { site } = useSiteConfig();
+  const phoneHref = site.phone ? `tel:${site.phone.replace(/[^+\d]/g, "")}` : undefined;
+  const emailHref = site.email ? `mailto:${site.email}` : undefined;
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,20 +34,16 @@ export function UtilityBar() {
           <Logo size={88} />
 
           <div className="mx-auto hidden items-center gap-7 text-[12px] text-brand-muted md:flex">
-            <a href="tel:+16175486419" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
-              <Phone size={14} /> +1 617-548-6419
-            </a>
-            <a href="mailto:sales@newenglanddistro.com" className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue">
-              <Mail size={15} /> sales@newenglanddistro.com
-            </a>
+            {site.phone && <a href={phoneHref} className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue"><Phone size={14} /> {site.phone}</a>}
+            {site.email && <a href={emailHref} className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue"><Mail size={15} /> {site.email}</a>}
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
             <Link href="/login" className="inline-flex min-h-10 items-center gap-2 rounded-[var(--brand-radius)] bg-brand-navy px-5 text-xs font-bold text-white no-underline hover:bg-brand-blue-deep">
-              <UserRound size={15} /> Login
+              <UserRound size={15} /> {site.login_text}
             </Link>
             <Link href="/register" className="hidden min-h-10 items-center border border-brand-blue px-5 text-xs font-semibold text-brand-blue no-underline transition-colors hover:bg-brand-blue hover:text-white sm:inline-flex">
-              Register for Wholesale
+              {site.register_text}
             </Link>
           </div>
         </div>
@@ -56,12 +56,8 @@ export function UtilityBar() {
       <div className="border-b border-brand-line bg-brand-bg-alt px-4 py-2 text-[11px] text-brand-muted lg:px-10">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4">
           <div className="flex items-center gap-5">
-            <a href="tel:+16175486419" className="inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue">
-              <Phone size={12} /> +1 617-548-6419
-            </a>
-            <a href="mailto:sales@newenglanddistro.com" className="hidden items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex">
-              <Mail size={13} /> sales@newenglanddistro.com
-            </a>
+            {site.phone && <a href={phoneHref} className="inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue"><Phone size={12} /> {site.phone}</a>}
+            {site.email && <a href={emailHref} className="hidden items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex"><Mail size={13} /> {site.email}</a>}
           </div>
           {isAuthenticated ? (
             <nav className="hidden items-center gap-4 md:flex" aria-label="Account shortcuts">
@@ -81,7 +77,7 @@ export function UtilityBar() {
         {isAuthenticated && (
           <form onSubmit={handleSearch} className="order-3 flex w-full overflow-hidden rounded-none border border-brand-line bg-white shadow-sm transition-all focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-brand-blue/15 lg:order-none lg:mx-auto lg:max-w-[720px]">
             <label htmlFor="site-search" className="sr-only">Search products, brands, or categories</label>
-            <input id="site-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search for products, brands or categories" className="h-12 min-w-0 flex-1 px-4 text-sm text-brand-ink outline-none placeholder:text-brand-muted" />
+            <input id="site-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={site.search_placeholder} className="h-12 min-w-0 flex-1 px-4 text-sm text-brand-ink outline-none placeholder:text-brand-muted" />
             <button type="submit" className="flex w-14 items-center justify-center border-l border-brand-navy bg-brand-navy text-white transition-colors hover:border-brand-blue hover:bg-brand-blue focus:outline-none focus-visible:bg-brand-blue" aria-label="Search"><Search size={21} /></button>
           </form>
         )}
@@ -93,7 +89,7 @@ export function UtilityBar() {
               <div className="rounded-none border border-brand-navy bg-brand-navy px-3 py-2.5 shadow-sm transition-colors hover:bg-brand-blue-deep"><UserAccountMenu /></div>
             </>
           ) : (
-            <Link href="/login" className="inline-flex items-center gap-2 rounded-[var(--brand-radius)] bg-brand-navy px-4 py-3 text-xs font-bold uppercase text-white no-underline"><UserRound size={17} /> Login</Link>
+            <Link href="/login" className="inline-flex items-center gap-2 rounded-[var(--brand-radius)] bg-brand-navy px-4 py-3 text-xs font-bold uppercase text-white no-underline"><UserRound size={17} /> {site.login_text}</Link>
           )}
           {isAuthenticated && (
             <Link href="/cart" className="group relative flex min-h-12 items-center gap-3 rounded-none border border-brand-line bg-brand-bg-alt px-3 text-brand-navy no-underline shadow-sm transition-all hover:border-brand-blue hover:bg-white" aria-label={`${itemCount} items in cart`}>

@@ -11,10 +11,18 @@ const geistMono = Geist_Mono({
 const configuredTheme = process.env.NEXT_PUBLIC_THEME?.trim();
 const siteTheme = configuredTheme === "pallet" ? "pallet" : "forge";
 
-export const metadata: Metadata = {
-  title: "Best Disposable Vapes Wholesale - New Hampshire",
-  description: "B2B wholesale ecommerce for indie retail buyers.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+  const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
+  try {
+    const response = await fetch(`${apiUrl}/api/homepage?client=${encodeURIComponent(client)}`, { next: { revalidate: 300 } });
+    if (!response.ok) return {};
+    const payload = await response.json() as { site?: { seo_title?: string; seo_description?: string } };
+    return { title: payload.site?.seo_title, description: payload.site?.seo_description };
+  } catch {
+    return {};
+  }
+}
 
 export default function RootLayout({
   children,

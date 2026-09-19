@@ -5,21 +5,7 @@ import Link from "next/link";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useCategories, type Category } from "@/hooks/useCategories";
-
-const NAV_GROUPS = [
-  { label: "Cigar", keywords: ["cigar"] },
-  { label: "C-Store", keywords: ["general", "battery", "detox", "synthetic", "incense"] },
-  { label: "Flower / Wax / Oil", keywords: ["flower", "wax", "oil", "cbd", "hemp"] },
-  { label: "Glass", keywords: ["glass", "bong", "pipe", "ceramic"] },
-  { label: "Hookah", keywords: ["hookah"] },
-  { label: "Kratom", keywords: ["kratom"] },
-  { label: "Vape Shop", keywords: ["vape", "disposable", "e-liquid", "nicotine", "pod"] },
-  { label: "7-Hydroxymitragynine", keywords: ["hydroxy", "alkaloid"] },
-  { label: "Tobacco", keywords: ["tobacco", "wrap", "leaf"] },
-  { label: "Roll Your Own", keywords: ["rolling", "paper", "filter", "grinder", "cone"] },
-  { label: "Torch It", keywords: ["torch", "lighter", "butane"] },
-  { label: "Whip Cream", keywords: ["whip", "cream", "charger"] },
-] as const;
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 function matches(category: Category, keywords: readonly string[]) {
   const value = `${category.name} ${category.slug}`.toLowerCase();
@@ -31,6 +17,7 @@ function categoryItems(category: Category) {
 
 export function NavBar() {
   const { data: categories = [] } = useCategories();
+  const { site } = useSiteConfig();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
@@ -51,17 +38,17 @@ export function NavBar() {
 
   const groups = useMemo(
     () =>
-      NAV_GROUPS.map((group, index) => {
+      (site.nav_groups ?? []).map((group, index) => {
         const matched = categories.filter((category) => matches(category, group.keywords));
         const fallback = categories[index] ? [categories[index]] : [];
         const roots = matched.length > 0 ? matched : fallback;
         return {
           ...group,
           items: roots.flatMap(categoryItems).slice(0, 18),
-          href: roots[0] ? `/category/${roots[0].id}` : "/shop",
+          href: group.url || (roots[0] ? `/category/${roots[0].id}` : "/shop"),
         };
       }),
-    [categories]
+    [categories, site.nav_groups]
   );
 
   const activeMobileGroup = groups.find((group) => group.label === mobileSection);
@@ -104,12 +91,12 @@ export function NavBar() {
           </div>
         ))}
 
-        <Link href="/sale" className="flex items-center border-b-2 border-transparent px-2.5 py-3 text-[10px] font-black uppercase tracking-[0.02em] text-brand-orange no-underline hover:border-brand-orange hover:bg-brand-blue-deep hover:text-white">On Sale</Link>
+        {site.sale_label && <Link href={site.sale_url || "/sale"} className="flex items-center border-b-2 border-transparent px-2.5 py-3 text-[10px] font-black uppercase tracking-[0.02em] text-brand-orange no-underline hover:border-brand-orange hover:bg-brand-blue-deep hover:text-white">{site.sale_label}</Link>}
       </div>
 
       <div className="flex items-center justify-between bg-brand-navy px-4 py-3 text-white xl:hidden">
         <button type="button" onClick={() => setMobileOpen(true)} className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wider" aria-label="Open category menu"><Menu size={22} /> Menu</button>
-        <Link href="/sale" className="text-xs font-black uppercase tracking-wider text-brand-orange no-underline">Clearance</Link>
+        {site.sale_label && <Link href={site.sale_url || "/sale"} className="text-xs font-black uppercase tracking-wider text-brand-orange no-underline">{site.sale_label}</Link>}
       </div>
 
       {mobileOpen && (
@@ -138,7 +125,7 @@ export function NavBar() {
                 <>
                   {groups.map((group) => <button key={group.label} type="button" onClick={() => setMobileSection(group.label)} className="flex w-full items-center justify-between border-b border-white/10 px-5 py-4 text-left text-sm font-bold uppercase tracking-wide">{group.label}<ChevronRight size={17} className="text-white/50" /></button>)}
                   <Link href="/brands" onClick={() => setMobileOpen(false)} className="flex items-center justify-between border-b border-white/10 px-5 py-4 text-sm font-bold uppercase text-white no-underline">Shop By Brand<ChevronRight size={17} /></Link>
-                  <Link href="/sale" onClick={() => setMobileOpen(false)} className="block border-b border-white/10 px-5 py-4 text-sm font-black uppercase text-red-300 no-underline">Clearance</Link>
+                  {site.sale_label && <Link href={site.sale_url || "/sale"} onClick={() => setMobileOpen(false)} className="block border-b border-white/10 px-5 py-4 text-sm font-black uppercase text-red-300 no-underline">{site.sale_label}</Link>}
                   <Link href="/shop" onClick={() => setMobileOpen(false)} className="block px-5 py-4 text-sm font-black uppercase text-white no-underline">Shop All</Link>
                 </>
               )}

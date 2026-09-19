@@ -26,7 +26,7 @@ import HTMLFlipBook from "react-pageflip";
 import { Document, Page, pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
+  "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
   import.meta.url,
 ).toString();
 
@@ -136,7 +136,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
   const [inputPageValue, setInputPageValue] = useState("1");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const downloadUrl = file || "https://newenglanddistro.com/wp-content/uploads/2026/03/New-England-Catalog.pdf";
+  const downloadUrl = file;
 
   // Fit book dimensions to viewport
   const fitBookToViewport = useCallback(() => {
