@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- managed image URLs are runtime values and include responsive picture sources */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,141 +9,99 @@ import { ArrowRight, ChevronLeft, ChevronRight, Send, ShoppingCart } from "lucid
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useProducts, type Product } from "@/hooks/useProducts";
+import { useSiteConfig, type HomepageItem, type HomepageSection } from "@/context/SiteConfigContext";
 
 const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbook"), { ssr: false });
 
-const HERO_SLIDES = [
-  { image: "/images/banners/tobacco-products-hero.png", alt: "Tobacco Products", href: "/shop" },
-  { image: "/images/banners/disposable-vapes-hero.png", alt: "Disposable Vapes", href: "/shop?search=Disposable%20Vapes" },
-  { image: "/images/banners/premium-cigars-hero.png", alt: "Premium Cigars", href: "/shop?search=Cigars" },
-];
-
-const CATEGORIES = [
-  ["Cigars", "/images/categories/cigars.png"], ["Detox & Synthetic", "/images/categories/detox-synthetic.png"],
-  ["Disposable Vapes", "/images/categories/disposable-vapes.png"], ["Kratom", "/images/categories/kratom.png"],
-  ["Nicotine Pouches", "/images/categories/nicotine-pouches.png"], ["Rolling Paper & Filters", "/images/categories/rolling-paper-filters.png"],
-  ["Salt E-Liquid", "/images/categories/salt-e-liquid.png"], ["Tobacco Products", "/images/categories/tobacco-products.png"],
-  ["Whip Cream Chargers", "/images/categories/whip-cream-chargers.png"], ["Big Torches", "/images/categories/big-torches.png"],
-  ["510 Batteries", "/images/categories/510-batteries.png"], ["Delta Products", "/images/categories/delta-products.png"],
-] as const;
-
-const TOP_BRANDS = [
-  "Naked 100", "RAZ", "Pod Salt", "Brixz", "Silver Fox", "Geek Bar", "Sora",
-  "Starmax", "Space Ultra", "Halo", "7OHMZ", "Crave", "Pod Juice", "Elysian Labs",
-] as const;
-
-const CATALOG_WORDS = ["Our Catalogs", "Premium Tobacco"] as const;
-const CATALOGS = [
-  { title: "Cigar Catalog", image: "/images/catalogs/cigar-catalog.jpg", pdf: "/catalogs/cigar-catalog.pdf" },
-  { title: "Product Catalog", image: "/images/catalogs/product-catalog.webp", pdf: "/catalogs/product-catalog.pdf" },
-] as const;
-
-function HeroCarousel() {
+function HeroCarousel({ section }: { section: HomepageSection }) {
+  const slides = section.items.filter((item) => item.kind === "slide" && item.desktop_image_url);
+  const carouselSlides = slides.map((item) => ({ image: item.desktop_image_url, mobileImage: item.mobile_image_url, alt: item.alt_text, href: item.link_url }));
   const [active, setActive] = useState(0);
   useEffect(() => {
-    const timer = window.setInterval(() => setActive((value) => (value + 1) % HERO_SLIDES.length), 5000);
+    if (carouselSlides.length < 2) return;
+    const interval = typeof section.settings.interval_ms === "number" ? section.settings.interval_ms : 5000;
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % carouselSlides.length), interval);
     return () => window.clearInterval(timer);
-  }, []);
-  const move = (direction: number) => setActive((value) => (value + direction + HERO_SLIDES.length) % HERO_SLIDES.length);
+  }, [carouselSlides.length, section.settings.interval_ms]);
+  const move = (direction: number) => setActive((value) => (value + direction + carouselSlides.length) % carouselSlides.length);
 
+  if (carouselSlides.length === 0) return null;
   return (
     <section className="relative overflow-hidden border-b border-brand-line bg-brand-navy" aria-label="Featured promotions">
       <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
-        {HERO_SLIDES.map((slide, index) => (
-          <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-            <Image src={slide.image} alt={slide.alt} fill loading={index === 0 ? "eager" : "lazy"} unoptimized className="object-cover" sizes="100vw" />
-          </Link>
+        {carouselSlides.map((slide, index) => (
+          slide.href ? <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
+            <picture>
+              {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
+              <img src={slide.image} alt={slide.alt} loading={index === 0 ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-cover" />
+            </picture>
+          </Link> : <div key={slide.image} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}><picture>{slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}<img src={slide.image} alt={slide.alt} loading={index === 0 ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-cover" /></picture></div>
         ))}
-        <button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
-        <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronRight size={24} /></button>
+        {carouselSlides.length > 1 && <><button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
+        <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronRight size={24} /></button></>}
       </div>
     </section>
   );
 }
 
 function ImageHeading({ image, title }: { image?: string; title: string }) {
-  if (!image) return <div className="mt-6 bg-gradient-to-r from-brand-navy via-brand-blue to-brand-orange px-4 py-3 text-center"><h2 className="text-2xl font-black uppercase italic tracking-wide text-white md:text-4xl">{title}</h2></div>;
-  return <div className="relative mt-6 aspect-[3/1] max-h-[430px] min-h-[150px] overflow-hidden bg-brand-navy"><Image src={image} alt={title} fill className="object-cover" sizes="100vw" /><h2 className="sr-only">{title}</h2></div>;
+  if (!image) return <h2 className="sr-only">{title}</h2>;
+  return <div className="relative mt-6 aspect-[24/1] min-h-12 overflow-hidden bg-brand-navy"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
 }
 
-function CategoryGrid() {
+function CategoryGrid({ section }: { section: HomepageSection }) {
+  const headingImage = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
+  const categories = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).map((item) => ({ key: String(item.id), name: item.title || item.alt_text, alt: item.alt_text, image: item.desktop_image_url, href: item.link_url }));
   const trackRef = useRef<HTMLDivElement>(null);
-  const physicalIndexRef = useRef<number>(CATEGORIES.length);
-  const loopResetRef = useRef<number | null>(null);
   const [active, setActive] = useState(0);
-
-  const scrollToPhysicalIndex = useCallback((physicalIndex: number, behavior: ScrollBehavior = "smooth") => {
+  const scrollToPhysicalIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const track = trackRef.current;
-    if (!track) return;
-
-    const card = track.children.item(physicalIndex) as HTMLElement | null;
-    if (!card) return;
-
-    const centeredLeft = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
-    track.scrollTo({ left: centeredLeft, behavior });
-    physicalIndexRef.current = physicalIndex;
+    const card = track?.children.item(index) as HTMLElement | null;
+    if (!track || !card) return;
+    track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior });
   }, []);
-
   const goToCategory = useCallback((index: number) => {
-    if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
-    scrollToPhysicalIndex(CATEGORIES.length + index);
+    if (!categories.length) return;
+    scrollToPhysicalIndex(index);
     setActive(index);
-  }, [scrollToPhysicalIndex]);
-
+  }, [categories.length, scrollToPhysicalIndex]);
   const move = useCallback((direction: number) => {
-    if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
-
-    const nextPhysical = physicalIndexRef.current + direction;
-    const next = ((nextPhysical % CATEGORIES.length) + CATEGORIES.length) % CATEGORIES.length;
-    scrollToPhysicalIndex(nextPhysical);
-    setActive(next);
-
-    if (nextPhysical < CATEGORIES.length || nextPhysical >= CATEGORIES.length * 2) {
-      loopResetRef.current = window.setTimeout(() => {
-        scrollToPhysicalIndex(CATEGORIES.length + next, "auto");
-      }, 500);
-    }
-  }, [scrollToPhysicalIndex]);
-
+    if (!categories.length) return;
+    setActive((current) => {
+      const next = (current + direction + categories.length) % categories.length;
+      scrollToPhysicalIndex(next);
+      return next;
+    });
+  }, [categories.length, scrollToPhysicalIndex]);
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => scrollToPhysicalIndex(CATEGORIES.length, "auto"));
-    return () => {
-      window.cancelAnimationFrame(frame);
-      if (loopResetRef.current !== null) window.clearTimeout(loopResetRef.current);
-    };
-  }, [scrollToPhysicalIndex]);
-
-  useEffect(() => {
+    if (categories.length <= 7) return;
     const timer = window.setInterval(() => move(1), 5000);
     return () => window.clearInterval(timer);
-  }, [move]);
+  }, [categories.length, move]);
+  if (!categories.length) return null;
+  const hasCarousel = categories.length > 7;
+  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><img src={category.image} alt={category.alt} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline lg:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-4 flex justify-center gap-1.5">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className={`h-1.5 rounded-full transition-all hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} />)}</div>}</section>;
+}
 
+function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
+  const banners = sections.flatMap((section) => section.items
+    .filter((item) => item.kind !== "heading")
+    .map((item) => ({ ...item, sectionTitle: section.title })));
+  if (banners.length === 0) return null;
   return (
-    <section className="bg-white pb-8">
-      <ImageHeading title="Our Categories" />
-      <div className="relative mx-auto max-w-[1600px] px-10">
-        <div ref={trackRef} className="flex snap-x snap-mandatory gap-3 overflow-x-hidden scroll-smooth">
-          {Array.from({ length: 3 }, (_, copyIndex) => CATEGORIES.map(([name, image]) => (
-            <Link key={`${copyIndex}-${name}`} href={`/shop?search=${encodeURIComponent(name)}`} aria-hidden={copyIndex !== 1} tabIndex={copyIndex === 1 ? undefined : -1} className="group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 text-center no-underline lg:w-[calc((100%-72px)/7)]">
-              <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><Image src={image} alt={name} fill sizes="(max-width: 1024px) 50vw, 14vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>
-              <h3 className="mt-3 min-h-8 text-[11px] font-black uppercase leading-4 text-brand-navy group-hover:text-brand-orange">{name}</h3>
-            </Link>
-          )).flat())}
-        </div>
-        <button type="button" onClick={() => move(-1)} aria-label="Previous categories" className="absolute left-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center bg-brand-navy text-white hover:bg-brand-orange"><ChevronLeft size={20} /></button>
-        <button type="button" onClick={() => move(1)} aria-label="Next categories" className="absolute right-0 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center bg-brand-navy text-white hover:bg-brand-orange"><ChevronRight size={20} /></button>
-      </div>
-      <div className="mt-4 flex justify-center gap-1.5">
-        {CATEGORIES.map(([name], index) => (
-          <button
-            key={name}
-            type="button"
-            onClick={() => goToCategory(index)}
-            aria-label={`Show ${name}`}
-            aria-current={index === active ? "true" : undefined}
-            className={`h-1.5 rounded-full transition-all hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`}
-          />
-        ))}
+    <section className="w-full bg-white py-3">
+      <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 px-2 md:grid-cols-2 md:px-0">
+      {banners.map((banner) => {
+        const image = <picture>
+          {banner.mobile_image_url && <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />}
+          <img src={banner.desktop_image_url} alt={banner.alt_text} width={956} height={170} className="block h-full w-full object-cover" />
+        </picture>;
+        return (
+          <div key={banner.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">
+            {banner.link_url ? <Link href={banner.link_url} aria-label={banner.alt_text} className="block h-full w-full">{image}</Link> : image}
+          </div>
+        );
+      })}
       </div>
     </section>
   );
@@ -189,52 +148,54 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-function ProductSection({ title, art, promos, products }: { title: string; art?: string; promos?: readonly [string, string]; products: Product[] }) {
+function ProductSection({ section, products }: { section: HomepageSection; products: Product[] }) {
+  const art = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
+  const promos = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).slice(0, 2);
   return (
     <section className="bg-white">
-      {promos && (
-        <div className="mx-auto grid max-w-[1900px] grid-cols-1 gap-3 bg-white px-1 py-3 md:grid-cols-2 md:px-2">
-          {promos.map((image, index) => (
-            <div key={image} className="relative aspect-[3/1] min-h-[110px] overflow-hidden bg-brand-navy">
-              <Image src={image} alt={`${title} promotional banner ${index + 1}`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
-            </div>
-          ))}
+      <ImageHeading image={art} title={section.title} />
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-7">
+        {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
+      </div>
+      {promos.length > 0 && (
+        <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-white px-2 py-3 md:grid-cols-2 md:px-0">
+          {promos.map((promo) => {
+            const image = <picture>{promo.mobile_image_url && <source media="(max-width: 640px)" srcSet={promo.mobile_image_url} />}<img src={promo.desktop_image_url} alt={promo.alt_text} width={956} height={170} loading="lazy" className="block h-full w-full object-cover" /></picture>;
+            return <div key={promo.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">{promo.link_url ? <Link href={promo.link_url} aria-label={promo.alt_text} className="block h-full w-full">{image}</Link> : image}</div>;
+          })}
         </div>
       )}
-      <ImageHeading image={art} title={title} />
-      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-7">
-        {products.map((product) => <ProductCard key={`${title}-${product.id}`} product={product} />)}
-      </div>
     </section>
   );
 }
 
-function BrandStrip() {
+function BrandStrip({ section }: { section: HomepageSection }) {
+  const headingImage = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
+  const brandImages = section.items.filter((item) => item.kind === "brand" && item.desktop_image_url).slice(0, 14);
+  if (brandImages.length === 0) return null;
   return (
     <section className="bg-white pb-10">
-      <ImageHeading title="Top Brands" />
+      <ImageHeading image={headingImage} title={section.title} />
       <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-7">
-        {TOP_BRANDS.map((name) => (
-          <Link key={name} href={`/shop?search=${encodeURIComponent(name)}`} className="group flex h-20 items-center justify-center px-3 text-center no-underline transition duration-200 hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)] md:h-24">
-            <span className="relative text-base font-black uppercase italic tracking-tight text-brand-navy transition group-hover:-translate-y-0.5 group-hover:text-brand-orange md:text-xl">
-              {name}
-              <span className="absolute -bottom-2 left-1/2 h-0.5 w-5 -translate-x-1/2 bg-brand-orange transition-all duration-200 group-hover:w-full" />
-            </span>
-          </Link>
+        {brandImages.map((item) => (
+          item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center p-3 no-underline transition hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)]"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain transition group-hover:-translate-y-0.5" /></Link> : <div key={item.id} className="flex h-24 items-center justify-center p-3"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain" /></div>
         ))}
       </div>
     </section>
   );
 }
 
-function CatalogSection() {
+function CatalogSection({ section, backgroundImage }: { section: HomepageSection; backgroundImage?: string | null }) {
+  const catalogs = section.items.filter((item) => item.kind === "catalog" && item.desktop_image_url && item.pdf_url);
+  const phrases = useMemo(() => Array.isArray(section.settings.heading_phrases) ? section.settings.heading_phrases.filter((value): value is string => typeof value === "string" && value.trim().length > 0) : [], [section.settings.heading_phrases]);
   const [wordIndex, setWordIndex] = useState(0);
   const [typedText, setTypedText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [openCatalog, setOpenCatalog] = useState<(typeof CATALOGS)[number] | null>(null);
+  const [openCatalog, setOpenCatalog] = useState<HomepageItem | null>(null);
 
   useEffect(() => {
-    const word = CATALOG_WORDS[wordIndex];
+    if (phrases.length === 0) return;
+    const word = phrases[wordIndex % phrases.length];
     const isComplete = typedText === word;
     const isEmpty = typedText.length === 0;
     const delay = isComplete && !isDeleting ? 1800 : isDeleting ? 45 : 95;
@@ -242,34 +203,35 @@ function CatalogSection() {
       if (isComplete && !isDeleting) setIsDeleting(true);
       else if (isDeleting && isEmpty) {
         setIsDeleting(false);
-        setWordIndex((index) => (index + 1) % CATALOG_WORDS.length);
+        setWordIndex((index) => (index + 1) % phrases.length);
       } else setTypedText(word.slice(0, typedText.length + (isDeleting ? -1 : 1)));
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [isDeleting, typedText, wordIndex]);
+  }, [isDeleting, phrases, typedText, wordIndex]);
 
+  if (catalogs.length === 0) return null;
   return (
     <section className="bg-white px-2 py-6 sm:px-4 lg:px-6 lg:py-10">
       <div className="relative isolate overflow-hidden border border-brand-navy/10 bg-brand-navy px-5 py-10 shadow-[0_18px_45px_rgba(11,31,58,0.22)] md:px-8 md:py-14 lg:px-12 lg:py-16">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-brand-orange" />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: "url('/images/brand/new-england-logo.png')", backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />
+        {backgroundImage && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: `url("${backgroundImage.replace(/["\\]/g, "")}")`, backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue-deep/25 via-transparent to-black/25" />
-        <div className="mx-auto grid max-w-[1600px] items-center gap-10 lg:grid-cols-[1.1fr_0.85fr_0.85fr] lg:gap-10 xl:gap-16">
+        <div className="mx-auto grid max-w-[1600px] items-center gap-10 lg:grid-cols-3 lg:gap-10 xl:gap-16">
         <div className="max-w-xl text-white lg:pr-4">
-          <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">New England Distro</span>
+          {typeof section.settings.eyebrow === "string" && section.settings.eyebrow && <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">{section.settings.eyebrow}</span>}
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
-            <span className="typing-cursor">{typedText}</span>
+            <span className="typing-cursor">{phrases.length > 0 ? typedText : section.title}</span>
           </h2>
-          <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 md:text-base">Explore our extensive catalog featuring a wide-ranging inventory across all categories—bringing you everything from everyday essentials to unique specialty items, all in one place.</p>
+          {typeof section.settings.description === "string" && section.settings.description && <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 md:text-base">{section.settings.description}</p>}
           <div aria-hidden="true" className="mt-7 h-px w-24 bg-brand-orange" />
         </div>
-        {CATALOGS.map((catalog) => (
-          <button key={catalog.title} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title}`} className="catalog-book group mx-auto block w-full max-w-[350px] text-left focus-visible:outline-2 focus-visible:outline-brand-orange">
+        {catalogs.map((catalog) => (
+          <button key={catalog.id} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title || catalog.alt_text}`} className="catalog-book group mx-auto block w-full max-w-[350px] text-left focus-visible:outline-2 focus-visible:outline-brand-orange">
             <div className="catalog-book-body relative aspect-[210/297]">
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
-                <Image src={catalog.image} alt={catalog.title} fill sizes="(max-width: 1024px) 70vw, 420px" className="object-cover" />
-                <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-medium text-brand-navy">{catalog.title}</span>
+                <img src={catalog.desktop_image_url} alt={catalog.alt_text} loading="lazy" className="h-full w-full object-cover" />
+                <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-medium text-brand-navy">{catalog.title || catalog.alt_text}</span>
               </div>
               <span aria-hidden="true" className="catalog-book-spine" />
             </div>
@@ -277,45 +239,67 @@ function CatalogSection() {
         ))}
         </div>
       </div>
-      {openCatalog && <CatalogFlipbook file={openCatalog.pdf} title={openCatalog.title} onClose={() => setOpenCatalog(null)} />}
+      {openCatalog?.pdf_url && <CatalogFlipbook file={openCatalog.pdf_url} title={openCatalog.title || openCatalog.alt_text} onClose={() => setOpenCatalog(null)} />}
     </section>
   );
 }
 
-function NewsletterSection() {
+function NewsletterSection({ title, placeholder, buttonText }: { title?: string; placeholder?: string; buttonText?: string }) {
+  if (!title) return null;
   return (
     <section className="border-y border-brand-line bg-gradient-to-r from-brand-bg via-brand-white to-brand-orange-soft px-5 py-5 md:px-10">
       <div className="mx-auto flex max-w-[1513px] flex-col items-center gap-4 md:flex-row md:justify-between md:gap-10">
         <div className="flex shrink-0 items-center gap-3 text-brand-navy">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-orange-soft text-brand-orange"><Send size={19} strokeWidth={2} /></span>
-          <h2 className="text-base font-bold md:text-lg">Signup To Newsletter</h2>
+          <h2 className="text-base font-bold md:text-lg">{title}</h2>
         </div>
         <form className="flex min-h-14 w-full max-w-2xl overflow-hidden border border-[#ded2c4] bg-white shadow-[0_8px_24px_rgba(11,31,58,0.10)] transition focus-within:border-brand-orange focus-within:ring-2 focus-within:ring-brand-orange/20" onSubmit={(event) => event.preventDefault()}>
           <label htmlFor="newsletter-email" className="sr-only">Email address</label>
-          <input id="newsletter-email" name="email" type="email" required placeholder="Enter your email address" className="min-w-0 flex-1 bg-white px-7 py-3 text-base text-brand-navy outline-none placeholder:text-brand-muted" />
-          <button type="submit" className="min-w-28 shrink-0 bg-brand-orange px-7 py-3 text-sm font-extrabold text-white transition hover:bg-brand-navy focus-visible:bg-brand-navy">SignUp</button>
+          <input id="newsletter-email" name="email" type="email" required placeholder={placeholder} className="min-w-0 flex-1 bg-white px-7 py-3 text-base text-brand-navy outline-none placeholder:text-brand-muted" />
+          <button type="submit" className="min-w-28 shrink-0 bg-brand-orange px-7 py-3 text-sm font-extrabold text-white transition hover:bg-brand-navy focus-visible:bg-brand-navy">{buttonText}</button>
         </form>
       </div>
     </section>
   );
 }
 
+function ManagedSection({ section, products, catalogBackground }: { section: HomepageSection; products: Product[]; catalogBackground?: string | null }) {
+  switch (section.type) {
+    case "hero":
+      return <HeroCarousel section={section} />;
+    case "banner":
+      return <ManagedBanners sections={[section]} />;
+    case "featured_category":
+      return <CategoryGrid section={section} />;
+    case "product_carousel": {
+      const ids = section.data?.product_ids ?? [];
+      const byId = new Map(products.map((product) => [product.id, product]));
+      const selected = ids.map((id) => byId.get(id)).filter((product): product is Product => Boolean(product));
+      const limit = typeof section.settings.limit === "number" ? section.settings.limit : 14;
+      return <ProductSection section={section} products={selected.slice(0, limit)} />;
+    }
+    case "brand_showcase":
+      return <BrandStrip section={section} />;
+    case "catalog_showcase":
+      return <CatalogSection section={section} backgroundImage={catalogBackground} />;
+    default:
+      return null;
+  }
+}
+
 export default function HomePage() {
-  const { data } = useProducts({ sort: "newest", per_page: 70 });
+  const { homepage, site, loaded: homepageLoaded, error, reload } = useSiteConfig();
+  const sections = useMemo(() => homepage?.sections ?? [], [homepage]);
+  const selectedProductIds = useMemo(() => Array.from(new Set(sections.flatMap((section) => section.type === "product_carousel" ? section.data?.product_ids ?? [] : []))), [sections]);
+  const { data } = useProducts({ ids: selectedProductIds, per_page: Math.max(selectedProductIds.length, 1) });
   const products = data?.data ?? [];
   return (
     <main className="bg-white">
-      <h1 className="sr-only">Wholesale Disposable Vapes in New Hampshire</h1>
-      <HeroCarousel />
-      <CategoryGrid />
-      <ProductSection title="New Arrivals" products={products.slice(0, 14)} />
-      <ProductSection title="Top Disposables" products={products.slice(14, 28)} />
-      <ProductSection title="Top E-Liquid" promos={["/images/banners/e-liquid-tropical.png", "/images/banners/e-liquid-night.png"]} products={products.slice(28, 42)} />
-      <ProductSection title="Top Cigar" promos={["/images/banners/cigar-tropical.png", "/images/banners/cigar-night.png"]} products={products.slice(42, 56)} />
-      <ProductSection title="7-Hydroxymitragynine" promos={["/images/banners/hydroxy-tropical.png", "/images/banners/hydroxy-night.png"]} products={products.slice(56, 70)} />
-      <BrandStrip />
-      <CatalogSection />
-      <NewsletterSection />
+      {site.homepage_heading && <h1 className="sr-only">{site.homepage_heading}</h1>}
+      {!homepageLoaded && <div className="h-48 animate-pulse bg-brand-bg-alt" aria-label="Loading homepage" />}
+      {homepageLoaded && error && <section className="grid min-h-[420px] place-items-center bg-brand-bg-alt px-5 py-16"><div className="max-w-lg border border-brand-line bg-white p-8 text-center shadow-[0_18px_45px_rgba(11,31,58,0.12)]"><p className="text-xs font-black uppercase tracking-[0.16em] text-brand-orange">Connection unavailable</p><h1 className="mt-3 text-2xl font-bold text-brand-navy">Storefront content could not be loaded</h1><p className="mt-3 text-sm leading-6 text-brand-muted">Please check the configured API URL or try again in a moment.</p><button type="button" onClick={reload} className="mt-6 bg-brand-navy px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-blue">Try again</button></div></section>}
+      {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} catalogBackground={site.catalog_background_logo_url} />)}
+      {site.newsletter_enabled && <NewsletterSection title={site.newsletter_title} placeholder={site.newsletter_placeholder} buttonText={site.newsletter_button_text} />}
     </main>
   );
 }

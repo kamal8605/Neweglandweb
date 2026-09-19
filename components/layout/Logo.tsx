@@ -1,21 +1,26 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useSiteConfig } from "@/context/SiteConfigContext";
 
 interface LogoProps {
   size?: number;
 }
 
 export function Logo({ size = 48 }: LogoProps) {
+  const { site } = useSiteConfig();
+  if (!site.logo_url) return null;
   return (
     <Link
       href="/"
-      aria-label="New England Smoke Distribution home"
+      aria-label={`${site.site_name || "Website"} home`}
       className="relative block shrink-0 no-underline"
       style={{ width: size, height: size }}
     >
       <Image
-        src="/images/brand/new-england-logo-clean.png"
-        alt="New England Smoke Distribution"
+        src={site.logo_url}
+        alt={site.site_name || "Website logo"}
         fill
         sizes={`${size}px`}
         priority
