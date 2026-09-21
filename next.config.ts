@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       ...configuredImagePatterns,
+      new URL("https://c8.alamy.com/comp/**"),
       new URL("https://erp.centralsmokedistro.com/uploads/**"),
       new URL("https://nes-gateway.cloud.bbtl.app/storage/**"),
       new URL("http://127.0.0.1:8000/storage/**"),
