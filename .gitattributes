@@ -1,2 +1,1 @@
 public/catalogs/*.pdf filter=lfs diff=lfs merge=lfs -text
-public/images/** filter=lfs diff=lfs merge=lfs -text
