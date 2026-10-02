@@ -48,7 +48,9 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
 
 function ImageHeading({ image, title }: { image?: string; title: string }) {
   if (!image) return <h2 className="sr-only">{title}</h2>;
-  return <div className="relative mt-6 aspect-[24/1] min-h-8 w-full overflow-hidden bg-brand-navy sm:min-h-12"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
+  // The art is a 32:1 strip with the title centred in ~30% of its width. A fixed height per breakpoint keeps the
+  // title fully inside the viewport on phones/tablets (object-cover crops only the decorative sides).
+  return <div className="relative mt-6 h-9 w-full overflow-hidden bg-brand-navy sm:h-12 md:h-14 lg:aspect-[24/1] lg:h-auto"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
 }
 
 function CategoryGrid({ section }: { section: HomepageSection }) {
