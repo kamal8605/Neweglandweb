@@ -47,8 +47,8 @@ function SkeletonRow({ showBrand }: { showBrand: boolean }) {
   );
 }
 
-const TH = "px-2.5 py-2.5 text-left font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted font-medium border-b border-brand-line bg-brand-bg-alt whitespace-nowrap";
-const TD = "px-2.5 py-2 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
+const TH = "px-1.5 sm:px-2.5 py-2.5 text-left font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted font-medium border-b border-brand-line bg-brand-bg-alt whitespace-nowrap";
+const TD = "px-1.5 sm:px-2.5 py-2 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
 export function ProductTable({
   products,
@@ -108,7 +108,7 @@ export function ProductTable({
           className={`border-b border-brand-line hover:bg-brand-bg transition-colors ${isChild ? "bg-brand-bg/50" : ""}`}
         >
           {/* Expand toggle / indent for children */}
-          <td className={`${TD} w-7`}>
+          <td className={`${TD} w-5 sm:w-7`}>
             {isGrouped ? (
               <button
                 onClick={() => toggleExpand(p.id)}
@@ -197,7 +197,7 @@ export function ProductTable({
           </td>
 
           {/* Qty stepper */}
-          <td className={`${TD} w-24 sm:w-28 text-right`}>
+          <td className={`${TD} w-24 sm:w-28 text-right whitespace-nowrap`}>
             {isGrouped ? (
               <span className="text-brand-muted font-mono text-[11px]">— expand —</span>
             ) : (
@@ -221,7 +221,7 @@ export function ProductTable({
       <table className="w-full border-collapse bg-brand-white text-sm">
         <thead>
           <tr>
-            <th className={`${TH} w-7`} />
+            <th className={`${TH} w-5 sm:w-7`} />
             <th className={`${TH} w-14 hidden sm:table-cell`}>Img</th>
             <th className={`${TH} w-24 hidden md:table-cell`}>SKU</th>
             <th className={TH}>Product</th>

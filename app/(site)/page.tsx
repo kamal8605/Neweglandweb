@@ -16,6 +16,8 @@ const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbo
 function HeroCarousel({ section }: { section: HomepageSection }) {
   const slides = section.items.filter((item) => item.kind === "slide" && item.desktop_image_url);
   const carouselSlides = slides.map((item) => ({ image: item.desktop_image_url, mobileImage: item.mobile_image_url, alt: item.alt_text, href: item.link_url }));
+  // Without dedicated mobile art, keep the banner's own ratio so its text isn't cropped off on phones.
+  const hasMobileArt = carouselSlides.length > 0 && carouselSlides.every((slide) => slide.mobileImage);
   const [active, setActive] = useState(0);
   useEffect(() => {
     if (carouselSlides.length < 2) return;
@@ -28,7 +30,7 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
   if (carouselSlides.length === 0) return null;
   return (
     <section className="relative overflow-hidden border-b border-brand-line bg-brand-navy" aria-label="Featured promotions">
-      <div className="relative aspect-[1920/622] min-h-[210px] w-full sm:min-h-0">
+      <div className={`relative aspect-[1920/622] w-full ${hasMobileArt ? "min-h-[210px] sm:min-h-0" : ""}`}>
         {carouselSlides.map((slide, index) => (
           slide.href ? <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
             <picture>
@@ -46,7 +48,7 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
 
 function ImageHeading({ image, title }: { image?: string; title: string }) {
   if (!image) return <h2 className="sr-only">{title}</h2>;
-  return <div className="relative mt-6 aspect-[24/1] min-h-12 overflow-hidden bg-brand-navy"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
+  return <div className="relative mt-6 aspect-[24/1] min-h-8 w-full overflow-hidden bg-brand-navy sm:min-h-12"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
 }
 
 function CategoryGrid({ section }: { section: HomepageSection }) {
@@ -58,7 +60,8 @@ function CategoryGrid({ section }: { section: HomepageSection }) {
     const track = trackRef.current;
     const card = track?.children.item(index) as HTMLElement | null;
     if (!track || !card) return;
-    track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior });
+    // Align to the card's start (matches snap-start) so no half-cut card shows on narrow screens.
+    track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior });
   }, []);
   const goToCategory = useCallback((index: number) => {
     if (!categories.length) return;
@@ -215,8 +218,8 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-brand-orange" />
         {backgroundImage && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: `url("${backgroundImage.replace(/["\\]/g, "")}")`, backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue-deep/25 via-transparent to-black/25" />
-        <div className="mx-auto grid max-w-[1600px] items-center gap-10 lg:grid-cols-3 lg:gap-10 xl:gap-16">
-        <div className="max-w-xl text-white lg:pr-4">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-2 items-center gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-3 lg:gap-10 xl:gap-16">
+        <div className="col-span-2 max-w-xl text-white lg:col-span-1 lg:pr-4">
           {typeof section.settings.eyebrow === "string" && section.settings.eyebrow && <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">{section.settings.eyebrow}</span>}
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
             <span className="typing-cursor">{phrases.length > 0 ? typedText : section.title}</span>
