@@ -66,13 +66,13 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
           <>
             <button
               onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
             >
               <ChevronLeft size={14} />
             </button>
             <button
               onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
             >
               <ChevronRight size={14} />
             </button>
@@ -257,11 +257,11 @@ function GroupedVariantTable({ product }: { product: Product }) {
           <thead>
             <tr>
               <th className={TH}>Variant</th>
-              <th className={TH}>SKU</th>
+              <th className={`${TH} hidden sm:table-cell`}>SKU</th>
               <th className={`${TH} text-right`}>Price</th>
               <th className={`${TH} text-right`}>Stock</th>
               <th className={`${TH} text-right`}>Qty</th>
-              <th className={`${TH} text-right`}>Line</th>
+              <th className={`${TH} hidden sm:table-cell text-right`}>Line</th>
             </tr>
           </thead>
           <tbody>
@@ -285,7 +285,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                       <span className="text-brand-ink">{child.name}</span>
                     </div>
                   </td>
-                  <td className={`${TD} font-mono text-brand-muted`}>{child.sku}</td>
+                  <td className={`${TD} hidden sm:table-cell font-mono text-brand-muted`}>{child.sku}</td>
                   <td className={`${TD} text-right`}>
                     <PriceGate pricesVisible={child.prices_visible}>
                       {child.on_sale && child.sale_price !== null ? (
@@ -303,7 +303,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                   <td className={`${TD} text-right`}>
                     <QtyStepper value={qty} onChange={(n) => setQty(child.id, n)} disabled={!child.in_stock} />
                   </td>
-                  <td className={`${TD} text-right font-mono text-brand-ink`}>
+                  <td className={`${TD} hidden sm:table-cell text-right font-mono text-brand-ink`}>
                     {qty > 0 && price > 0 ? `$${(qty * price).toFixed(2)}` : "—"}
                   </td>
                 </tr>
@@ -313,7 +313,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
         </table>
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <span className="font-mono text-[11px] text-brand-muted">
           {selectedCount} variant{selectedCount !== 1 ? "s" : ""} selected
         </span>
@@ -340,14 +340,14 @@ function SpecStrip({ attributes }: { attributes?: Record<string, string> }) {
 
   return (
     <div className="border-t border-brand-line mt-10">
-      <div className="px-8 py-4 border-b border-brand-line">
+      <div className="px-4 md:px-6 lg:px-8 py-4 border-b border-brand-line">
         <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-muted">
           Product specifications
         </span>
       </div>
-      <div className="grid grid-cols-3 divide-x divide-brand-line">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:divide-x divide-brand-line">
         {entries.map(([key, value]) => (
-          <div key={key} className="px-8 py-5 border-b border-brand-line">
+          <div key={key} className="px-4 md:px-6 lg:px-8 py-5 border-b border-brand-line">
             <div className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">
               {key}
             </div>
@@ -398,7 +398,7 @@ function ProductDetail({ id }: { id: string }) {
     return (
       <div className="animate-pulse">
         <div className="h-10 bg-brand-bg-alt border-b border-brand-line" />
-        <div className="grid grid-cols-2 gap-8 p-8">
+        <div className="grid grid-cols-1 gap-8 p-4 md:grid-cols-2 md:p-8">
           <div className="aspect-[4/3] bg-brand-bg-alt" />
           <div className="space-y-4">
             <div className="h-4 bg-brand-bg-alt rounded w-1/3" />
@@ -433,21 +433,21 @@ function ProductDetail({ id }: { id: string }) {
   ];
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Breadcrumb */}
-      <div className="px-8 py-3.5 border-b border-brand-line bg-brand-white">
+      <div className="px-4 md:px-6 lg:px-8 py-3.5 border-b border-brand-line bg-brand-white">
         <Breadcrumb items={crumbs} />
       </div>
 
       {/* Hero */}
-      <div className="grid gap-0 border-b border-brand-line" style={{ gridTemplateColumns: "1fr 1fr" }}>
+      <div className="grid grid-cols-1 gap-0 border-b border-brand-line md:grid-cols-2">
         {/* Left: images */}
-        <div className="p-8 border-r border-brand-line bg-brand-white">
+        <div className="min-w-0 p-4 md:p-6 lg:p-8 md:border-r border-b md:border-b-0 border-brand-line bg-brand-white">
           <ImageGallery images={images} name={product.name} />
         </div>
 
         {/* Right: summary */}
-        <div className="p-8 bg-brand-white">
+        <div className="min-w-0 p-5 md:p-6 lg:p-8 bg-brand-white">
           {/* Brand */}
           {product.brand && (
             <Link
@@ -459,7 +459,7 @@ function ProductDetail({ id }: { id: string }) {
           )}
 
           {/* Name */}
-          <h1 className="font-serif text-[38px] leading-[1.05] font-normal tracking-tight mt-1 text-brand-ink">
+          <h1 className="font-serif text-[26px] md:text-[30px] lg:text-[38px] leading-[1.1] font-normal tracking-tight mt-1 text-brand-ink">
             {product.name}
           </h1>
 
@@ -518,7 +518,7 @@ function ProductDetail({ id }: { id: string }) {
 
       {/* Grouped variant table */}
       {product.type === "grouped" && (
-        <div className="px-8 py-6">
+        <div className="px-4 md:px-6 lg:px-8 py-6 overflow-x-auto">
           <GroupedVariantTable product={product} />
         </div>
       )}

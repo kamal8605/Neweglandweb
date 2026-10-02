@@ -74,13 +74,12 @@ function CategoryGrid({ section }: { section: HomepageSection }) {
     });
   }, [categories.length, scrollToPhysicalIndex]);
   useEffect(() => {
-    if (categories.length <= 7) return;
-    const timer = window.setInterval(() => move(1), 5000);
+    if (categories.length <= 7) return;    const timer = window.setInterval(() => move(1), 5000);
     return () => window.clearInterval(timer);
   }, [categories.length, move]);
   if (!categories.length) return null;
   const hasCarousel = categories.length > 7;
-  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><img src={category.image} alt={category.alt} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline lg:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-4 flex justify-center gap-1.5">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className={`h-1.5 rounded-full transition-all hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} />)}</div>}</section>;
+  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><img src={category.image} alt={category.alt} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-4 flex justify-center gap-1.5">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className={`h-1.5 rounded-full transition-all hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} />)}</div>}</section>;
 }
 
 function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
@@ -154,7 +153,7 @@ function ProductSection({ section, products }: { section: HomepageSection; produ
   return (
     <section className="bg-white">
       <ImageHeading image={art} title={section.title} />
-      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-7">
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
         {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
       </div>
       {promos.length > 0 && (
@@ -176,7 +175,7 @@ function BrandStrip({ section }: { section: HomepageSection }) {
   return (
     <section className="bg-white pb-10">
       <ImageHeading image={headingImage} title={section.title} />
-      <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7">
         {brandImages.map((item) => (
           item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center p-3 no-underline transition hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)]"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain transition group-hover:-translate-y-0.5" /></Link> : <div key={item.id} className="flex h-24 items-center justify-center p-3"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain" /></div>
         ))}

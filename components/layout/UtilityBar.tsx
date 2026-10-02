@@ -35,7 +35,7 @@ export function UtilityBar() {
 
           <div className="mx-auto hidden items-center gap-7 text-[12px] text-brand-muted md:flex">
             {site.phone && <a href={phoneHref} className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue"><Phone size={14} /> {site.phone}</a>}
-            {site.email && <a href={emailHref} className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue"><Mail size={15} /> {site.email}</a>}
+            {site.email && <a href={emailHref} className="hidden items-center gap-2 text-brand-muted no-underline hover:text-brand-blue lg:inline-flex"><Mail size={15} /> {site.email}</a>}
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-2.5">

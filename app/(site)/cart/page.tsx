@@ -19,7 +19,7 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
         const done = n < step;
         return (
           <div key={label} className="flex items-center">
-            <div className="flex items-center gap-2 px-4 py-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2.5">
               <span
                 className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] shrink-0 ${
                   active
@@ -139,12 +139,12 @@ export default function CartPage() {
   const TH = "px-3 py-2 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Page header */}
       <div className="border-b border-brand-line bg-brand-white px-4 py-5 sm:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="font-serif text-[36px] font-normal text-brand-ink leading-none">
+            <h1 className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] font-normal text-brand-ink leading-tight">
               Cart · draft P.O.
             </h1>
             <div className="mt-2 font-mono text-[11px] text-brand-muted tracking-[0.06em] uppercase">
@@ -188,7 +188,7 @@ export default function CartPage() {
                   className="bg-brand-white border border-brand-line"
                 >
                   {/* Group header */}
-                  <div className="flex items-center gap-3 px-4 py-3 border-b border-brand-line">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 border-b border-brand-line">
                     {firstItem.image ? (
                       <div className="w-12 h-12 relative overflow-hidden shrink-0 border border-brand-line">
                         <Image
@@ -201,7 +201,7 @@ export default function CartPage() {
                     ) : (
                       <ImagePlaceholder size={48} />
                     )}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-[140px]">
                       <Link
                         href={`/product/${productId}`}
                         className="font-medium text-[13px] text-brand-ink hover:text-brand-blue transition-colors block truncate"
@@ -232,12 +232,12 @@ export default function CartPage() {
 
                   {/* Variant rows */}
                   <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px]">
+                  <table className="w-full sm:min-w-[560px] md:min-w-[640px]">
                     <thead>
                       <tr>
-                        <th className={TH}>SKU</th>
+                        <th className={`${TH} hidden md:table-cell`}>SKU</th>
                         <th className={TH}>Variant</th>
-                        <th className={`${TH} text-right`}>Unit price</th>
+                        <th className={`${TH} hidden sm:table-cell text-right`}>Unit price</th>
                         <th className={`${TH} text-right`}>Qty</th>
                         <th className={`${TH} text-right`}>Line total</th>
                         <th className={`${TH} w-8`} />
@@ -246,13 +246,13 @@ export default function CartPage() {
                     <tbody>
                       {group.items.map((item) => (
                         <tr key={item.product_id} className="hover:bg-brand-bg/50 transition-colors">
-                          <td className={`${TD} font-mono text-[11px] text-brand-muted w-28`}>
+                          <td className={`${TD} hidden md:table-cell font-mono text-[11px] text-brand-muted w-28`}>
                             {item.sku}
                           </td>
                           <td className={TD}>
                             <span className="text-brand-ink">{item.name}</span>
                           </td>
-                          <td className={`${TD} text-right font-mono`}>
+                          <td className={`${TD} hidden sm:table-cell text-right font-mono`}>
                             ${item.price.toFixed(2)}
                           </td>
                           <td className={`${TD} text-right`}>

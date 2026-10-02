@@ -123,7 +123,7 @@ export function ProductTable({
           </td>
 
           {/* Image */}
-          <td className={`${TD} w-14`}>
+          <td className={`${TD} w-14 hidden sm:table-cell`}>
             <div className="w-9 h-9 overflow-hidden rounded-[var(--brand-radius)] shrink-0">
               {p.image ? (
                 <Image
@@ -141,7 +141,7 @@ export function ProductTable({
           </td>
 
           {/* SKU */}
-          <td className={`${TD} w-24`}>
+          <td className={`${TD} w-24 hidden md:table-cell`}>
             <span className="font-mono text-[11px] text-brand-muted">{p.sku}</span>
           </td>
 
@@ -169,7 +169,7 @@ export function ProductTable({
 
           {/* Brand */}
           {showBrand && (
-            <td className={`${TD} w-32`}>
+            <td className={`${TD} w-32 hidden lg:table-cell`}>
               {p.brand?.id ? (
                 <Link
                   href={`/brand/${p.brand.id}`}
@@ -184,7 +184,7 @@ export function ProductTable({
           )}
 
           {/* Price */}
-          <td className={`${TD} w-24 text-right`}>{renderPriceCell(p)}</td>
+          <td className={`${TD} w-20 sm:w-24 text-right`}>{renderPriceCell(p)}</td>
 
           {/* Off % — sale page only */}
           {showDiscountPct && (
@@ -192,12 +192,12 @@ export function ProductTable({
           )}
 
           {/* Stock */}
-          <td className={`${TD} w-28`}>
+          <td className={`${TD} w-28 hidden sm:table-cell`}>
             <StockDot inStock={p.in_stock} stockQuantity={p.stock_quantity} />
           </td>
 
           {/* Qty stepper */}
-          <td className={`${TD} w-28 text-right`}>
+          <td className={`${TD} w-24 sm:w-28 text-right`}>
             {isGrouped ? (
               <span className="text-brand-muted font-mono text-[11px]">— expand —</span>
             ) : (
@@ -222,13 +222,13 @@ export function ProductTable({
         <thead>
           <tr>
             <th className={`${TH} w-7`} />
-            <th className={`${TH} w-14`}>Img</th>
-            <th className={`${TH} w-24`}>SKU</th>
+            <th className={`${TH} w-14 hidden sm:table-cell`}>Img</th>
+            <th className={`${TH} w-24 hidden md:table-cell`}>SKU</th>
             <th className={TH}>Product</th>
-            {showBrand && <th className={`${TH} w-32`}>Brand</th>}
+            {showBrand && <th className={`${TH} w-32 hidden lg:table-cell`}>Brand</th>}
             <th className={`${TH} w-24 text-right`}>Price</th>
             {showDiscountPct && <th className={`${TH} w-16 text-right`}>Off</th>}
-            <th className={`${TH} w-28`}>Stock</th>
+            <th className={`${TH} w-28 hidden sm:table-cell`}>Stock</th>
             <th className={`${TH} w-28 text-right`}>Qty</th>
           </tr>
         </thead>

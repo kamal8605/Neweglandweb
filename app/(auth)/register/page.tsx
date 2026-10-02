@@ -99,7 +99,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right panel — form or success */}
-      <div className="flex-1 flex flex-col justify-center px-10 py-10">
+      <div className="flex-1 flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-10">
         <div className="mb-8">
           <Logo />
         </div>

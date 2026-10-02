@@ -7,7 +7,7 @@ function SaleInner() {
   return (
     <div>
       {/* Promo banner */}
-      <div className="bg-[#B83434] text-white px-8 py-3 flex items-center justify-between">
+      <div className="bg-[#B83434] text-white px-4 md:px-8 py-3 flex flex-wrap items-center justify-between gap-2">
         <span className="font-mono text-[11px] tracking-[0.12em] uppercase font-medium">
           Sale · Ends soon
         </span>

@@ -46,9 +46,9 @@ export default function EditProfilePage() {
   const LABEL = "block font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted mb-1";
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader crumbs={[{ label: "Account", href: "/account/profile" }, { label: "Edit Profile" }]} title="Edit Profile" />
-      <div className="px-8 py-8 max-w-lg mx-auto">
+      <div className="px-4 md:px-8 py-8 max-w-lg mx-auto">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className={LABEL}>Full Name</label>

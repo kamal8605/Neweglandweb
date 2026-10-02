@@ -11,11 +11,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ crumbs, title, accent, meta, actions }: PageHeaderProps) {
   return (
-    <div className="px-8 py-5 pb-4 border-b border-brand-line bg-brand-white">
+    <div className="px-4 md:px-6 lg:px-8 py-4 md:py-5 pb-4 border-b border-brand-line bg-brand-white">
       <div className="flex items-baseline justify-between gap-4 flex-wrap max-w-7xl mx-auto">
         <div className="flex items-baseline gap-4 flex-wrap">
           {crumbs && crumbs.length > 0 && <Breadcrumb items={crumbs} />}
-          <h1 className="font-serif text-[36px] leading-none text-brand-ink font-normal tracking-tight m-0">
+          <h1 className="font-serif text-[26px] md:text-[32px] lg:text-[36px] leading-tight lg:leading-none text-brand-ink font-normal tracking-tight m-0">
             {title}
             {accent && (
               <em className="text-brand-blue not-italic"> {accent}</em>

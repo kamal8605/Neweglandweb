@@ -22,7 +22,7 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
         const done = n < step;
         return (
           <div key={label} className="flex items-center">
-            <div className="flex items-center gap-2 px-4 py-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2.5">
               <span
                 className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] shrink-0 ${
                   active
@@ -272,7 +272,7 @@ function AddressModal({
       {/* Panel */}
       <div className="relative w-full max-w-lg bg-brand-white max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-brand-ink">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-brand-ink">
           <span className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink">
             {initial ? "Edit address" : "New address"}
           </span>
@@ -286,23 +286,23 @@ function AddressModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-5">
+        <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-5">
           <div className="space-y-3">
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <AddressField label="First name" value={form.first_name} onChange={(v) => set("first_name", v)} required half />
               <AddressField label="Last name" value={form.last_name} onChange={(v) => set("last_name", v)} required half />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <AddressField label="Label (e.g. Home)" value={form.label ?? ""} onChange={(v) => set("label", v)} half />
               <AddressField label="Company" value={form.company ?? ""} onChange={(v) => set("company", v)} half />
             </div>
             <AddressField label="Address line 1" value={form.address_1} onChange={(v) => set("address_1", v)} required />
             <AddressField label="Address line 2" value={form.address_2 ?? ""} onChange={(v) => set("address_2", v)} />
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <AddressField label="City" value={form.city} onChange={(v) => set("city", v)} required half />
               <AddressField label="State / Province" value={form.state ?? ""} onChange={(v) => set("state", v)} half />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <AddressField label="Postcode" value={form.postcode} onChange={(v) => set("postcode", v)} required half />
               <AddressField label="Country" value={form.country} onChange={(v) => set("country", v)} required half />
             </div>
@@ -442,11 +442,11 @@ export default function CheckoutPage() {
   const TD = "px-3 py-2.5 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Page header */}
       <div className="border-b border-brand-line bg-brand-white px-4 py-5 sm:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <h1 className="font-serif text-[36px] font-normal text-brand-ink leading-none">
+          <h1 className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] font-normal text-brand-ink leading-tight">
             Checkout
           </h1>
           <div className="max-w-full overflow-x-auto"><StepIndicator step={2} /></div>
@@ -457,7 +457,7 @@ export default function CheckoutPage() {
         {/* Left — form sections */}
         <div className="flex-1 min-w-0 space-y-8">
           {/* Billing address */}
-          <section className="bg-brand-white border border-brand-line p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <AddressSelector
               title="Billing address"
               addresses={addresses}
@@ -469,7 +469,7 @@ export default function CheckoutPage() {
           </section>
 
           {/* Shipping address */}
-          <section className="bg-brand-white border border-brand-line p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <AddressSelector
               title="Shipping address"
               addresses={addresses}
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
           </section>
 
           {/* Order note */}
-          <section className="bg-brand-white border border-brand-line p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <div className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink border-b border-brand-ink pb-2 mb-3">
               Order note
             </div>
@@ -503,7 +503,7 @@ export default function CheckoutPage() {
           </section>
 
           {/* Order review */}
-          <section className="bg-brand-white border border-brand-line p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <div className="flex items-center justify-between border-b border-brand-ink pb-2 mb-3">
               <span className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink">
                 Order review · {items.length} line{items.length !== 1 ? "s" : ""}
@@ -516,7 +516,7 @@ export default function CheckoutPage() {
               </Link>
             </div>
             <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
+            <table className="w-full sm:min-w-[560px]">
               <thead>
                 <tr>
                   <th className={TH}>Product</th>

@@ -17,9 +17,9 @@ export function CartBar({ onAddToCart, cta = "ADD TO CART", selectedCount }: Car
   if (itemCount === 0 && selectedCount === undefined) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-brand-navy text-white px-8 py-3 flex items-center justify-between font-mono text-[11.5px] tracking-[0.04em] shadow-[0_-2px_16px_rgba(0,0,0,0.2)]">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-brand-navy text-white px-4 md:px-8 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 font-mono text-[11.5px] tracking-[0.04em] shadow-[0_-2px_16px_rgba(0,0,0,0.2)]">
       {/* Left — cart summary */}
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 md:gap-6">
         <span className="flex items-center gap-2">
           <ShoppingCart size={14} className="text-[#9DAAC2]" />
           <span className="text-[#9DAAC2]">CART</span>

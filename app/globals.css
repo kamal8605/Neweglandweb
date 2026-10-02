@@ -327,3 +327,19 @@ textarea {
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* Responsive safety: never let a stray wide element create a horizontal page scroll. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Comfortable tap targets and no iOS zoom-on-focus on touch screens. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

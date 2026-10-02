@@ -138,12 +138,12 @@ function OrdersTable() {
 
 export default function OrdersPage() {
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={[{ label: "Orders" }]}
         title="Your orders"
       />
-      <div className="px-8 py-6 max-w-5xl mx-auto">
+      <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto">
         <Suspense>
           <OrdersTable />
         </Suspense>

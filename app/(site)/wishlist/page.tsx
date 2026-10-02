@@ -150,12 +150,12 @@ function WishlistTable() {
 
 export default function WishlistPage() {
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={[{ label: "Wishlist" }]}
         title="Wishlist"
       />
-      <div className="px-8 py-6 max-w-5xl mx-auto">
+      <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto">
         <Suspense>
           <WishlistTable />
         </Suspense>

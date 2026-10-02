@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { X, SlidersHorizontal, LayoutList, LayoutGrid } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -61,11 +61,26 @@ export function BrowseLayout({
   // Local state
   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
   const [brandSearch, setBrandSearch] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"list" | "grid">(() => {
     if (typeof window === "undefined") return "list";
     return (localStorage.getItem("fastweb_view") as "list" | "grid") ?? "list";
   });
   const { addItem } = useCart();
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const previous = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFiltersOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [filtersOpen]);
 
   function switchView(v: "list" | "grid") {
     setView(v);
@@ -190,7 +205,7 @@ export function BrowseLayout({
   const activeSubCatName = sidebarSubCats.find((sc) => sc.id === subCatId)?.name;
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={
           crumbs ?? [
@@ -204,7 +219,7 @@ export function BrowseLayout({
 
       {/* Sub-category pills — category pages only */}
       {subCategories.length > 0 && (
-        <div className="px-8 py-3 border-b border-brand-line bg-brand-white flex items-center gap-2 flex-wrap">
+        <div className="px-4 md:px-6 lg:px-8 py-3 border-b border-brand-line bg-brand-white flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setParam("sub_cat", null)}
             className={`px-3 py-1 text-[11.5px] border rounded-[var(--brand-radius)] transition-colors ${
@@ -234,22 +249,44 @@ export function BrowseLayout({
         </div>
       )}
 
-      <div className="flex px-8 pt-4 gap-6 max-w-[1600px] mx-auto">
-        {/* ── Filters sidebar ──────────────────────────────── */}
-        <aside className="w-[220px] shrink-0 text-[12.5px]">
+      <div className="flex px-4 md:px-6 lg:px-8 pt-4 gap-6 max-w-[1600px] mx-auto">
+        {filtersOpen && (
+          <button
+            type="button"
+            aria-label="Close filters"
+            onClick={() => setFiltersOpen(false)}
+            className="fixed inset-0 z-[55] bg-black/50 lg:hidden"
+          />
+        )}
+        {/* ── Filters sidebar (drawer below lg) ─────────────── */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-[60] w-[min(86vw,320px)] overflow-y-auto bg-brand-white p-5 text-[12.5px] shadow-2xl transition-transform duration-200 lg:static lg:z-auto lg:w-[220px] lg:shrink-0 lg:translate-x-0 lg:overflow-visible lg:bg-transparent lg:p-0 lg:shadow-none ${
+            filtersOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
           <div className="flex items-center justify-between pb-2 border-b border-brand-ink mb-3">
             <span className="font-mono text-[10px] tracking-[0.08em] uppercase flex items-center gap-1.5">
               <SlidersHorizontal size={11} />
               FILTERS{activeFilterCount > 0 && ` · ${activeFilterCount}`}
             </span>
-            {activeFilterCount > 0 && (
+            <div className="flex items-center gap-3">
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={clearAll}
+                  className="text-[11px] text-brand-orange hover:text-brand-ink transition-colors"
+                >
+                  Clear all
+                </button>
+              )}
               <button
-                onClick={clearAll}
-                className="text-[11px] text-brand-orange hover:text-brand-ink transition-colors"
+                type="button"
+                onClick={() => setFiltersOpen(false)}
+                aria-label="Close filters"
+                className="p-1 text-brand-ink lg:hidden"
               >
-                Clear all
+                <X size={18} />
               </button>
-            )}
+            </div>
           </div>
 
           {/* In stock */}
@@ -354,7 +391,7 @@ export function BrowseLayout({
 
         {/* ── Main: toolbar + table + pagination ─────────── */}
         <main className="flex-1 min-w-0">
-          <div className="flex items-center justify-between py-2.5 border-b border-brand-ink mb-0">
+          <div className="flex flex-wrap items-center justify-between gap-y-2 py-2.5 border-b border-brand-ink mb-0">
             <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.04em] text-brand-muted uppercase flex-wrap">
               {meta && (
                 <span>
@@ -400,12 +437,20 @@ export function BrowseLayout({
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setFiltersOpen(true)}
+                className="inline-flex h-9 items-center gap-1.5 border border-brand-line bg-brand-white px-3 font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-ink hover:border-brand-ink lg:hidden"
+              >
+                <SlidersHorizontal size={13} />
+                Filters{activeFilterCount > 0 && ` · ${activeFilterCount}`}
+              </button>
               <div className="flex items-center border border-brand-line rounded-[var(--brand-radius)] overflow-hidden">
                 <button
                   onClick={() => switchView("list")}
                   title="List view"
-                  className={`px-2 py-1.5 transition-colors ${
+                  className={`px-2.5 py-2 lg:px-2 lg:py-1.5 transition-colors ${
                     view === "list"
                       ? "bg-brand-ink text-white"
                       : "bg-brand-white text-brand-muted hover:text-brand-ink"
@@ -416,7 +461,7 @@ export function BrowseLayout({
                 <button
                   onClick={() => switchView("grid")}
                   title="Grid view"
-                  className={`px-2 py-1.5 transition-colors border-l border-brand-line ${
+                  className={`px-2.5 py-2 lg:px-2 lg:py-1.5 transition-colors border-l border-brand-line ${
                     view === "grid"
                       ? "bg-brand-ink text-white"
                       : "bg-brand-white text-brand-muted hover:text-brand-ink"
@@ -432,7 +477,7 @@ export function BrowseLayout({
               <select
                 value={sort}
                 onChange={(e) => setParam("sort", e.target.value)}
-                className="h-7 px-2 border border-brand-line text-[11.5px] bg-brand-white rounded-[var(--brand-radius)] focus:outline-none focus:border-brand-blue"
+                className="h-9 lg:h-7 px-2 border border-brand-line text-[11.5px] bg-brand-white rounded-[var(--brand-radius)] focus:outline-none focus:border-brand-blue"
               >
                 {SORT_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>

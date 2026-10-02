@@ -55,7 +55,7 @@ function BrandHero({ id }: { id: string }) {
   return (
     <>
       {/* Breadcrumb */}
-      <div className="px-8 py-3.5 border-b border-brand-line bg-brand-white">
+      <div className="px-4 md:px-8 py-3.5 border-b border-brand-line bg-brand-white">
         <Breadcrumb
           items={[
             { label: "Brands", href: "/brands" },
@@ -66,11 +66,10 @@ function BrandHero({ id }: { id: string }) {
 
       {/* Hero — two-column */}
       <div
-        className="grid border-b border-brand-line"
-        style={{ gridTemplateColumns: "1.2fr 1fr" }}
+        className="grid grid-cols-1 border-b border-brand-line md:[grid-template-columns:1.2fr_1fr]"
       >
         {/* Left: image with gradient overlay */}
-        <div className="relative min-h-[280px] overflow-hidden">
+        <div className="relative min-h-[220px] md:min-h-[280px] overflow-hidden">
           {brand.image ? (
             <Image src={brand.image} alt={brand.name} fill sizes="(max-width: 768px) 100vw, 50vw" loading="eager" className="object-cover" />
           ) : (
@@ -85,19 +84,19 @@ function BrandHero({ id }: { id: string }) {
             }}
           />
           {/* Brand name overlay */}
-          <div className="absolute bottom-6 left-8 right-8 text-white">
+          <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-8 md:right-8 text-white">
             <div className="font-mono text-[10.5px] tracking-[0.12em] uppercase text-brand-orange mb-2">
               {brand.location ?? "USA"}
               {brand.founded_year ? ` · EST. ${brand.founded_year}` : ""}
             </div>
-            <h1 className="font-serif text-[52px] leading-[0.95] font-normal tracking-tight m-0">
+            <h1 className="font-serif text-[34px] md:text-[44px] lg:text-[52px] leading-[1] font-normal tracking-tight m-0">
               {brand.name}
             </h1>
           </div>
         </div>
 
         {/* Right: buyer fact sheet */}
-        <div className="bg-brand-white px-7 py-6">
+        <div className="bg-brand-white px-4 md:px-7 py-6">
           <div className="flex items-center justify-between pb-3 border-b border-brand-ink mb-1">
             <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-ink">
               Buyer fact sheet
@@ -162,7 +161,7 @@ function BrandProducts({ id, brandName }: { id: string; brandName: string }) {
   return (
     <div id="products">
       {/* Tab bar */}
-      <div className="px-8 pt-0 border-b border-brand-line bg-brand-white flex items-center gap-0">
+      <div className="px-4 md:px-8 pt-0 border-b border-brand-line bg-brand-white flex items-center gap-0 overflow-x-auto">
         {(Object.entries(TAB_CONFIG) as [Tab, (typeof TAB_CONFIG)[Tab]][]).map(
           ([key, cfg]) => (
             <button

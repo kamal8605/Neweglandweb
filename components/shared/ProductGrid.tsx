@@ -117,7 +117,7 @@ export function ProductGrid({
                   src={p.image}
                   alt={p.name}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   unoptimized
                 />
               ) : (
@@ -158,7 +158,7 @@ export function ProductGrid({
 
               <span className="font-mono text-[10.5px] text-brand-muted">{p.sku}</span>
 
-              <div className="mt-auto pt-2 flex items-center justify-between gap-2">
+              <div className="mt-auto pt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                 {renderPrice(p)}
                 <StockDot inStock={p.in_stock} stockQuantity={p.stock_quantity} />
               </div>

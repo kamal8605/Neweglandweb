@@ -43,7 +43,7 @@ function StatusTracker({ status }: { status: OrderStatus }) {
   const activeIndex = STATUS_STEPS.indexOf(status);
 
   return (
-    <div className="flex items-center gap-0">
+    <div className="flex items-center gap-0 overflow-x-auto max-w-full">
       {STATUS_STEPS.map((step, i) => {
         const done = i < activeIndex;
         const active = i === activeIndex;
@@ -130,9 +130,9 @@ function OrderDetail({ id }: { id: string }) {
   const TD = "px-4 py-3 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Breadcrumb */}
-      <div className="px-8 py-3.5 border-b border-brand-line bg-brand-white">
+      <div className="px-4 md:px-8 py-3.5 border-b border-brand-line bg-brand-white">
         <Breadcrumb
           items={[
             { label: "Orders", href: "/orders" },
@@ -142,9 +142,9 @@ function OrderDetail({ id }: { id: string }) {
       </div>
 
       {/* Order header */}
-      <div className="px-8 py-6 border-b border-brand-line bg-brand-white flex items-start justify-between gap-6">
+      <div className="px-4 md:px-8 py-6 border-b border-brand-line bg-brand-white flex flex-wrap items-start justify-between gap-6">
         <div>
-          <h1 className="font-serif text-[36px] font-normal text-brand-ink leading-none">
+          <h1 className="font-serif text-[28px] md:text-[36px] font-normal text-brand-ink leading-none">
             {order.invoice_no}
           </h1>
           <div className="mt-2 flex items-center gap-3">
@@ -161,9 +161,9 @@ function OrderDetail({ id }: { id: string }) {
         <StatusTracker status={order.status} />
       </div>
 
-      <div className="px-8 py-6 max-w-5xl mx-auto space-y-6">
+      <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto space-y-6">
         {/* Addresses */}
-        <div className="bg-brand-white border border-brand-line p-6 grid grid-cols-2 gap-6">
+        <div className="bg-brand-white border border-brand-line p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <AddressBlock
             label="Billing address"
             fields={[

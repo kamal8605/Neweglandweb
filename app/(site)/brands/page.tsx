@@ -32,7 +32,7 @@ export default function BrandsPage() {
         meta={brands ? `${brands.length} brands` : undefined}
       />
 
-      <div className="px-8 py-8 max-w-7xl mx-auto">
+      <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto">
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
