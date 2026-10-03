@@ -10,6 +10,9 @@
     "ios_saf >= 13"
   ],
   "scripts": {
+    "build:pdf-worker": "node scripts/build-pdf-worker.mjs",
+    "postinstall": "node scripts/build-pdf-worker.mjs",
+    "prebuild": "node scripts/build-pdf-worker.mjs",
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
     "build": "next build",
