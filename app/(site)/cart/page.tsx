@@ -69,14 +69,20 @@ function ImagePlaceholder({ size = 48 }: { size?: number }) {
 function QtyStepper({
   value,
   onChange,
+  max,
+  canIncrease = true,
 }: {
   value: number;
   onChange: (n: number) => void;
+  max?: number;
+  canIncrease?: boolean;
 }) {
+  const atMax = !canIncrease || (max !== undefined && value >= max);
   return (
     <div className="inline-flex items-center border border-brand-line">
       <button
         onClick={() => onChange(Math.max(0, value - 1))}
+        aria-label="Decrease quantity"
         className="w-7 h-7 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors"
       >
         −
@@ -86,7 +92,10 @@ function QtyStepper({
       </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="w-7 h-7 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors"
+        disabled={atMax}
+        aria-label="Increase quantity"
+        title={atMax && canIncrease ? "Maximum available quantity" : undefined}
+        className="w-7 h-7 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors disabled:cursor-not-allowed disabled:opacity-30"
       >
         +
       </button>
@@ -99,12 +108,14 @@ function QtyStepper({
 export default function CartPage() {
   const { isLoading } = useRequireAuth();
   const { isApproved } = useAuth();
-  const { items, itemCount, subtotal, updateQty, removeItem, isSyncingPrices } = useCart();
+  const { items, itemCount, subtotal, updateQty, removeItem, isLoaded, notices, dismissNotices } = useCart();
+  const unavailableCount = items.filter((i) => i.in_stock === false).length;
 
-  if (isLoading || isSyncingPrices) {
+  // Only the first load shows a loader; later background syncs update the cart in place (no flicker).
+  if (isLoading || !isLoaded) {
     return (
       <div className="flex items-center justify-center h-60 font-mono text-[11px] text-brand-muted tracking-widest uppercase">
-        {isSyncingPrices ? "Updating cart prices…" : "Loading…"}
+        Loading cart…
       </div>
     );
   }
@@ -156,6 +167,20 @@ export default function CartPage() {
           <div className="max-w-full overflow-x-auto"><StepIndicator step={1} /></div>
         </div>
       </div>
+
+      {/* Messages from the server: quantities capped to stock, products removed, failed updates */}
+      {notices.length > 0 && (
+        <div role="status" className="mx-auto mt-4 max-w-[1400px] px-4 sm:px-8">
+          <div className="flex items-start justify-between gap-4 border border-brand-orange/40 bg-brand-orange-soft px-4 py-3">
+            <ul className="space-y-1 font-mono text-[11.5px] text-brand-ink">
+              {notices.map((notice) => <li key={notice}>{notice}</li>)}
+            </ul>
+            <button onClick={dismissNotices} aria-label="Dismiss cart messages" className="shrink-0 text-brand-muted hover:text-brand-ink">
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Empty state */}
       {items.length === 0 ? (
@@ -250,7 +275,12 @@ export default function CartPage() {
                             {item.sku}
                           </td>
                           <td className={TD}>
-                            <span className="text-brand-ink">{item.name}</span>
+                            <span className={item.in_stock === false ? "text-brand-muted line-through" : "text-brand-ink"}>{item.name}</span>
+                            {item.in_stock === false && (
+                              <span className="ml-2 inline-block bg-[#B83434] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.06em] text-white">
+                                Out of stock
+                              </span>
+                            )}
                           </td>
                           <td className={`${TD} hidden sm:table-cell text-right font-mono`}>
                             ${item.price.toFixed(2)}
@@ -258,6 +288,8 @@ export default function CartPage() {
                           <td className={`${TD} text-right`}>
                             <QtyStepper
                               value={item.quantity}
+                              max={item.max_quantity}
+                              canIncrease={item.in_stock !== false}
                               onChange={(n) => updateQty(item.product_id, n)}
                             />
                           </td>
@@ -311,7 +343,13 @@ export default function CartPage() {
             </div>
 
             <div className="px-5 pb-5">
-              {isApproved ? (
+              {isApproved && unavailableCount > 0 ? (
+                <div className="border border-[#B83434]/40 px-4 py-3 text-center">
+                  <p className="font-mono text-[11px] text-[#B83434]">
+                    Remove {unavailableCount === 1 ? "the out-of-stock item" : `${unavailableCount} out-of-stock items`} to continue.
+                  </p>
+                </div>
+              ) : isApproved ? (
                 <Link
                   href="/checkout"
                   className="block w-full bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase text-center px-5 py-3 hover:bg-brand-navy/90 transition-colors"

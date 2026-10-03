@@ -345,7 +345,7 @@ interface ModalState {
 export default function CheckoutPage() {
   const { isLoading } = useRequireApproved();
   const { user } = useAuth();
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, refreshCart, isLoaded: cartLoaded } = useCart();
   const { data: addresses = [] } = useAddresses();
   const router = useRouter();
 
@@ -371,7 +371,7 @@ export default function CheckoutPage() {
     });
   }
 
-  if (isLoading) {
+  if (isLoading || !cartLoaded) {
     return (
       <div className="flex items-center justify-center h-60 font-mono text-[11px] text-brand-muted tracking-widest uppercase">
         Loading…
@@ -386,6 +386,10 @@ export default function CheckoutPage() {
     }
     if (items.length === 0) {
       setError("Your cart is empty.");
+      return;
+    }
+    if (items.some((item) => item.in_stock === false)) {
+      setError("Some items in your cart are out of stock. Please remove them from your cart first.");
       return;
     }
 
@@ -422,7 +426,8 @@ export default function CheckoutPage() {
 
     try {
       const res = await api.post<{ data: { id: number } }>("/orders", payload);
-      clearCart();
+      // The server removes the ordered products from the account cart; re-read it so every device agrees.
+      void refreshCart();
       router.push(`/orders/${res.data.data.id}`);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };

@@ -6,6 +6,7 @@ import { type FormEvent, useState } from "react";
 import { Heart, Mail, Phone, Search, ShoppingCart, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useWishlistCount } from "@/hooks/useWishlist";
 import { UserAccountMenu } from "./UserAccountMenu";
 import { Logo } from "./Logo";
 import { useSiteConfig } from "@/context/SiteConfigContext";
@@ -13,6 +14,7 @@ import { useSiteConfig } from "@/context/SiteConfigContext";
 export function UtilityBar() {
   const { isAuthenticated, user } = useAuth();
   const { itemCount, subtotal } = useCart();
+  const wishlistCount = useWishlistCount();
   const router = useRouter();
   const [search, setSearch] = useState("");
   const { site } = useSiteConfig();
@@ -85,7 +87,7 @@ export function UtilityBar() {
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
           {isAuthenticated ? (
             <>
-              <Link href="/wishlist" className="hidden min-h-12 flex-col items-center justify-center gap-1 rounded-none px-3 text-[10px] font-bold uppercase text-brand-muted no-underline transition-colors hover:bg-brand-orange-soft hover:text-brand-orange sm:flex"><Heart size={21} /><span>Wishlist</span></Link>
+              <Link href="/wishlist" aria-label={`${wishlistCount} items in wishlist`} className="hidden min-h-12 flex-col items-center justify-center gap-1 rounded-none px-3 text-[10px] font-bold uppercase text-brand-muted no-underline transition-colors hover:bg-brand-orange-soft hover:text-brand-orange sm:flex"><span className="relative"><Heart size={21} />{wishlistCount > 0 && <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-none bg-brand-orange px-1 text-[9px] font-black text-white">{wishlistCount}</span>}</span><span>Wishlist</span></Link>
               <div className="rounded-none border border-brand-navy bg-brand-navy px-3 py-2.5 shadow-sm transition-colors hover:bg-brand-blue-deep"><UserAccountMenu /></div>
             </>
           ) : (

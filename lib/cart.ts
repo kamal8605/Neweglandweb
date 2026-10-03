@@ -9,6 +9,44 @@ export interface CartItem {
   quantity: number;
   parent_id?: number | null;
   parent_name?: string | null;
+  /** Server-validated fields (present for signed-in carts). */
+  in_stock?: boolean;
+  max_quantity?: number;
+}
+
+/** A cart line as returned by the account cart API (`/cart`). */
+export interface ServerCartLine {
+  product_id: number;
+  name: string;
+  sku: string | null;
+  image: string | null;
+  quantity: number;
+  price: number | null;
+  in_stock: boolean;
+  max_quantity: number;
+  parent_id: number | null;
+  parent_name: string | null;
+}
+
+export interface ServerCartResponse {
+  data: { items: ServerCartLine[]; item_count: number; subtotal: number | null; prices_visible: boolean };
+  notices?: string[];
+  message?: string;
+}
+
+export function fromServerCart(lines: ServerCartLine[]): CartItem[] {
+  return lines.map((line) => ({
+    product_id: line.product_id,
+    name: line.name,
+    sku: line.sku ?? "",
+    image: line.image,
+    price: line.price ?? 0,
+    quantity: line.quantity,
+    parent_id: line.parent_id,
+    parent_name: line.parent_name,
+    in_stock: line.in_stock,
+    max_quantity: line.max_quantity,
+  }));
 }
 
 export function sanitizeCart(value: unknown): CartItem[] {

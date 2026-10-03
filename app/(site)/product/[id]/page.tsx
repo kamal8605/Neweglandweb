@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useCallback, Suspense } from "react";
+import { use, useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, GitCompare, ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,7 +12,7 @@ import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PriceGate } from "@/components/shared/PriceGate";
 import { StockDot } from "@/components/shared/StockDot";
 import { CartBar } from "@/components/shared/CartBar";
-import api from "@/lib/axios";
+import { useToggleWishlist, useWishlistIds } from "@/hooks/useWishlist";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -148,6 +148,7 @@ function QtyStepper({
       <button
         onClick={() => onChange(Math.max(0, value - 1))}
         disabled={disabled || value <= 0}
+        aria-label="Decrease quantity"
         className="w-8 h-8 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors disabled:opacity-30"
       >
         −
@@ -158,6 +159,7 @@ function QtyStepper({
       <button
         onClick={() => onChange(value + 1)}
         disabled={disabled}
+        aria-label="Increase quantity"
         className="w-8 h-8 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors disabled:opacity-30"
       >
         +
@@ -359,40 +361,20 @@ function SpecStrip({ attributes }: { attributes?: Record<string, string> }) {
   );
 }
 
-// ─── Wishlist ────────────────────────────────────────────────────────────────
-
-function useWishlist(productId: number) {
-  const [wishlisted, setWishlisted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useAuth();
-
-  const toggle = useCallback(async () => {
-    if (!isAuthenticated) return;
-    setLoading(true);
-    try {
-      if (wishlisted) {
-        await api.delete(`/wishlist/${productId}`);
-        setWishlisted(false);
-      } else {
-        await api.post("/wishlist", { product_id: productId });
-        setWishlisted(true);
-      }
-    } catch {
-      // silently ignore — wishlist is non-critical
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated, productId, wishlisted]);
-
-  return { wishlisted, loading, toggle };
-}
-
 // ─── Main Product Detail ──────────────────────────────────────────────────────
 
 function ProductDetail({ id }: { id: string }) {
   const { data: product, isLoading, isError } = useProduct(id);
-  const { wishlisted, loading: wishlistLoading, toggle: toggleWishlist } = useWishlist(Number(id));
   const { isAuthenticated } = useAuth();
+  // Server-backed wishlist shared with every device (state comes from the account, not this page).
+  const wishlistIds = useWishlistIds();
+  const toggleWishlistItem = useToggleWishlist();
+  const wishlisted = wishlistIds.has(Number(id));
+  const toggleWishlist = () => {
+    if (!product) return;
+    void toggleWishlistItem(product.id, { name: product.name, sku: product.sku, image: product.image, in_stock: product.in_stock })
+      .catch(() => undefined); // the hook already restored the previous state
+  };
 
   if (isLoading) {
     return (
@@ -499,7 +481,7 @@ function ProductDetail({ id }: { id: string }) {
           <div className="mt-5 flex items-center gap-4 pt-4 border-t border-brand-line">
             <button
               onClick={() => { if (isAuthenticated) toggleWishlist(); }}
-              disabled={wishlistLoading}
+              aria-pressed={wishlisted}
               title={isAuthenticated ? (wishlisted ? "Remove from wishlist" : "Add to wishlist") : "Sign in to wishlist"}
               className={`flex items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase transition-colors disabled:opacity-50 ${
                 wishlisted ? "text-[#B83434]" : "text-brand-muted hover:text-brand-ink"
