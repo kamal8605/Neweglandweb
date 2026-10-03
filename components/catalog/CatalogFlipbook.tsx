@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
   ChevronLeft,
@@ -30,8 +30,19 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-const PDF_OPTIONS = { wasmUrl: "/pdfjs/wasm/" };
+// disableAutoFetch: only download the byte ranges of pages that are actually shown (catalogs are tens of MB).
+const PDF_OPTIONS = { wasmUrl: "/pdfjs/wasm/", disableAutoFetch: true };
 const ZOOM_LEVELS = [1, 1.25, 1.5, 1.8, 2.2];
+
+// Layout breakpoints (viewport width, px). Below PHONE the book is always a single page;
+// below DOUBLE_MIN (or in portrait) it defaults to a single page; otherwise a two-page spread.
+const PHONE = 768;
+const DOUBLE_MIN = 900;
+
+function readViewport() {
+  if (typeof window === "undefined") return { width: 1280, height: 800 };
+  return { width: window.innerWidth, height: window.innerHeight };
+}
 
 interface FlipbookProps {
   file: string;
@@ -50,14 +61,14 @@ interface FlipbookHandle {
   };
 }
 
-const PdfPage = forwardRef<HTMLDivElement, { pageNumber: number; width: number; shouldRender: boolean }>(
-  ({ pageNumber, width, shouldRender }, ref) => (
+const PdfPage = forwardRef<HTMLDivElement, { pageNumber: number; width: number; shouldRender: boolean; dpr: number }>(
+  ({ pageNumber, width, shouldRender, dpr }, ref) => (
     <div ref={ref} className="catalog-pdf-page bg-white" data-density={pageNumber === 1 ? "hard" : "soft"}>
       {shouldRender ? (
         <Page
           pageNumber={pageNumber}
           width={width}
-          devicePixelRatio={1.5}
+          devicePixelRatio={dpr}
           renderMode="canvas"
           renderTextLayer={false}
           renderAnnotationLayer={false}
@@ -121,14 +132,15 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
   const [currentPage, setCurrentPage] = useState(0);
   const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null);
   const [pageRatio, setPageRatio] = useState(255 / 330);
-  const [bookSize, setBookSize] = useState({ width: 460, height: 598 });
+  const [viewport, setViewport] = useState(readViewport);
+  const [loadProgress, setLoadProgress] = useState<number | null>(null);
 
   // Interactive controls state
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSinglePage, setIsSinglePage] = useState(false);
+  const [pageMode, setPageMode] = useState<"auto" | "single" | "double">("auto");
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -138,27 +150,78 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
 
   const downloadUrl = file;
 
-  // Fit book dimensions to viewport
-  const fitBookToViewport = useCallback(() => {
-    const isMobile = window.innerWidth < 768;
-    const effectiveSingle = isSinglePage || isMobile;
-    const availableHeight = Math.max(260, window.innerHeight - 150);
-    const availablePageWidth = effectiveSingle
-      ? Math.max(200, Math.min(560, (window.innerWidth - 120) / 2.6))
-      : Math.max(200, (window.innerWidth - 140) / 2);
-    const height = Math.floor(Math.min(780, availableHeight, availablePageWidth / pageRatio));
-    const width = Math.floor(height * pageRatio);
-    setBookSize({ width, height });
-  }, [isSinglePage, pageRatio]);
-
+  // Track the viewport (debounced). Ignore small height-only changes (mobile browser toolbars showing/hiding)
+  // so the book is not rebuilt while the user is just touching the screen.
   useEffect(() => {
-    const timer = window.setTimeout(fitBookToViewport, 0);
-    window.addEventListener("resize", fitBookToViewport);
+    let timer: number | undefined;
+    const update = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const next = readViewport();
+        setViewport((prev) =>
+          prev.width === next.width && Math.abs(prev.height - next.height) < 80 ? prev : next,
+        );
+      }, 120);
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
     return () => {
       window.clearTimeout(timer);
-      window.removeEventListener("resize", fitBookToViewport);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
     };
-  }, [fitBookToViewport]);
+  }, []);
+
+  const isPhone = viewport.width < PHONE;
+  const canChooseMode = !isPhone;
+  const autoSingle = viewport.width < DOUBLE_MIN || viewport.height > viewport.width * 1.05;
+  const isSinglePage = isPhone || (pageMode === "auto" ? autoSingle : pageMode === "single");
+
+  // Fit the book inside the space left by the close button (top) and the toolbar (bottom).
+  const bookSize = useMemo(() => {
+    // Must match the viewport padding below (pt-14 / sm:pt-8 and pb-24).
+    const topSpace = viewport.width < 640 ? 56 : 32;
+    const bottomSpace = 96;
+    const sideSpace = viewport.width < 640 ? 16 : viewport.width < 1024 ? 56 : 80;
+    const availableHeight = Math.max(240, viewport.height - topSpace - bottomSpace);
+    const availablePageWidth = Math.max(
+      160,
+      isSinglePage ? viewport.width - sideSpace * 2 : (viewport.width - sideSpace * 2) / 2,
+    );
+    const height = Math.floor(Math.min(820, availableHeight, availablePageWidth / pageRatio));
+    return { width: Math.floor(height * pageRatio), height };
+  }, [viewport, isSinglePage, pageRatio]);
+
+  const renderDpr = Math.min(
+    typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
+    viewport.width < DOUBLE_MIN ? 1.5 : 2,
+  );
+  const renderWindow = viewport.width < DOUBLE_MIN ? 3 : 6;
+
+  // In a two-page spread the cover (first page) and the back cover (last page, when the count is even)
+  // sit alone on one side; slide the book so that single page is centred instead of half off-screen.
+  const spreadShift = (() => {
+    if (isSinglePage || !pageCount) return 0;
+    if (currentPage === 0) return -bookSize.width / 2;
+    if (pageCount % 2 === 0 && currentPage >= pageCount - 1) return bookSize.width / 2;
+    return 0;
+  })();
+
+  // Keep the zoomed page from being dragged completely out of view.
+  const clampPan = useCallback(
+    (x: number, y: number) => {
+      const contentWidth = (isSinglePage ? bookSize.width : bookSize.width * 2) * zoom;
+      const contentHeight = bookSize.height * zoom;
+      const limitX = Math.max(0, (contentWidth - viewport.width) / 2 + 48);
+      const limitY = Math.max(0, (contentHeight - (viewport.height - 140)) / 2 + 48);
+      return {
+        x: Math.max(-limitX, Math.min(limitX, x)),
+        y: Math.max(-limitY, Math.min(limitY, y)),
+      };
+    },
+    [bookSize, isSinglePage, viewport, zoom],
+  );
 
   // Handle escape key and body overflow lock
   useEffect(() => {
@@ -287,13 +350,24 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || zoom <= 1) return;
-    setPan({
-      x: e.clientX - dragStartRef.current.x,
-      y: e.clientY - dragStartRef.current.y,
-    });
+    setPan(clampPan(e.clientX - dragStartRef.current.x, e.clientY - dragStartRef.current.y));
   };
 
   const handleMouseUp = () => setIsDragging(false);
+
+  // Touch pan while zoomed in (the book ignores touches then, so it cannot flip pages by accident).
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (zoom <= 1 || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    dragStartRef.current = { x: touch.clientX - pan.x, y: touch.clientY - pan.y };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || zoom <= 1 || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    setPan(clampPan(touch.clientX - dragStartRef.current.x, touch.clientY - dragStartRef.current.y));
+  };
 
   return (
     <div
@@ -316,40 +390,62 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
 
       {/* Main flipbook viewport */}
       <div
-        className="relative flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden px-8 py-4 sm:px-16"
+        className={`relative flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden px-2 pb-24 pt-14 sm:px-8 sm:pb-24 sm:pt-8 ${zoom > 1 ? "touch-none" : ""}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleMouseUp}
+        onTouchCancel={handleMouseUp}
       >
         <Document
           file={file}
           options={PDF_OPTIONS}
+          onLoadProgress={({ loaded, total }) => {
+            if (total) setLoadProgress(Math.min(100, Math.round((loaded / total) * 100)));
+          }}
           onLoadSuccess={async (document) => {
             setPdfDocument(document);
             setPageCount(document.numPages);
             const firstPage = await document.getPage(1);
-            const viewport = firstPage.getViewport({ scale: 1 });
-            setPageRatio(viewport.width / viewport.height);
+            const pageViewport = firstPage.getViewport({ scale: 1 });
+            setPageRatio(pageViewport.width / pageViewport.height);
           }}
           loading={
-            <div className="flex flex-col items-center gap-3 text-white">
+            <div className="flex flex-col items-center gap-3 px-6 text-center text-white">
               <LoaderCircle className="animate-spin text-brand-orange" size={44} />
-              <span className="text-sm font-semibold tracking-wide">Loading catalog…</span>
+              <span className="text-sm font-semibold tracking-wide">
+                Loading catalog…{loadProgress !== null && loadProgress < 100 ? ` ${loadProgress}%` : ""}
+              </span>
             </div>
           }
-          error={<p className="text-white text-sm font-semibold">Catalog could not be loaded.</p>}
+          error={
+            <div className="flex flex-col items-center gap-4 px-6 text-center text-white">
+              <p className="text-sm font-semibold">Catalog could not be loaded in the viewer.</p>
+              <a
+                href={downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 bg-brand-orange px-5 text-xs font-bold uppercase tracking-wider text-white no-underline hover:bg-brand-orange/90"
+              >
+                <Download size={16} /> Open PDF
+              </a>
+            </div>
+          }
         >
           {pageCount > 0 && (
             <div
-              className={`transition-transform duration-200 ease-out flex items-center justify-center overflow-visible ${
+              className={`flex items-center justify-center overflow-visible transition-transform duration-300 ease-out ${
                 zoom > 1 ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
               }`}
               style={{
                 width: isSinglePage ? `${bookSize.width}px` : `${bookSize.width * 2}px`,
                 maxWidth: isSinglePage ? `${bookSize.width}px` : `${bookSize.width * 2}px`,
-                transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                transform: `scale(${zoom}) translate(${pan.x / zoom + spreadShift}px, ${pan.y / zoom}px)`,
                 transformOrigin: "center center",
+                pointerEvents: zoom > 1 ? "none" : undefined,
               }}
             >
               <HTMLFlipBook
@@ -391,7 +487,8 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     key={index + 1}
                     pageNumber={index + 1}
                     width={bookSize.width}
-                    shouldRender={Math.abs(index - currentPage) <= 6}
+                    dpr={renderDpr}
+                    shouldRender={Math.abs(index - currentPage) <= renderWindow}
                   />
                 ))}
               </HTMLFlipBook>
@@ -409,9 +506,9 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           disabled={currentPage === 0}
           aria-label="Previous page"
           title="Previous Page"
-          className={`absolute ${showThumbnails ? "left-68 sm:left-76" : "left-2 sm:left-6"} top-1/2 z-30 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/35 text-white/80 backdrop-blur-xs transition-all hover:bg-black/70 hover:text-white disabled:pointer-events-none disabled:opacity-0`}
+          className={`absolute left-1 sm:left-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white/90 backdrop-blur-xs transition-all hover:bg-black/70 hover:text-white disabled:pointer-events-none disabled:opacity-0 sm:h-12 sm:w-12 ${showThumbnails ? "md:left-76" : "md:left-6"}`}
         >
-          <ChevronLeft size={32} />
+          <ChevronLeft size={28} />
         </button>
 
         <button
@@ -423,16 +520,16 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           disabled={currentPage >= pageCount - 1}
           aria-label="Next page"
           title="Next Page"
-          className="absolute right-2 sm:right-6 top-1/2 z-30 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/35 text-white/80 backdrop-blur-xs transition hover:bg-black/70 hover:text-white disabled:pointer-events-none disabled:opacity-0"
+          className="absolute right-1 sm:right-3 md:right-6 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white/90 backdrop-blur-xs transition hover:bg-black/70 hover:text-white disabled:pointer-events-none disabled:opacity-0 sm:h-12 sm:w-12"
         >
-          <ChevronRight size={32} />
+          <ChevronRight size={28} />
         </button>
       </div>
 
       {/* Vertical Thumbnails Sidebar touching the left border */}
       {showThumbnails && (
         <aside
-          className="fixed left-0 top-0 bottom-0 z-40 flex h-full w-64 sm:w-72 flex-col bg-slate-950/95 backdrop-blur-xl border-r border-white/15 shadow-2xl animate-slide-in-left select-none"
+          className="fixed left-0 top-0 bottom-0 z-40 flex h-full w-[min(82vw,288px)] sm:w-72 flex-col bg-slate-950/95 backdrop-blur-xl border-r border-white/15 shadow-2xl animate-slide-in-left select-none"
           aria-label="Page Thumbnails"
         >
           <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4 text-white">
@@ -462,7 +559,11 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     key={pageNum}
                     ref={isActive ? activeThumbnailRef : undefined}
                     type="button"
-                    onClick={() => handleJumpToPage(pageNum)}
+                    onClick={() => {
+                      handleJumpToPage(pageNum);
+                      // On small screens the sidebar covers the book, so close it after picking a page.
+                      if (viewport.width < 1024) setShowThumbnails(false);
+                    }}
                     className={`group relative flex flex-col items-center gap-1.5 rounded-lg p-1.5 transition-all text-left ${
                       isActive
                         ? "ring-2 ring-brand-orange bg-brand-orange/20 shadow-lg scale-[1.02]"
@@ -501,8 +602,8 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
       )}
 
       {/* Floating Pill Toolbar matching DearFlip df-ui specification */}
-      <div className="df-ui fixed bottom-5 left-1/2 -translate-x-1/2 z-50 select-none">
-        <div className="df-ui-center relative flex items-center bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.22)] border border-slate-200/90 px-2 py-1 gap-1 text-slate-600">
+      <div className="df-ui fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-50 max-w-[calc(100vw-16px)] -translate-x-1/2 select-none">
+        <div className="df-ui-center relative flex items-center bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.22)] border border-slate-200/90 px-1.5 sm:px-2 py-1 gap-0.5 sm:gap-1 text-slate-600">
           {/* Page indicator & direct jump input (df-ui-page) */}
           <div className="df-ui-btn df-ui-page relative flex items-center justify-center min-w-[52px] px-2 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
             {isEditingPage ? (
@@ -557,7 +658,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           <button
             type="button"
             onClick={() => setShowThumbnails((prev) => !prev)}
-            className={`df-ui-btn df-ui-thumbnail df-icon-grid-view df-sidemenu-trigger p-2 rounded-lg transition hover:bg-slate-100 ${
+            className={`df-ui-btn df-ui-thumbnail df-icon-grid-view df-sidemenu-trigger p-2.5 sm:p-2 rounded-lg transition hover:bg-slate-100 ${
               showThumbnails ? "text-brand-orange bg-slate-100" : "text-slate-600 hover:text-slate-900"
             }`}
             title="Toggle Thumbnails"
@@ -571,7 +672,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
             type="button"
             onClick={handleZoomIn}
             disabled={zoom >= ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
-            className="df-ui-btn df-ui-zoomin df-icon-add-circle p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="df-ui-btn df-ui-zoomin df-icon-add-circle p-2.5 sm:p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed"
             title="Zoom In"
           >
             <PlusCircle size={19} strokeWidth={1.8} />
@@ -583,7 +684,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
             type="button"
             onClick={handleZoomOut}
             disabled={zoom <= 1}
-            className={`df-ui-btn df-ui-zoomout df-icon-minus-circle p-2 rounded-lg transition ${
+            className={`df-ui-btn df-ui-zoomout df-icon-minus-circle p-2.5 sm:p-2 rounded-lg transition ${
               zoom <= 1
                 ? "disabled opacity-30 text-slate-400 cursor-not-allowed"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -598,7 +699,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="df-ui-btn df-ui-fullscreen df-icon-fullscreen p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100"
+            className="df-ui-btn df-ui-fullscreen df-icon-fullscreen p-2.5 sm:p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100"
             title="Toggle Fullscreen"
           >
             {isFullscreen ? <Minimize2 size={18} strokeWidth={2} /> : <Maximize2 size={18} strokeWidth={2} />}
@@ -609,7 +710,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           <button
             type="button"
             onClick={handleShare}
-            className="df-ui-btn df-ui-share df-icon-share p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100"
+            className="df-ui-btn df-ui-share df-icon-share p-2.5 sm:p-2 rounded-lg text-slate-600 hover:text-slate-900 transition hover:bg-slate-100"
             title="Share"
           >
             <Share2 size={18} strokeWidth={2} />
@@ -621,7 +722,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
             <button
               type="button"
               onClick={() => setShowMoreMenu((prev) => !prev)}
-              className={`df-ui-btn df-ui-more df-icon-more p-2 rounded-lg transition hover:bg-slate-100 ${
+              className={`df-ui-btn df-ui-more df-icon-more p-2.5 sm:p-2 rounded-lg transition hover:bg-slate-100 ${
                 showMoreMenu ? "text-brand-orange bg-slate-100" : "text-slate-600 hover:text-slate-900"
               }`}
               title="More Options"
@@ -646,27 +747,29 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                   <span>Download PDF File</span>
                 </a>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSinglePage((prev) => !prev);
-                    setShowMoreMenu(false);
-                  }}
-                  className="df-ui-btn df-ui-pagemode df-icon-file flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
-                  title={isSinglePage ? "Double Page Mode" : "Single Page Mode"}
-                >
-                  {isSinglePage ? (
-                    <>
-                      <BookOpen size={16} strokeWidth={2} className="text-slate-500" />
-                      <span>Double Page Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <FileText size={16} strokeWidth={2} className="text-slate-500" />
-                      <span>Single Page Mode</span>
-                    </>
-                  )}
-                </button>
+                {canChooseMode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageMode(isSinglePage ? "double" : "single");
+                      setShowMoreMenu(false);
+                    }}
+                    className="df-ui-btn df-ui-pagemode df-icon-file flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
+                    title={isSinglePage ? "Double Page Mode" : "Single Page Mode"}
+                  >
+                    {isSinglePage ? (
+                      <>
+                        <BookOpen size={16} strokeWidth={2} className="text-slate-500" />
+                        <span>Double Page Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileText size={16} strokeWidth={2} className="text-slate-500" />
+                        <span>Single Page Mode</span>
+                      </>
+                    )}
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -723,7 +826,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
 
       {/* Floating toast notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-2xl border border-white/20 backdrop-blur-sm pointer-events-none">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-[calc(100vw-32px)] text-center bg-slate-900/95 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-2xl border border-white/20 backdrop-blur-sm pointer-events-none">
           {toastMessage}
         </div>
       )}
