@@ -126,10 +126,10 @@ function ProductCard({ product }: { product: Product }) {
   }
   return (
     <article className="product-card relative min-h-[390px] bg-white">
-      <div className="group relative z-0 flex min-h-[390px] flex-col bg-white px-4 pb-4 pt-4 transition-shadow duration-200 after:pointer-events-none after:absolute after:bottom-4 after:right-0 after:top-4 after:w-px after:bg-brand-line after:content-[''] hover:z-10 hover:shadow-[0_3px_14px_rgba(0,0,0,0.22)] hover:outline hover:outline-1 hover:outline-brand-line hover:after:opacity-0">
+      <div className="group relative z-0 flex min-h-[390px] flex-col bg-white px-3 pb-4 pt-4 2xl:px-4 transition-shadow duration-200 after:pointer-events-none after:absolute after:bottom-4 after:right-0 after:top-4 after:w-px after:bg-brand-line after:content-[''] hover:z-10 hover:shadow-[0_3px_14px_rgba(0,0,0,0.22)] hover:outline hover:outline-1 hover:outline-brand-line hover:after:opacity-0">
         <Link href={`/product/${product.id}`} className="no-underline">
-          <div className="mb-2 min-h-[34px] text-[12px] uppercase leading-tight text-[#7A8DA3]">{product.category?.name ?? "Wholesale"}</div>
-          <h3 className="min-h-[72px] text-[15px] font-black uppercase leading-[1.16] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
+          <div className="mb-2 min-h-[30px] text-[11px] uppercase leading-tight 2xl:min-h-[34px] 2xl:text-[12px] text-[#7A8DA3]">{product.category?.name ?? "Wholesale"}</div>
+          <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-black uppercase leading-[1.18] sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
         </Link>
         <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
           {image ? <Image src={image} alt={product.name} fill unoptimized sizes="(max-width: 768px) 50vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
@@ -141,7 +141,7 @@ function ProductCard({ product }: { product: Product }) {
             <span className="inline-flex min-h-11 w-full items-center justify-center bg-brand-bg-alt px-4 py-2.5 text-center text-[12px] font-bold uppercase text-brand-muted">Pending Price Approval</span>
           ) : (
             <>
-              <span className="inline-flex flex-col"><span className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-brand-orange">Wholesale</span><span className="mt-1 text-[22px] font-medium leading-none text-[#374151]">{money(price)}</span></span>
+              <span className="inline-flex flex-col"><span className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-brand-orange">Wholesale</span><span className="mt-1 text-[20px] font-medium leading-none xl:text-[18px] 2xl:text-[22px] text-[#374151]">{money(price)}</span></span>
               {canAdd ? <button type="button" onClick={addToCart} aria-label={`Add ${product.name} to cart`} className="grid h-11 w-11 shrink-0 place-items-center border border-brand-navy bg-brand-navy text-white shadow-sm transition hover:border-brand-blue hover:bg-brand-blue"><ShoppingCart size={20} /></button> : <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`} className="grid h-11 w-11 shrink-0 place-items-center bg-[#E7E7E7] text-white no-underline transition group-hover:bg-brand-blue"><ArrowRight size={20} /></Link>}
             </>
           )}
@@ -158,7 +158,7 @@ function ProductSection({ section, products }: { section: HomepageSection; produ
   return (
     <section className="bg-white">
       <ImageHeading image={art} title={section.title} />
-      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
       </div>
       {promos.length > 0 && (
