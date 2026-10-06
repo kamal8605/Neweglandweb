@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRequireAuth } from "@/components/auth/withAuth";
 import {
   useAddresses,
@@ -39,6 +39,7 @@ function AddressForm({
   saving: boolean;
 }) {
   const [form, setForm] = useState<NewAddress>(initial);
+  const fieldId = useId();
   const set = (field: keyof NewAddress) => (e: { target: { value: string } }) =>
     setForm((f: NewAddress) => ({ ...f, [field]: e.target.value }));
 
@@ -53,60 +54,60 @@ function AddressForm({
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={LABEL}>First Name *</label>
-          <input type="text" value={form.first_name} onChange={set("first_name")} className={INPUT} required maxLength={100} />
+          <label htmlFor={`${fieldId}-first-name`} className={LABEL}>First Name *</label>
+          <input id={`${fieldId}-first-name`} type="text" value={form.first_name} onChange={set("first_name")} className={INPUT} required maxLength={100} />
         </div>
         <div>
-          <label className={LABEL}>Last Name *</label>
-          <input type="text" value={form.last_name} onChange={set("last_name")} className={INPUT} required maxLength={100} />
+          <label htmlFor={`${fieldId}-last-name`} className={LABEL}>Last Name *</label>
+          <input id={`${fieldId}-last-name`} type="text" value={form.last_name} onChange={set("last_name")} className={INPUT} required maxLength={100} />
         </div>
       </div>
 
       <div>
-        <label className={LABEL}>Label (e.g. Home, Office)</label>
-        <input type="text" value={form.label ?? ""} onChange={set("label")} className={INPUT} maxLength={50} placeholder="Optional" />
+        <label htmlFor={`${fieldId}-label`} className={LABEL}>Label (e.g. Home, Office)</label>
+        <input id={`${fieldId}-label`} type="text" value={form.label ?? ""} onChange={set("label")} className={INPUT} maxLength={50} placeholder="Optional" />
       </div>
 
       <div>
-        <label className={LABEL}>Company</label>
-        <input type="text" value={form.company ?? ""} onChange={set("company")} className={INPUT} maxLength={255} placeholder="Optional" />
+        <label htmlFor={`${fieldId}-company`} className={LABEL}>Company</label>
+        <input id={`${fieldId}-company`} type="text" value={form.company ?? ""} onChange={set("company")} className={INPUT} maxLength={255} placeholder="Optional" />
       </div>
 
       <div>
-        <label className={LABEL}>Address Line 1 *</label>
-        <input type="text" value={form.address_1} onChange={set("address_1")} className={INPUT} required maxLength={255} />
+        <label htmlFor={`${fieldId}-address-line-1`} className={LABEL}>Address Line 1 *</label>
+        <input id={`${fieldId}-address-line-1`} type="text" value={form.address_1} onChange={set("address_1")} className={INPUT} required maxLength={255} />
       </div>
 
       <div>
-        <label className={LABEL}>Address Line 2</label>
-        <input type="text" value={form.address_2 ?? ""} onChange={set("address_2")} className={INPUT} maxLength={255} placeholder="Optional" />
+        <label htmlFor={`${fieldId}-address-line-2`} className={LABEL}>Address Line 2</label>
+        <input id={`${fieldId}-address-line-2`} type="text" value={form.address_2 ?? ""} onChange={set("address_2")} className={INPUT} maxLength={255} placeholder="Optional" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={LABEL}>City *</label>
-          <input type="text" value={form.city} onChange={set("city")} className={INPUT} required maxLength={100} />
+          <label htmlFor={`${fieldId}-city`} className={LABEL}>City *</label>
+          <input id={`${fieldId}-city`} type="text" value={form.city} onChange={set("city")} className={INPUT} required maxLength={100} />
         </div>
         <div>
-          <label className={LABEL}>State / Region</label>
-          <input type="text" value={form.state ?? ""} onChange={set("state")} className={INPUT} maxLength={100} placeholder="Optional" />
+          <label htmlFor={`${fieldId}-state-region`} className={LABEL}>State / Region</label>
+          <input id={`${fieldId}-state-region`} type="text" value={form.state ?? ""} onChange={set("state")} className={INPUT} maxLength={100} placeholder="Optional" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={LABEL}>Postcode *</label>
-          <input type="text" value={form.postcode} onChange={set("postcode")} className={INPUT} required maxLength={20} />
+          <label htmlFor={`${fieldId}-postcode`} className={LABEL}>Postcode *</label>
+          <input id={`${fieldId}-postcode`} type="text" value={form.postcode} onChange={set("postcode")} className={INPUT} required maxLength={20} />
         </div>
         <div>
-          <label className={LABEL}>Country *</label>
-          <input type="text" value={form.country} onChange={set("country")} className={INPUT} required maxLength={2} placeholder="AU" />
+          <label htmlFor={`${fieldId}-country`} className={LABEL}>Country *</label>
+          <input id={`${fieldId}-country`} type="text" value={form.country} onChange={set("country")} className={INPUT} required maxLength={2} placeholder="AU" />
         </div>
       </div>
 
       <div>
-        <label className={LABEL}>Phone</label>
-        <input type="tel" value={form.phone ?? ""} onChange={set("phone")} className={INPUT} maxLength={20} placeholder="Optional" />
+        <label htmlFor={`${fieldId}-phone`} className={LABEL}>Phone</label>
+        <input id={`${fieldId}-phone`} type="tel" value={form.phone ?? ""} onChange={set("phone")} className={INPUT} maxLength={20} placeholder="Optional" />
       </div>
 
       <label className="flex items-center gap-2 cursor-pointer">

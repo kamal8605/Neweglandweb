@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
@@ -77,9 +78,12 @@ function parseOrder(raw: Record<string, unknown>): Order {
   };
 }
 
+// Orders need an approved account; the queries wait for it instead of firing a 401 first.
 export function useOrders(page = 1) {
+  const { user, isApproved } = useAuth();
   return useQuery<OrdersResponse>({
-    queryKey: ["orders", page],
+    queryKey: ["orders", user?.id, page],
+    enabled: isApproved,
     queryFn: () =>
       api
         .get<{ data: Record<string, unknown>[]; meta: OrdersMeta }>("/orders", {
@@ -91,12 +95,13 @@ export function useOrders(page = 1) {
 }
 
 export function useOrder(id: number | string) {
+  const { user, isApproved } = useAuth();
   return useQuery<Order>({
-    queryKey: ["order", id],
+    queryKey: ["order", user?.id, id],
     queryFn: () =>
       api
         .get<Record<string, unknown>>(`/orders/${id}`)
         .then((r) => parseOrder(r.data)),
-    enabled: !!id,
+    enabled: !!id && isApproved,
   });
 }

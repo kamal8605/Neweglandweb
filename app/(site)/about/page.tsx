@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { StaticContentPage } from "@/components/shared/StaticContentPage";
 
-export const metadata: Metadata = { title: "About | New England Distribution" };
+export const metadata: Metadata = { title: "About Us", description: "Who we are: a wholesale distributor serving retailers across New England.", alternates: { canonical: "/about" } };
 
 export default function AboutPage() {
   return (

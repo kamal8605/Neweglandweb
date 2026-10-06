@@ -101,20 +101,9 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
     return () => controller.abort();
   }, [requestVersion]);
 
-  useEffect(() => {
-    const settings = homepage?.site;
-    if (!settings) return;
-    if (settings.seo_title) document.title = settings.seo_title;
-    if (settings.seo_description) {
-      let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.name = "description";
-        document.head.appendChild(meta);
-      }
-      meta.content = settings.seo_description;
-    }
-  }, [homepage]);
+  // Title and description are rendered on the server (app/layout.tsx and per-page metadata);
+  // overwriting document.title here used to give every page the same title.
+
 
   const value = useMemo(() => ({ homepage, site: homepage?.site ?? {}, loaded, error, reload }), [error, homepage, loaded, reload]);
   return <SiteConfigContext.Provider value={value}>{children}</SiteConfigContext.Provider>;

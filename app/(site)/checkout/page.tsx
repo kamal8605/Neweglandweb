@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Check, Plus, Pencil, X } from "lucide-react";
@@ -198,12 +198,14 @@ function AddressField({
   required?: boolean;
   half?: boolean;
 }) {
+  const id = useId();
   return (
     <div className={half ? "flex-1" : "w-full"}>
-      <label className="block font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">
+      <label htmlFor={id} className="block font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">
         {label} {required && <span className="text-[#B83434]">*</span>}
       </label>
       <input
+        id={id}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}

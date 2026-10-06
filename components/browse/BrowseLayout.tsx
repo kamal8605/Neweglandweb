@@ -299,7 +299,7 @@ export function BrowseLayout({
                 type="checkbox"
                 checked={inStock}
                 onChange={(e) => setParam("in_stock", e.target.checked ? "true" : null)}
-                className="w-3 h-3 accent-brand-blue"
+                className="w-4 h-4 accent-brand-blue"
               />
               <span>In stock now</span>
             </label>
@@ -326,12 +326,12 @@ export function BrowseLayout({
                   <p className="text-[11.5px] text-brand-muted">No brands found</p>
                 ) : (
                   filteredBrands.map((b) => (
-                    <label key={b.id} className="flex items-center gap-2 cursor-pointer">
+                    <label key={b.id} className="flex min-h-7 items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={activeBrandIds.includes(b.id)}
                         onChange={() => toggleBrand(b.id)}
-                        className="w-3 h-3 accent-brand-blue shrink-0"
+                        className="w-4 h-4 accent-brand-blue shrink-0"
                       />
                       <span className="text-[12px] text-brand-ink truncate">{b.name}</span>
                     </label>
@@ -349,12 +349,12 @@ export function BrowseLayout({
               </div>
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                 {(allCategories ?? []).slice().sort((a, b) => a.name.localeCompare(b.name)).map((cat) => (
-                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                  <label key={cat.id} className="flex min-h-7 items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={catId === cat.id}
                       onChange={() => toggleCategory(cat.id)}
-                      className="w-3 h-3 accent-brand-blue shrink-0"
+                      className="w-4 h-4 accent-brand-blue shrink-0"
                     />
                     <span className="text-[12px] text-brand-ink truncate">{cat.name}</span>
                   </label>
@@ -371,14 +371,14 @@ export function BrowseLayout({
               </div>
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                 {sidebarSubCats.map((sc) => (
-                  <label key={sc.id} className="flex items-center gap-2 cursor-pointer">
+                  <label key={sc.id} className="flex min-h-7 items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={subCatId === sc.id}
                       onChange={() =>
                         setParam("sub_cat", subCatId === sc.id ? null : String(sc.id))
                       }
-                      className="w-3 h-3 accent-brand-blue shrink-0"
+                      className="w-4 h-4 accent-brand-blue shrink-0"
                     />
                     <span className="text-[12px] text-brand-ink truncate">{sc.name}</span>
                   </label>

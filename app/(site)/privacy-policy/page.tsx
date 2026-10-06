@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { StaticContentPage } from "@/components/shared/StaticContentPage";
 
-export const metadata: Metadata = { title: "Privacy Policy | New England Distribution" };
+export const metadata: Metadata = { title: "Privacy Policy", alternates: { canonical: "/privacy-policy" } };
 
 export default function PrivacyPolicyPage() {
   return (

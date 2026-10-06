@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StaticContentPage } from "@/components/shared/StaticContentPage";
 
-export const metadata: Metadata = { title: "Blog | New England Distribution" };
+export const metadata: Metadata = { title: "Blog", description: "News, product insights and updates from our wholesale team.", alternates: { canonical: "/blog" } };
 
 export default function BlogPage() {
   return (

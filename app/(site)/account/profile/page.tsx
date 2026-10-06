@@ -51,8 +51,8 @@ export default function EditProfilePage() {
       <div className="px-4 md:px-8 py-8 max-w-lg mx-auto">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className={LABEL}>Full Name</label>
-            <input
+            <label htmlFor="profile-full-name" className={LABEL}>Full Name</label>
+            <input id="profile-full-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -63,8 +63,8 @@ export default function EditProfilePage() {
           </div>
 
           <div>
-            <label className={LABEL}>Email Address</label>
-            <input
+            <label htmlFor="profile-email-address" className={LABEL}>Email Address</label>
+            <input id="profile-email-address"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -74,8 +74,8 @@ export default function EditProfilePage() {
           </div>
 
           <div>
-            <label className={LABEL}>Phone Number</label>
-            <input
+            <label htmlFor="profile-phone-number" className={LABEL}>Phone Number</label>
+            <input id="profile-phone-number"
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -86,8 +86,8 @@ export default function EditProfilePage() {
           </div>
 
           <div>
-            <label className={LABEL}>Address</label>
-            <textarea
+            <label htmlFor="profile-address" className={LABEL}>Address</label>
+            <textarea id="profile-address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className={`${INPUT} resize-none`}

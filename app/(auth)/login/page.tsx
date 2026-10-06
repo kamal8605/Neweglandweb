@@ -7,6 +7,20 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Logo } from "@/components/layout/Logo";
 
+/**
+ * Only same-site paths are allowed after login. Resolving against the current origin also rejects
+ * "//evil.com" and "/\evil.com" (browsers treat the backslash as a slash), preventing an open redirect.
+ */
+function safeReturnPath(requested: string | null): string {
+  if (!requested || !requested.startsWith("/")) return "/";
+  try {
+    const url = new URL(requested, window.location.origin);
+    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : "/";
+  } catch {
+    return "/";
+  }
+}
+
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
@@ -25,11 +39,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      const requestedPath = new URLSearchParams(window.location.search).get("returnTo");
-      const returnTo = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
-        ? requestedPath
-        : "/";
-      router.replace(returnTo);
+      router.replace(safeReturnPath(new URLSearchParams(window.location.search).get("returnTo")));
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number; data?: { message?: string } } })?.response?.status;
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "";
@@ -106,10 +116,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-semibold text-brand-ink mb-1.5">
+            <label htmlFor="login-email-address" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
               Email address
             </label>
-            <input
+            <input id="login-email-address"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -122,14 +132,14 @@ export default function LoginPage() {
 
           <div>
             <div className="flex items-baseline justify-between mb-1.5">
-              <label className="block text-[12px] font-semibold text-brand-ink">
+              <label htmlFor="login-password" className="block text-[12px] font-semibold text-brand-ink">
                 Password
               </label>
               <a href="mailto:sales@newenglanddistro.com?subject=Password%20reset%20request" className="text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors">
                 Forgot password?
               </a>
             </div>
-            <input
+            <input id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

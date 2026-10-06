@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { StaticContentPage } from "@/components/shared/StaticContentPage";
 
-export const metadata: Metadata = { title: "Terms and Conditions | New England Distribution" };
+export const metadata: Metadata = { title: "Terms and Conditions", alternates: { canonical: "/terms-and-conditions" } };
 
 export default function TermsPage() {
   return (

@@ -147,10 +147,10 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {/* Name */}
               <div>
-                <label className="block text-[12px] font-semibold text-brand-ink mb-1.5">
+                <label htmlFor="register-full-name" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Full name
                 </label>
-                <input
+                <input id="register-full-name"
                   type="text"
                   value={form.name}
                   onChange={update("name")}
@@ -164,10 +164,10 @@ export default function RegisterPage() {
 
               {/* Email */}
               <div>
-                <label className="block text-[12px] font-semibold text-brand-ink mb-1.5">
+                <label htmlFor="register-work-email" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Work email
                 </label>
-                <input
+                <input id="register-work-email"
                   type="email"
                   value={form.email}
                   onChange={update("email")}
@@ -181,10 +181,10 @@ export default function RegisterPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-[12px] font-semibold text-brand-ink mb-1.5">
+                <label htmlFor="register-password" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Password
                 </label>
-                <input
+                <input id="register-password"
                   type="password"
                   value={form.password}
                   onChange={update("password")}
@@ -202,10 +202,10 @@ export default function RegisterPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-[12px] font-semibold text-brand-ink mb-1.5">
+                <label htmlFor="register-confirm-password" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Confirm password
                 </label>
-                <input
+                <input id="register-confirm-password"
                   type="password"
                   value={form.password_confirmation}
                   onChange={update("password_confirmation")}

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { useAuth } from "@/context/AuthContext";
 
 export interface Address {
   id: number;
@@ -20,8 +21,11 @@ export interface Address {
 export type NewAddress = Omit<Address, "id"> & { is_default?: boolean };
 
 export function useAddresses() {
+  const { user } = useAuth();
   return useQuery<Address[]>({
-    queryKey: ["addresses"],
+    // Scoped to the account and only run when signed in (no 401 round-trip before the login redirect).
+    queryKey: ["addresses", user?.id],
+    enabled: !!user,
     queryFn: () =>
       api.get<Address[] | { data: Address[] }>("/addresses").then((r) =>
         Array.isArray(r.data) ? r.data : r.data.data

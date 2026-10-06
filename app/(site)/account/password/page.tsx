@@ -66,8 +66,8 @@ export default function ChangePasswordPage() {
       <div className="px-4 md:px-8 py-8 max-w-lg mx-auto">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className={LABEL}>Current Password</label>
-            <input
+            <label htmlFor="password-current-password" className={LABEL}>Current Password</label>
+            <input id="password-current-password"
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -81,8 +81,8 @@ export default function ChangePasswordPage() {
           </div>
 
           <div>
-            <label className={LABEL}>New Password</label>
-            <input
+            <label htmlFor="password-new-password" className={LABEL}>New Password</label>
+            <input id="password-new-password"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -97,8 +97,8 @@ export default function ChangePasswordPage() {
           </div>
 
           <div>
-            <label className={LABEL}>Confirm New Password</label>
-            <input
+            <label htmlFor="password-confirm-new-password" className={LABEL}>Confirm New Password</label>
+            <input id="password-confirm-new-password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

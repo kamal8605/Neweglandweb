@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
+import { SITE_URL, getSiteSettings } from "@/lib/site";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -12,16 +13,24 @@ const configuredTheme = process.env.NEXT_PUBLIC_THEME?.trim();
 const siteTheme = configuredTheme === "pallet" ? "pallet" : "forge";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
-  const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
-  try {
-    const response = await fetch(`${apiUrl}/api/homepage?client=${encodeURIComponent(client)}`, { next: { revalidate: 300 } });
-    if (!response.ok) return {};
-    const payload = await response.json() as { site?: { seo_title?: string; seo_description?: string } };
-    return { title: payload.site?.seo_title, description: payload.site?.seo_description };
-  } catch {
-    return {};
-  }
+  const site = await getSiteSettings();
+  const siteName = site.site_name || "New England Distribution";
+  const defaultTitle = site.seo_title || siteName;
+  return {
+    metadataBase: new URL(SITE_URL),
+    // Child pages set a short title ("Shop", a product name, ...) and get " | Site name" appended.
+    title: { default: defaultTitle, template: `%s | ${siteName}` },
+    description: site.seo_description,
+    applicationName: siteName,
+    openGraph: {
+      type: "website",
+      siteName,
+      title: defaultTitle,
+      description: site.seo_description,
+      images: site.logo_url ? [{ url: site.logo_url, alt: siteName }] : undefined,
+    },
+    twitter: { card: "summary", title: defaultTitle, description: site.seo_description },
+  };
 }
 
 export default function RootLayout({
