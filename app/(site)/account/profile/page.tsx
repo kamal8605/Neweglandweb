@@ -2,23 +2,37 @@
 
 import { useState } from "react";
 import { useRequireAuth } from "@/components/auth/withAuth";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, type User } from "@/context/AuthContext";
 import { PageHeader } from "@/components/shared/PageHeader";
 import api from "@/lib/axios";
 
 export default function EditProfilePage() {
   const { isLoading } = useRequireAuth();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
 
-  const [name, setName] = useState(user?.name ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
-  const [address, setAddress] = useState(user?.address ?? "");
+  // On a direct load / refresh the account is fetched after the first render. The form is only mounted once
+  // the user is known, so its fields start from the real values; keying by id remounts it only for a different
+  // account, never on updateUser() after a save, so unsaved edits are not overwritten.
+  if (isLoading || !user) {
+    return (
+      <div className="flex h-60 items-center justify-center font-mono text-[11px] uppercase tracking-widest text-brand-muted">
+        Loading…
+      </div>
+    );
+  }
+  return <ProfileForm key={user.id} user={user} />;
+}
+
+function ProfileForm({ user }: { user: User }) {
+  const { updateUser } = useAuth();
+
+  const [name, setName] = useState(user.name ?? "");
+  const [email, setEmail] = useState(user.email ?? "");
+  const [phone, setPhone] = useState(user.phone ?? "");
+  const [address, setAddress] = useState(user.address ?? "");
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  if (isLoading) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +41,7 @@ export default function EditProfilePage() {
     setSuccess(false);
     try {
       const res = await api.patch<{ user: { name: string; email: string; phone?: string; address?: string } }>(
-        `/users/${user!.id}`,
+        `/users/${user.id}`,
         { name, email, phone: phone || undefined, address: address || undefined }
       );
       updateUser({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone, address: res.data.user.address });

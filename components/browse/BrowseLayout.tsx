@@ -57,6 +57,8 @@ export function BrowseLayout({
   const subCatId = searchParams.get("sub_cat") ? Number(searchParams.get("sub_cat")) : undefined;
   // Sidebar-driven category selection (only used when categoryId prop is not set)
   const catId = searchParams.get("cat") ? Number(searchParams.get("cat")) : undefined;
+  // Free-text search from the header search box (?search=...). Empty = full catalogue.
+  const search = (searchParams.get("search") ?? "").trim();
 
   // Local state
   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
@@ -150,6 +152,7 @@ export function BrowseLayout({
     category_id: subCatId ?? catId ?? categoryId,
     brand_id: activeBrandIds.length >= 1 ? activeBrandIds[0] : undefined,
     in_stock: inStock || undefined,
+    search: search || undefined,
     sort,
     page,
     per_page: 48,
@@ -193,7 +196,9 @@ export function BrowseLayout({
 
   const selectedCount = Object.values(qtyMap).filter((q) => q > 0).length;
 
-  const pageTitle = title ?? categoryName ?? (brandId ? "Brand" : "All Products");
+  const pageTitle = search
+    ? `Results for “${search}”`
+    : title ?? categoryName ?? (brandId ? "Brand" : "All Products");
   const metaStr = meta
     ? `${meta.total.toLocaleString()} SKUs${meta.from && meta.to ? ` · ${meta.from}–${meta.to}` : ""}`
     : undefined;
@@ -390,7 +395,8 @@ export function BrowseLayout({
         </aside>
 
         {/* ── Main: toolbar + table + pagination ─────────── */}
-        <main className="flex-1 min-w-0">
+        {/* The page already has a <main> (SiteLayout); this is the product results region. */}
+        <section aria-label="Products" className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-y-2 py-2.5 border-b border-brand-ink mb-0">
             <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.04em] text-brand-muted uppercase flex-wrap">
               {meta && (
@@ -398,6 +404,15 @@ export function BrowseLayout({
                   <span className="text-brand-ink">{meta.total.toLocaleString()} SKUs</span>
                   {meta.from && meta.to && ` · ${meta.from}–${meta.to}`}
                 </span>
+              )}
+              {search && (
+                <button
+                  onClick={() => setParam("search", null)}
+                  aria-label={`Clear search “${search}”`}
+                  className="flex max-w-[16rem] items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
+                >
+                  <span className="truncate">Search: {search}</span> <X size={10} className="shrink-0" />
+                </button>
               )}
               {inStock && (
                 <button
@@ -515,7 +530,7 @@ export function BrowseLayout({
               />
             </div>
           )}
-        </main>
+        </section>
       </div>
 
       <CartBar

@@ -36,7 +36,7 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
               </span>
               <span
                 className={`font-mono text-[10.5px] tracking-[0.06em] uppercase ${
-                  active ? "text-brand-ink" : "text-brand-muted"
+                  active ? "text-brand-ink" : "sr-only text-brand-muted sm:not-sr-only"
                 }`}
               >
                 {label}
@@ -104,7 +104,8 @@ function AddressCard({
             type="button"
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
             title="Edit address"
-            className="w-5 h-5 flex items-center justify-center text-brand-muted hover:text-brand-ink transition-colors"
+            aria-label="Edit address"
+            className="-m-2 w-9 h-9 lg:m-0 lg:w-5 lg:h-5 flex items-center justify-center text-brand-muted hover:text-brand-ink transition-colors"
           >
             <Pencil size={11} />
           </button>
@@ -160,7 +161,7 @@ function AddressSelector({
 
       <button
         onClick={onAdd}
-        className="flex items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+        className="flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
       >
         <Plus size={12} />
         Add new address
@@ -460,7 +461,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-6 px-4 py-6 sm:px-8 lg:flex-row">
+      <div className="mx-auto flex max-w-[1400px] flex-col items-stretch gap-6 px-4 py-6 sm:px-8 lg:flex-row lg:items-start">
         {/* Left — form sections */}
         <div className="flex-1 min-w-0 space-y-8">
           {/* Billing address */}
@@ -517,7 +518,7 @@ export default function CheckoutPage() {
               </span>
               <Link
                 href="/cart"
-                className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+                className="inline-flex min-h-6 items-center font-mono text-[10px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
               >
                 ← Edit in cart
               </Link>
@@ -590,7 +591,7 @@ export default function CheckoutPage() {
 
             <Link
               href="/cart"
-              className="block mt-3 text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+              className="block mt-3 py-2 lg:py-0 text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               ← Back to cart
             </Link>

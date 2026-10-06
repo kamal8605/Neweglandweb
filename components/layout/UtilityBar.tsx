@@ -58,15 +58,15 @@ export function UtilityBar() {
       <div className="border-b border-brand-line bg-brand-bg-alt px-4 py-2 text-[11px] text-brand-muted lg:px-10">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4">
           <div className="flex items-center gap-5">
-            {site.phone && <a href={phoneHref} className="inline-flex items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue"><Phone size={12} /> {site.phone}</a>}
-            {site.email && <a href={emailHref} className="hidden items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex"><Mail size={13} /> {site.email}</a>}
+            {site.phone && <a href={phoneHref} className="inline-flex min-h-8 items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue lg:min-h-0"><Phone size={12} /> {site.phone}</a>}
+            {site.email && <a href={emailHref} className="hidden min-h-8 items-center gap-1.5 text-brand-muted no-underline hover:text-brand-blue sm:inline-flex lg:min-h-0"><Mail size={13} /> {site.email}</a>}
           </div>
           {isAuthenticated ? (
             <nav className="hidden items-center gap-4 md:flex" aria-label="Account shortcuts">
               <span className="font-semibold text-brand-ink">Welcome, {user?.name}</span>
-              <Link href="/orders" className="text-brand-muted no-underline hover:text-brand-blue">Orders</Link>
-              <Link href="/account/addresses" className="text-brand-muted no-underline hover:text-brand-blue">Addresses</Link>
-              <Link href="/account/profile" className="text-brand-muted no-underline hover:text-brand-blue">Account details</Link>
+              <Link href="/orders" className="inline-flex min-h-6 items-center text-brand-muted no-underline hover:text-brand-blue">Orders</Link>
+              <Link href="/account/addresses" className="inline-flex min-h-6 items-center text-brand-muted no-underline hover:text-brand-blue">Addresses</Link>
+              <Link href="/account/profile" className="inline-flex min-h-6 items-center text-brand-muted no-underline hover:text-brand-blue">Account details</Link>
             </nav>
           ) : (
             <span className="hidden font-semibold uppercase tracking-[0.08em] sm:block">Wholesale accounts only</span>
@@ -88,7 +88,7 @@ export function UtilityBar() {
           {isAuthenticated ? (
             <>
               <Link href="/wishlist" aria-label={`${wishlistCount} items in wishlist`} className="hidden min-h-12 flex-col items-center justify-center gap-1 rounded-none px-3 text-[10px] font-bold uppercase text-brand-muted no-underline transition-colors hover:bg-brand-orange-soft hover:text-brand-orange sm:flex"><span className="relative"><Heart size={21} />{wishlistCount > 0 && <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-none bg-brand-orange px-1 text-[9px] font-black text-white">{wishlistCount}</span>}</span><span>Wishlist</span></Link>
-              <div className="rounded-none border border-brand-navy bg-brand-navy px-3 py-2.5 shadow-sm transition-colors hover:bg-brand-blue-deep"><UserAccountMenu /></div>
+              <div className="rounded-none border border-brand-navy bg-brand-navy shadow-sm transition-colors hover:bg-brand-blue-deep"><UserAccountMenu /></div>
             </>
           ) : (
             <Link href="/login" className="inline-flex items-center gap-2 rounded-[var(--brand-radius)] bg-brand-navy px-4 py-3 text-xs font-bold uppercase text-white no-underline"><UserRound size={17} /> {site.login_text}</Link>

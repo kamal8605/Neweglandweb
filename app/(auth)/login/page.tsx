@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useSyncExternalStore, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -11,6 +11,17 @@ import { Logo } from "@/components/layout/Logo";
  * Only same-site paths are allowed after login. Resolving against the current origin also rejects
  * "//evil.com" and "/\evil.com" (browsers treat the backslash as a slash), preventing an open redirect.
  */
+const noopSubscribe = () => () => {};
+
+/**
+ * false in the server HTML, true once React has hydrated. Until then the submit button stays disabled:
+ * a native submit at that point would just reload /login (losing what was typed) instead of signing in.
+ * A disabled default button also blocks implicit (Enter-key) submission, so nothing is sent early.
+ */
+function useHydrated() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
 function safeReturnPath(requested: string | null): string {
   if (!requested || !requested.startsWith("/")) return "/";
   try {
@@ -30,6 +41,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const hydrated = useHydrated();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -135,7 +147,7 @@ export default function LoginPage() {
               <label htmlFor="login-password" className="block text-[12px] font-semibold text-brand-ink">
                 Password
               </label>
-              <a href="mailto:sales@newenglanddistro.com?subject=Password%20reset%20request" className="text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors">
+              <a href="mailto:sales@newenglanddistro.com?subject=Password%20reset%20request" className="inline-flex min-h-6 items-center text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors">
                 Forgot password?
               </a>
             </div>
@@ -152,7 +164,8 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !hydrated}
+            aria-busy={loading || undefined}
             className="w-full h-10 bg-brand-ink text-brand-white font-semibold text-[13px] rounded-[var(--brand-radius)] hover:bg-brand-navy transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
           >
             {loading && <Loader2 size={14} className="animate-spin" />}

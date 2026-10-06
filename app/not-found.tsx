@@ -15,7 +15,7 @@ export default function NotFound() {
       <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2">
         <Link
           href="/"
-          className="font-mono text-[11px] tracking-[0.08em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+          className="inline-flex min-h-6 items-center font-mono text-[11px] tracking-[0.08em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
         >
           ← Back to home
         </Link>

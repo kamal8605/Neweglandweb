@@ -36,7 +36,7 @@ export function UserAccountMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[#C8D2E5] hover:text-white transition-colors cursor-pointer bg-transparent border-none p-0 font-mono text-[11px] tracking-[0.04em] uppercase flex items-center gap-1"
+        className="text-[#C8D2E5] hover:text-white transition-colors cursor-pointer bg-transparent border-none px-3 py-2.5 min-h-11 lg:min-h-0 font-mono text-[11px] tracking-[0.04em] uppercase flex items-center gap-1"
         aria-haspopup="true"
         aria-expanded={open}
       >

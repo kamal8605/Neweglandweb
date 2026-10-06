@@ -434,7 +434,7 @@ function ProductDetail({ id }: { id: string }) {
           {product.brand && (
             <Link
               href={`/brand/${product.brand.id}`}
-              className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+              className="inline-flex min-h-6 items-center font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               {product.brand.name}
             </Link>
@@ -483,14 +483,14 @@ function ProductDetail({ id }: { id: string }) {
               onClick={() => { if (isAuthenticated) toggleWishlist(); }}
               aria-pressed={wishlisted}
               title={isAuthenticated ? (wishlisted ? "Remove from wishlist" : "Add to wishlist") : "Sign in to wishlist"}
-              className={`flex items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase transition-colors disabled:opacity-50 ${
+              className={`flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase transition-colors disabled:opacity-50 ${
                 wishlisted ? "text-[#B83434]" : "text-brand-muted hover:text-brand-ink"
               }`}
             >
               <Heart size={13} fill={wishlisted ? "currentColor" : "none"} />
               {wishlisted ? "Wishlisted" : "Wishlist"}
             </button>
-            <button className="flex items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-muted hover:text-brand-ink transition-colors">
+            <button className="flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-muted hover:text-brand-ink transition-colors">
               <GitCompare size={13} />
               Compare
             </button>

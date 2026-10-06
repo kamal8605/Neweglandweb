@@ -138,7 +138,7 @@ function BrandHero({ id }: { id: string }) {
           <div className="mt-5 flex items-center gap-4">
             <Link
               href={`/brand/${id}#products`}
-              className="font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+              className="inline-flex min-h-6 items-center font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               → Shop all products
             </Link>

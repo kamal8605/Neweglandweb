@@ -94,9 +94,9 @@ export function NavBar() {
         {site.sale_label && <Link href={site.sale_url || "/sale"} className="flex items-center border-b-2 border-transparent px-2.5 py-3 text-[10px] font-black uppercase tracking-[0.02em] text-brand-orange no-underline hover:border-brand-orange hover:bg-brand-blue-deep hover:text-white">{site.sale_label}</Link>}
       </div>
 
-      <div className="flex items-center justify-between bg-brand-navy px-4 py-3 text-white xl:hidden">
-        <button type="button" onClick={() => setMobileOpen(true)} className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wider" aria-label="Open category menu"><Menu size={22} /> Menu</button>
-        {site.sale_label && <Link href={site.sale_url || "/sale"} className="text-xs font-black uppercase tracking-wider text-brand-orange no-underline">{site.sale_label}</Link>}
+      <div className="flex items-center justify-between bg-brand-navy px-4 py-0.5 text-white xl:hidden">
+        <button type="button" onClick={() => setMobileOpen(true)} className="inline-flex min-h-11 items-center gap-2 text-sm font-black uppercase tracking-wider" aria-label="Open category menu"><Menu size={22} /> Menu</button>
+        {site.sale_label && <Link href={site.sale_url || "/sale"} className="inline-flex min-h-11 items-center text-xs font-black uppercase tracking-wider text-brand-orange no-underline">{site.sale_label}</Link>}
       </div>
 
       {mobileOpen && (

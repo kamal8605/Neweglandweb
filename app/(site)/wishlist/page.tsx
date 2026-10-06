@@ -134,7 +134,7 @@ function WishlistTable() {
               <td className={`${TD} text-center`}>
                 <button
                   onClick={() => void toggle(item.product_id).catch(() => undefined)}
-                  className="text-brand-muted hover:text-[#B83434] transition-colors"
+                  className="-m-2 inline-grid h-9 w-9 place-items-center text-brand-muted hover:text-[#B83434] transition-colors"
                   aria-label="Remove from wishlist"
                 >
                   <X size={13} />

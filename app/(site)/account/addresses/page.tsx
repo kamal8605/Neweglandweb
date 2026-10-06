@@ -183,14 +183,14 @@ function AddressCard({
       <div className="flex items-center gap-4 mt-3">
         <button
           onClick={onEdit}
-          className="font-mono text-[11px] tracking-[0.04em] text-brand-blue hover:text-brand-blue-deep transition-colors cursor-pointer bg-transparent border-none p-0"
+          className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-brand-blue hover:text-brand-blue-deep transition-colors cursor-pointer bg-transparent border-none p-0"
         >
           Edit
         </button>
         {!address.is_default && (
           <button
             onClick={onSetDefault}
-            className="font-mono text-[11px] tracking-[0.04em] text-brand-muted hover:text-brand-ink transition-colors cursor-pointer bg-transparent border-none p-0"
+            className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-brand-muted hover:text-brand-ink transition-colors cursor-pointer bg-transparent border-none p-0"
           >
             Set as default
           </button>
@@ -198,7 +198,7 @@ function AddressCard({
         <button
           onClick={onDelete}
           disabled={deleting}
-          className="font-mono text-[11px] tracking-[0.04em] text-[#B83434] hover:text-[#8B2020] transition-colors cursor-pointer bg-transparent border-none p-0 disabled:opacity-60"
+          className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-[#B83434] hover:text-[#8B2020] transition-colors cursor-pointer bg-transparent border-none p-0 disabled:opacity-60"
         >
           {deleting ? "Deleting…" : "Delete"}
         </button>

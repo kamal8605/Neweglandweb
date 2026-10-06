@@ -119,7 +119,7 @@ function OrderDetail({ id }: { id: string }) {
     return (
       <div className="flex flex-col items-center justify-center h-60 gap-4">
         <p className="font-mono text-[12px] text-brand-muted">Order not found.</p>
-        <Link href="/orders" className="font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep">
+        <Link href="/orders" className="inline-flex min-h-6 items-center font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep">
           ← Back to orders
         </Link>
       </div>
@@ -260,7 +260,7 @@ function OrderDetail({ id }: { id: string }) {
 
         <Link
           href="/orders"
-          className="inline-block font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+          className="inline-flex min-h-6 items-center font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
         >
           ← Back to orders
         </Link>

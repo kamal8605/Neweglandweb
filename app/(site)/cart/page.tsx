@@ -33,7 +33,7 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
               </span>
               <span
                 className={`font-mono text-[10.5px] tracking-[0.06em] uppercase ${
-                  active ? "text-brand-ink" : "text-brand-muted"
+                  active ? "text-brand-ink" : "sr-only text-brand-muted sm:not-sr-only"
                 }`}
               >
                 {label}
@@ -146,8 +146,8 @@ export default function CartPage() {
   const totalVariants = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalProducts = groups.length;
 
-  const TD = "px-3 py-2.5 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
-  const TH = "px-3 py-2 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
+  const TD = "px-2 sm:px-3 py-2.5 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
+  const TH = "px-2 sm:px-3 py-2 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
 
   return (
     <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
@@ -195,7 +195,7 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-6 px-4 py-6 sm:px-8 lg:flex-row">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-stretch gap-6 px-4 py-6 sm:px-8 lg:flex-row lg:items-start">
           {/* Left — Cart groups */}
           <div className="flex-1 min-w-0 space-y-6">
             {groups.map((group) => {
@@ -229,7 +229,7 @@ export default function CartPage() {
                     <div className="flex-1 min-w-[140px]">
                       <Link
                         href={`/product/${productId}`}
-                        className="font-medium text-[13px] text-brand-ink hover:text-brand-blue transition-colors block truncate"
+                        className="font-medium text-[13px] text-brand-ink hover:text-brand-blue transition-colors block truncate py-1 lg:py-0"
                       >
                         {productName}
                       </Link>
@@ -242,13 +242,13 @@ export default function CartPage() {
                     <div className="flex items-center gap-3 shrink-0">
                       <Link
                         href={`/product/${productId}`}
-                        className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+                        className="inline-flex min-h-10 lg:min-h-0 items-center font-mono text-[10px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
                       >
                         + Add variant
                       </Link>
                       <button
                         onClick={() => group.items.forEach((i) => removeItem(i.product_id))}
-                        className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted hover:text-[#B83434] transition-colors"
+                        className="inline-flex min-h-10 lg:min-h-0 items-center font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted hover:text-[#B83434] transition-colors"
                       >
                         Remove group
                       </button>
@@ -264,7 +264,7 @@ export default function CartPage() {
                         <th className={TH}>Variant</th>
                         <th className={`${TH} hidden sm:table-cell text-right`}>Unit price</th>
                         <th className={`${TH} text-right`}>Qty</th>
-                        <th className={`${TH} text-right`}>Line total</th>
+                        <th className={`${TH} hidden sm:table-cell text-right`}>Line total</th>
                         <th className={`${TH} w-8`} />
                       </tr>
                     </thead>
@@ -293,13 +293,13 @@ export default function CartPage() {
                               onChange={(n) => updateQty(item.product_id, n)}
                             />
                           </td>
-                          <td className={`${TD} text-right font-mono font-semibold`}>
+                          <td className={`${TD} hidden sm:table-cell text-right font-mono font-semibold`}>
                             ${(item.price * item.quantity).toFixed(2)}
                           </td>
                           <td className={`${TD} text-center w-8`}>
                             <button
                               onClick={() => removeItem(item.product_id)}
-                              className="text-brand-muted hover:text-[#B83434] transition-colors"
+                              className="-m-2 inline-grid h-9 w-9 place-items-center text-brand-muted hover:text-[#B83434] transition-colors lg:m-0 lg:h-auto lg:w-auto"
                               aria-label="Remove item"
                             >
                               <X size={13} />
@@ -369,7 +369,7 @@ export default function CartPage() {
 
               <Link
                 href="/shop"
-                className="block mt-3 text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+                className="block mt-3 py-2 lg:py-0 text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
               >
                 ← Continue shopping
               </Link>
