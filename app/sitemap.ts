@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL, fetchApi } from "@/lib/site";
+import { SITE_URL, fetchApiWithRetry } from "@/lib/site";
 
 // Pages, categories and brands. Products are in /product/sitemap/<n>.xml (see robots.ts).
 export const revalidate = 86400;
@@ -13,8 +13,8 @@ function flatten(nodes: CategoryNode[]): number[] {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [categories, brands] = await Promise.all([
-    fetchApi<CategoryNode[] | { data: CategoryNode[] }>("/categories", revalidate),
-    fetchApi<BrandRow[] | { data: BrandRow[] }>("/brands", revalidate),
+    fetchApiWithRetry<CategoryNode[] | { data: CategoryNode[] }>("/categories", revalidate),
+    fetchApiWithRetry<BrandRow[] | { data: BrandRow[] }>("/brands", revalidate),
   ]);
   const categoryList = Array.isArray(categories) ? categories : categories?.data ?? [];
   const brandList = Array.isArray(brands) ? brands : brands?.data ?? [];

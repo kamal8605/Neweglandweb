@@ -26,6 +26,19 @@ export async function fetchApi<T>(path: string, revalidate = 300): Promise<T | n
   }
 }
 
+/**
+ * fetchApi with retries for build/background jobs (sitemaps): a transient failure from the API host
+ * (timeout, 429, 5xx) is retried with a short back-off instead of silently producing an empty list.
+ */
+export async function fetchApiWithRetry<T>(path: string, revalidate = 300, attempts = 3): Promise<T | null> {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const result = await fetchApi<T>(path, revalidate);
+    if (result !== null) return result;
+    if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, 750 * attempt));
+  }
+  return null;
+}
+
 /** True only when the API positively says the resource does not exist (not on network/server errors). */
 export async function apiSaysNotFound(path: string, revalidate = 300): Promise<boolean> {
   try {
