@@ -153,7 +153,7 @@ export default function CartPage() {
     <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Page header */}
       <div className="border-b border-brand-line bg-brand-white px-4 py-5 sm:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] font-normal text-brand-ink leading-tight">
               Cart · draft P.O.
