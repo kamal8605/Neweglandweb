@@ -79,9 +79,12 @@ function errorCart(error: unknown): ServerCartResponse | null {
   return data && Array.isArray(data.data?.items) ? data : null;
 }
 
+/** Business messages (422: out of stock, unavailable...) are shown as-is; anything else gets a neutral message. */
 function errorMessage(error: unknown) {
-  return (error as { response?: { data?: { message?: string } } })?.response?.data?.message
-    ?? "Your cart could not be updated. Please try again.";
+  const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+  if (response?.status === 422 && response.data?.message) return response.data.message;
+  if (response?.status === 429) return "Too many changes at once. Please wait a moment and try again.";
+  return "Your cart could not be synced right now. Please try again in a moment.";
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
