@@ -19,13 +19,13 @@ interface ProductGridProps {
 
 function SkeletonCard() {
   return (
-    <div className="bg-brand-white border border-brand-line flex flex-col animate-pulse">
-      <div className="aspect-square bg-brand-bg-alt" />
+    <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm animate-pulse">
+      <div className="aspect-square bg-muted" />
       <div className="p-3 space-y-2">
-        <div className="h-3 bg-brand-bg-alt rounded w-1/3" />
-        <div className="h-4 bg-brand-bg-alt rounded w-4/5" />
-        <div className="h-3 bg-brand-bg-alt rounded w-1/2" />
-        <div className="h-7 bg-brand-bg-alt rounded mt-3" />
+        <div className="h-3 w-1/3 rounded bg-muted" />
+        <div className="h-4 w-4/5 rounded bg-muted" />
+        <div className="h-3 w-1/2 rounded bg-muted" />
+        <div className="mt-3 h-7 rounded bg-muted" />
       </div>
     </div>
   );
@@ -36,7 +36,7 @@ function ImagePlaceholder() {
     <div
       className="w-full h-full"
       style={{
-        background: "repeating-linear-gradient(135deg, #E5DFD0 0 10px, #D9D3C5 10px 20px)",
+        background: "repeating-linear-gradient(135deg, var(--muted) 0 10px, var(--border) 10px 20px)",
       }}
     />
   );
@@ -62,20 +62,20 @@ export function ProductGrid({
       <PriceGate pricesVisible={p.prices_visible}>
         {p.on_sale && p.sale_price !== null ? (
           <span className="flex items-baseline gap-1.5 font-mono">
-            <span className="text-[#B83434] font-semibold text-[13px]">
+            <span className="text-[13px] font-semibold text-destructive">
               ${p.sale_price.toFixed(2)}
             </span>
-            <span className="text-brand-muted line-through text-[11px]">
+            <span className="text-[11px] text-muted-foreground line-through">
               ${p.regular_price?.toFixed(2)}
             </span>
             {showDiscountPct && p.regular_price && (
-              <span className="text-[#B83434] text-[10.5px] font-mono">
+              <span className="font-mono text-[10.5px] text-destructive">
                 {Math.round((1 - p.sale_price / p.regular_price) * 100)}% off
               </span>
             )}
           </span>
         ) : (
-          <span className="font-mono font-semibold text-[13px] text-brand-ink">
+          <span className="font-mono text-[13px] font-semibold text-foreground">
             {p.current_price !== null ? `$${p.current_price.toFixed(2)}` : "—"}
           </span>
         )}
@@ -95,7 +95,7 @@ export function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <div className="py-16 text-center font-mono text-[11px] text-brand-muted tracking-[0.06em] uppercase bg-brand-white border border-brand-line mt-3">
+      <div className="mt-3 rounded-lg border border-border bg-card py-16 text-center text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground shadow-sm">
         No products found
       </div>
     );
@@ -109,10 +109,10 @@ export function ProductGrid({
         return (
           <div
             key={p.id}
-            className="bg-brand-white border border-brand-line flex flex-col hover:border-brand-blue transition-colors"
+            className="flex flex-col overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-[border-color,box-shadow] hover:border-primary/40 hover:shadow-md"
           >
             {/* Image */}
-            <Link href={`/product/${p.id}`} className="block relative aspect-square overflow-hidden bg-brand-bg-alt">
+            <Link href={`/product/${p.id}`} className="relative block aspect-square overflow-hidden bg-muted">
               {p.image ? (
                 <Image
                   src={imageVariant(p.image, p.image_variants, 512)!}
@@ -125,7 +125,7 @@ export function ProductGrid({
                 <ImagePlaceholder />
               )}
               {p.on_sale && (
-                <span className="absolute top-2 left-2 bg-[#B83434] text-white font-mono text-[9px] tracking-[0.06em] px-1.5 py-0.5 leading-none">
+                <span className="absolute left-2 top-2 rounded-sm bg-destructive px-1.5 py-0.5 font-mono text-[9px] leading-none tracking-[0.06em] text-destructive-foreground shadow-sm">
                   SALE
                 </span>
               )}
@@ -138,12 +138,12 @@ export function ProductGrid({
                   {p.brand.id ? (
                     <Link
                       href={`/brand/${p.brand.id}`}
-                      className="font-mono text-[10px] tracking-[0.05em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+                      className="font-mono text-[10px] uppercase tracking-[0.05em] text-primary transition-colors hover:text-primary/80"
                     >
                       {p.brand.name}
                     </Link>
                   ) : (
-                    <span className="font-mono text-[10px] tracking-[0.05em] uppercase text-brand-muted">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.05em] text-muted-foreground">
                       {p.brand.name}
                     </span>
                   )}
@@ -152,12 +152,12 @@ export function ProductGrid({
 
               <Link
                 href={`/product/${p.id}`}
-                className="text-[12.5px] font-medium text-brand-ink hover:text-brand-blue transition-colors leading-snug line-clamp-2"
+                className="line-clamp-2 text-[12.5px] font-medium leading-snug text-foreground transition-colors hover:text-primary"
               >
                 {p.name}
               </Link>
 
-              <span className="font-mono text-[10.5px] text-brand-muted">{p.sku}</span>
+              <span className="font-mono text-[10.5px] text-muted-foreground">{p.sku}</span>
 
               <div className="mt-auto pt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                 {renderPrice(p)}
@@ -168,7 +168,7 @@ export function ProductGrid({
                 {isGrouped ? (
                   <Link
                     href={`/product/${p.id}`}
-                    className="block w-full text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors py-1.5 border border-brand-line hover:border-brand-blue"
+                    className="block w-full rounded-md border border-border py-1.5 text-center text-[10.5px] font-medium uppercase tracking-[0.06em] text-primary transition-colors hover:border-primary/50 hover:bg-accent"
                   >
                     {p.children!.length} variants →
                   </Link>

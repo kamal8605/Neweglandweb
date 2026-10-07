@@ -36,7 +36,7 @@ export function UserAccountMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[#C8D2E5] hover:text-white transition-colors cursor-pointer bg-transparent border-none px-3 py-2.5 min-h-11 lg:min-h-0 font-mono text-[11px] tracking-[0.04em] uppercase flex items-center gap-1"
+        className="flex min-h-11 cursor-pointer items-center gap-1 rounded-md border-none bg-transparent px-3 py-2.5 text-[11px] font-medium uppercase tracking-[0.04em] text-background/80 transition-colors hover:bg-background/10 hover:text-background lg:min-h-0"
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -53,11 +53,11 @@ export function UserAccountMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 bg-brand-navy border border-[#1E3A5F] shadow-lg z-50">
-          <div className="px-4 pt-3 pb-2 border-b border-[#1E3A5F]">
-            <p className="font-mono text-[10px] tracking-[0.06em] text-[#7A8EB0] uppercase">Account</p>
-            <p className="font-mono text-[12px] text-white mt-0.5 truncate">{user?.name}</p>
-            <p className="font-mono text-[10px] text-[#7A8EB0] truncate">{user?.email}</p>
+        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
+          <div className="border-b border-border px-4 pb-3 pt-3">
+            <p className="font-heading text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Account</p>
+            <p className="mt-1 truncate text-xs font-medium text-foreground">{user?.name}</p>
+            <p className="truncate text-[11px] text-muted-foreground">{user?.email}</p>
           </div>
 
           <nav className="py-1">
@@ -66,17 +66,17 @@ export function UserAccountMenu() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2 font-mono text-[11px] tracking-[0.04em] text-[#C8D2E5] hover:text-white hover:bg-[#1E3A5F] transition-colors"
+                className="block px-4 py-2.5 text-[11px] font-medium tracking-[0.04em] text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="border-t border-[#1E3A5F] py-1">
+          <div className="border-t border-border py-1">
             <button
               onClick={handleLogout}
-              className="w-full text-left px-4 py-2 font-mono text-[11px] tracking-[0.04em] uppercase text-brand-orange hover:text-white hover:bg-[#1E3A5F] transition-colors cursor-pointer bg-transparent border-none"
+              className="w-full cursor-pointer border-none bg-transparent px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-[0.04em] text-destructive transition-colors hover:bg-destructive/10"
             >
               SIGN OUT
             </button>

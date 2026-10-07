@@ -27,7 +27,7 @@ function ImagePlaceholder() {
       className="w-full h-full"
       style={{
         background:
-          "repeating-linear-gradient(135deg, #E5DFD0 0 14px, #D9D3C5 14px 28px)",
+          "repeating-linear-gradient(135deg, var(--muted) 0 14px, var(--border) 14px 28px)",
       }}
     />
   );
@@ -35,9 +35,9 @@ function ImagePlaceholder() {
 
 export function ProductCard({ product, onWishlistToggle, wishlisted = false }: ProductCardProps) {
   return (
-    <div className="bg-brand-white border border-brand-line rounded-[var(--brand-radius)] overflow-hidden group hover:border-brand-blue transition-colors">
+    <div className="group relative overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-[border-color,box-shadow] hover:border-primary/40 hover:shadow-md">
       {/* Image */}
-      <Link href={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden bg-brand-bg-alt">
+      <Link href={`/product/${product.id}`} className="relative block aspect-[4/3] overflow-hidden bg-muted">
         {product.image ? (
           <Image
             src={imageVariant(product.image, product.image_variants, 512)!}
@@ -50,7 +50,7 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
           <ImagePlaceholder />
         )}
         {product.on_sale && (
-          <span className="absolute top-2 left-2 bg-[#B83434] text-white font-mono text-[9px] tracking-[0.06em] px-1.5 py-0.5">
+          <span className="absolute left-2 top-2 rounded-sm bg-destructive px-1.5 py-0.5 font-mono text-[9px] tracking-[0.06em] text-destructive-foreground shadow-sm">
             SALE
           </span>
         )}
@@ -61,13 +61,13 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
         {product.brand?.name && (
           <Link
             href={product.brand.id ? `/brand/${product.brand.id}` : "#"}
-            className="font-mono text-[10px] tracking-[0.06em] text-brand-blue uppercase hover:text-brand-blue-deep transition-colors"
+            className="font-mono text-[10px] uppercase tracking-[0.06em] text-primary transition-colors hover:text-primary/80"
           >
             {product.brand.name}
           </Link>
         )}
         <Link href={`/product/${product.id}`} className="block mt-0.5">
-          <h3 className="text-[13px] font-medium text-brand-ink leading-snug line-clamp-2 hover:text-brand-blue transition-colors">
+          <h3 className="line-clamp-2 text-[13px] font-medium leading-snug text-foreground transition-colors hover:text-primary">
             {product.name}
           </h3>
         </Link>
@@ -76,11 +76,11 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
           <PriceGate pricesVisible={product.prices_visible}>
             {product.on_sale && product.sale_price !== null ? (
               <span className="flex items-baseline gap-1.5 font-mono text-[13px]">
-                <span className="text-[#B83434] font-semibold">${product.sale_price.toFixed(2)}</span>
-                <span className="text-brand-muted line-through text-[11px]">${product.regular_price?.toFixed(2)}</span>
+                <span className="font-semibold text-destructive">${product.sale_price.toFixed(2)}</span>
+                <span className="text-[11px] text-muted-foreground line-through">${product.regular_price?.toFixed(2)}</span>
               </span>
             ) : (
-              <span className="font-mono text-[13px] font-semibold text-brand-ink">
+              <span className="font-mono text-[13px] font-semibold text-foreground">
                 {product.current_price !== null ? `$${product.current_price.toFixed(2)}` : "—"}
               </span>
             )}
@@ -94,12 +94,12 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
       {onWishlistToggle && (
         <button
           onClick={() => onWishlistToggle(product.id)}
-          className="absolute top-2 right-2 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors"
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border border-border/70 bg-background/90 shadow-sm transition-colors hover:bg-background"
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
             size={14}
-            className={wishlisted ? "text-[#B83434] fill-[#B83434]" : "text-brand-muted"}
+            className={wishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"}
           />
         </button>
       )}

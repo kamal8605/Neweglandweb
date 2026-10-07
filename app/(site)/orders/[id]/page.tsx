@@ -13,17 +13,17 @@ interface Props {
 const STATUS_STEPS: OrderStatus[] = ["pending", "processing", "shipped", "delivered"];
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
-  pending: "bg-[#E5DFD0] text-[#6B6045]",
-  processing: "bg-[#DBEAFE] text-[#1D4ED8]",
-  shipped: "bg-[#FEE9D6] text-brand-orange",
-  delivered: "bg-[#D1FAE5] text-[#065F46]",
-  cancelled: "bg-[#FEE2E2] text-[#B83434]",
+  pending: "bg-muted text-muted-foreground",
+  processing: "bg-primary/10 text-primary",
+  shipped: "bg-orange-100 text-orange-800",
+  delivered: "bg-emerald-100 text-emerald-800",
+  cancelled: "bg-destructive/10 text-destructive",
 };
 
 function StatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
-      className={`inline-block font-mono text-[10px] tracking-[0.06em] uppercase px-2 py-0.5 rounded-[var(--brand-radius)] ${STATUS_STYLES[status] ?? "bg-brand-bg-alt text-brand-muted"}`}
+      className={`inline-block text-[10px] tracking-[0.06em] uppercase px-2 py-0.5 rounded-md ${STATUS_STYLES[status] ?? "bg-muted text-muted-foreground"}`}
     >
       {status}
     </span>
@@ -33,8 +33,8 @@ function StatusBadge({ status }: { status: OrderStatus }) {
 function StatusTracker({ status }: { status: OrderStatus }) {
   if (status === "cancelled") {
     return (
-      <div className="flex items-center gap-2 font-mono text-[11px] text-[#B83434]">
-        <span className="w-2 h-2 rounded-full bg-[#B83434]" />
+      <div className="flex items-center gap-2 text-[11px] text-destructive">
+        <span className="w-2 h-2 rounded-full bg-destructive" />
         Order cancelled
       </div>
     );
@@ -51,19 +51,19 @@ function StatusTracker({ status }: { status: OrderStatus }) {
           <div key={step} className="flex items-center">
             <div className="flex flex-col items-center gap-1 px-4">
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] shrink-0 ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 ${
                   done
-                    ? "bg-brand-navy text-white"
+                    ? "bg-primary/15 text-primary"
                     : active
-                    ? "bg-brand-orange text-white"
-                    : "bg-brand-bg-alt text-brand-muted border border-brand-line"
+                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                    : "bg-muted text-muted-foreground border border-border"
                 }`}
               >
                 {done ? "✓" : i + 1}
               </span>
               <span
-                className={`font-mono text-[9.5px] tracking-[0.06em] uppercase ${
-                  active ? "text-brand-ink" : done ? "text-brand-ink" : "text-brand-muted"
+                className={`text-[9.5px] tracking-[0.06em] uppercase ${
+                  active ? "text-foreground" : done ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {step}
@@ -72,7 +72,7 @@ function StatusTracker({ status }: { status: OrderStatus }) {
             {i < STATUS_STEPS.length - 1 && (
               <span
                 className={`w-8 h-px ${
-                  i < activeIndex ? "bg-brand-navy" : "bg-brand-line"
+                  i < activeIndex ? "bg-primary" : "bg-border"
                 }`}
               />
             )}
@@ -89,10 +89,10 @@ function AddressBlock({ label, fields }: { label: string; fields: (string | null
 
   return (
     <div>
-      <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted mb-1.5">
+      <div className="text-[10px] tracking-[0.08em] uppercase text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className="text-[12.5px] text-brand-ink leading-relaxed">
+      <div className="text-[12.5px] text-foreground leading-relaxed">
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
         ))}
@@ -108,9 +108,9 @@ function OrderDetail({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-4 p-8">
-        <div className="h-6 bg-brand-bg-alt rounded w-1/4" />
-        <div className="h-4 bg-brand-bg-alt rounded w-1/3" />
-        <div className="h-32 bg-brand-bg-alt rounded" />
+        <div className="h-6 bg-muted rounded-md w-1/4" />
+        <div className="h-4 bg-muted rounded-md w-1/3" />
+        <div className="h-32 bg-muted rounded-md" />
       </div>
     );
   }
@@ -118,21 +118,21 @@ function OrderDetail({ id }: { id: string }) {
   if (isError || !order) {
     return (
       <div className="flex flex-col items-center justify-center h-60 gap-4">
-        <p className="font-mono text-[12px] text-brand-muted">Order not found.</p>
-        <Link href="/orders" className="inline-flex min-h-6 items-center font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep">
+        <p className="text-[12px] text-muted-foreground">Order not found.</p>
+        <Link href="/orders" className="inline-flex min-h-6 items-center text-[11px] text-primary hover:text-primary/80">
           ← Back to orders
         </Link>
       </div>
     );
   }
 
-  const TH = "px-4 py-2.5 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
-  const TD = "px-4 py-3 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
+  const TH = "px-4 py-2.5 text-[10px] tracking-[0.08em] uppercase text-muted-foreground border-b border-border text-left bg-muted";
+  const TD = "px-4 py-3 text-[12.5px] text-foreground border-b border-border align-middle";
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
+    <div className="bg-background min-h-screen pb-28 md:pb-20">
       {/* Breadcrumb */}
-      <div className="px-4 md:px-8 py-3.5 border-b border-brand-line bg-brand-white">
+      <div className="px-4 md:px-8 py-3.5 border-b border-border bg-card">
         <Breadcrumb
           items={[
             { label: "Orders", href: "/orders" },
@@ -142,14 +142,14 @@ function OrderDetail({ id }: { id: string }) {
       </div>
 
       {/* Order header */}
-      <div className="px-4 md:px-8 py-6 border-b border-brand-line bg-brand-white flex flex-wrap items-start justify-between gap-6">
+      <div className="px-4 md:px-8 py-6 border-b border-border bg-card flex flex-wrap items-start justify-between gap-6">
         <div>
-          <h1 className="font-serif text-[28px] md:text-[36px] font-normal text-brand-ink leading-none">
+          <h1 className="font-serif text-[28px] md:text-[36px] font-normal text-foreground leading-none">
             {order.invoice_no}
           </h1>
           <div className="mt-2 flex items-center gap-3">
             <StatusBadge status={order.status} />
-            <span className="font-mono text-[11px] text-brand-muted">
+            <span className="text-[11px] text-muted-foreground">
               {new Date(order.created_at).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
@@ -163,7 +163,7 @@ function OrderDetail({ id }: { id: string }) {
 
       <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto space-y-6">
         {/* Addresses */}
-        <div className="bg-brand-white border border-brand-line p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="bg-card border border-border p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <AddressBlock
             label="Billing address"
             fields={[
@@ -189,9 +189,9 @@ function OrderDetail({ id }: { id: string }) {
         </div>
 
         {/* Line items */}
-        <div className="bg-brand-white border border-brand-line">
-          <div className="px-5 py-3 border-b border-brand-ink">
-            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-muted">
+        <div className="bg-card border border-border">
+          <div className="px-5 py-3 border-b border-border">
+            <span className="text-[10px] tracking-[0.1em] uppercase text-muted-foreground">
               Line items
             </span>
           </div>
@@ -206,14 +206,14 @@ function OrderDetail({ id }: { id: string }) {
             </thead>
             <tbody>
               {(order.items ?? []).map((line) => (
-                <tr key={line.id} className="hover:bg-brand-bg/50 transition-colors">
+                <tr key={line.id} className="hover:bg-muted/30 transition-colors">
                   <td className={TD}>
-                    <div className="text-brand-ink">{line.name}</div>
-                    <div className="font-mono text-[10.5px] text-brand-muted">{line.sku}</div>
+                    <div className="text-foreground">{line.name}</div>
+                    <div className="font-mono text-[10.5px] text-muted-foreground">{line.sku}</div>
                   </td>
-                  <td className={`${TD} text-right font-mono`}>{line.quantity}</td>
-                  <td className={`${TD} text-right font-mono`}>${line.unit_price.toFixed(2)}</td>
-                  <td className={`${TD} text-right font-mono font-semibold`}>
+                  <td className={`${TD} text-right `}>{line.quantity}</td>
+                  <td className={`${TD} text-right `}>${line.unit_price.toFixed(2)}</td>
+                  <td className={`${TD} text-right font-semibold`}>
                     ${line.total.toFixed(2)}
                   </td>
                 </tr>
@@ -222,37 +222,37 @@ function OrderDetail({ id }: { id: string }) {
           </table>
 
           {/* Totals */}
-          <div className="px-5 py-4 border-t border-brand-ink space-y-2 max-w-xs ml-auto">
-            <div className="flex justify-between font-mono text-[12.5px]">
-              <span className="text-brand-muted">Line total</span>
-              <span className="text-brand-ink">${order.line_total.toFixed(2)}</span>
+          <div className="px-5 py-4 border-t border-border space-y-2 max-w-xs ml-auto">
+            <div className="flex justify-between text-[12.5px]">
+              <span className="text-muted-foreground">Line total</span>
+              <span className="text-foreground">${order.line_total.toFixed(2)}</span>
             </div>
             {order.shipping_total != null && (
-              <div className="flex justify-between font-mono text-[12.5px]">
-                <span className="text-brand-muted">Shipping</span>
-                <span className="text-brand-ink">${order.shipping_total.toFixed(2)}</span>
+              <div className="flex justify-between text-[12.5px]">
+                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-foreground">${order.shipping_total.toFixed(2)}</span>
               </div>
             )}
             {order.total_tax != null && (
-              <div className="flex justify-between font-mono text-[12.5px]">
-                <span className="text-brand-muted">Tax</span>
-                <span className="text-brand-ink">${order.total_tax.toFixed(2)}</span>
+              <div className="flex justify-between text-[12.5px]">
+                <span className="text-muted-foreground">Tax</span>
+                <span className="text-foreground">${order.total_tax.toFixed(2)}</span>
               </div>
             )}
-            <div className="flex justify-between font-mono text-[13.5px] border-t border-brand-ink pt-2">
-              <span className="text-brand-ink font-semibold">Total</span>
-              <span className="text-brand-ink font-semibold">${order.total.toFixed(2)}</span>
+            <div className="flex justify-between text-[13.5px] border-t border-border pt-2">
+              <span className="text-foreground font-semibold">Total</span>
+              <span className="text-foreground font-semibold">${order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>
 
         {/* Customer note */}
         {order.customer_note && (
-          <div className="bg-brand-white border border-brand-line p-5">
-            <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted mb-2">
+          <div className="bg-card border border-border p-5">
+            <div className="text-[10px] tracking-[0.08em] uppercase text-muted-foreground mb-2">
               Order note
             </div>
-            <p className="text-[13px] text-brand-ink leading-relaxed italic">
+            <p className="text-[13px] text-foreground leading-relaxed italic">
               {order.customer_note}
             </p>
           </div>
@@ -260,7 +260,7 @@ function OrderDetail({ id }: { id: string }) {
 
         <Link
           href="/orders"
-          className="inline-flex min-h-6 items-center font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
+          className="inline-flex min-h-6 items-center text-[11px] tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
         >
           ← Back to orders
         </Link>

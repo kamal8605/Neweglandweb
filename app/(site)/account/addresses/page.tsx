@@ -44,13 +44,13 @@ function AddressForm({
     setForm((f: NewAddress) => ({ ...f, [field]: e.target.value }));
 
   const INPUT =
-    "w-full bg-brand-white border border-brand-line rounded-[var(--brand-radius)] px-3 py-2 font-mono text-[13px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue transition-colors";
-  const LABEL = "block font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted mb-1";
+    "w-full min-h-10 rounded-md border border-input bg-background px-3 py-2 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 transition-colors";
+  const LABEL = "block text-[11px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-1";
 
   return (
     <form
       onSubmit={(e) => { e.preventDefault(); onSave(form); }}
-      className="space-y-4 bg-brand-bg-alt border border-brand-line rounded-[var(--brand-radius)] p-5"
+      className="space-y-4 rounded-lg border border-border bg-muted/50 p-5"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -115,23 +115,23 @@ function AddressForm({
           type="checkbox"
           checked={!!form.is_default}
           onChange={(e) => setForm((f) => ({ ...f, is_default: e.target.checked }))}
-          className="accent-brand-blue"
+          className="accent-primary"
         />
-        <span className="font-mono text-[11px] tracking-[0.04em] text-brand-ink">Set as default address</span>
+        <span className="text-[11px] tracking-[0.04em] text-foreground">Set as default address</span>
       </label>
 
       <div className="flex gap-3">
         <button
           type="submit"
           disabled={saving}
-          className="bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase py-2 px-5 hover:bg-brand-blue transition-colors disabled:opacity-60 cursor-pointer rounded-[var(--brand-radius)]"
+          className="rounded-md bg-primary px-5 py-2 text-[12px] font-medium tracking-[0.04em] uppercase text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:opacity-60 cursor-pointer"
         >
           {saving ? "Saving…" : "Save Address"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="font-mono text-[11px] tracking-[0.08em] uppercase py-2 px-5 border border-brand-line text-brand-muted hover:text-brand-ink hover:border-brand-ink transition-colors cursor-pointer rounded-[var(--brand-radius)] bg-transparent"
+          className="rounded-md border border-input bg-background px-5 py-2 text-[12px] font-medium tracking-[0.04em] uppercase text-foreground shadow-xs transition-colors hover:bg-muted cursor-pointer"
         >
           Cancel
         </button>
@@ -154,43 +154,43 @@ function AddressCard({
   deleting: boolean;
 }) {
   return (
-    <div className={`border rounded-[var(--brand-radius)] p-4 bg-brand-white relative ${address.is_default ? "border-brand-blue" : "border-brand-line"}`}>
+    <div className={`relative rounded-lg border bg-card p-4 shadow-xs ${address.is_default ? "border-primary" : "border-border"}`}>
       {address.is_default && (
-        <span className="absolute top-3 right-3 font-mono text-[9px] tracking-[0.08em] uppercase bg-brand-blue text-white px-2 py-0.5 rounded-[var(--brand-radius)]">
+        <span className="absolute top-3 right-3 text-[9px] tracking-[0.08em] uppercase bg-primary text-primary-foreground px-2 py-0.5 rounded-md">
           Default
         </span>
       )}
       {address.label && (
-        <p className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">{address.label}</p>
+        <p className="text-[10px] tracking-[0.06em] uppercase text-muted-foreground mb-1">{address.label}</p>
       )}
-      <p className="font-mono text-[13px] text-brand-ink font-medium">
+      <p className="text-[13px] text-foreground font-medium">
         {address.first_name} {address.last_name}
       </p>
       {address.company && (
-        <p className="font-mono text-[12px] text-brand-muted">{address.company}</p>
+        <p className="text-[12px] text-muted-foreground">{address.company}</p>
       )}
-      <p className="font-mono text-[12px] text-brand-muted mt-1">
+      <p className="text-[12px] text-muted-foreground mt-1">
         {address.address_1}
         {address.address_2 ? `, ${address.address_2}` : ""}
       </p>
-      <p className="font-mono text-[12px] text-brand-muted">
+      <p className="text-[12px] text-muted-foreground">
         {address.city}{address.state ? `, ${address.state}` : ""} {address.postcode} {address.country}
       </p>
       {address.phone && (
-        <p className="font-mono text-[12px] text-brand-muted mt-0.5">{address.phone}</p>
+        <p className="text-[12px] text-muted-foreground mt-0.5">{address.phone}</p>
       )}
 
       <div className="flex items-center gap-4 mt-3">
         <button
           onClick={onEdit}
-          className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-brand-blue hover:text-brand-blue-deep transition-colors cursor-pointer bg-transparent border-none p-0"
+          className="inline-flex min-h-10 items-center lg:min-h-0 text-[11px] tracking-[0.04em] text-primary hover:text-primary/80 transition-colors cursor-pointer bg-transparent border-none p-0"
         >
           Edit
         </button>
         {!address.is_default && (
           <button
             onClick={onSetDefault}
-            className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-brand-muted hover:text-brand-ink transition-colors cursor-pointer bg-transparent border-none p-0"
+            className="inline-flex min-h-10 items-center lg:min-h-0 text-[11px] tracking-[0.04em] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-transparent border-none p-0"
           >
             Set as default
           </button>
@@ -198,7 +198,7 @@ function AddressCard({
         <button
           onClick={onDelete}
           disabled={deleting}
-          className="inline-flex min-h-10 items-center lg:min-h-0 font-mono text-[11px] tracking-[0.04em] text-[#B83434] hover:text-[#8B2020] transition-colors cursor-pointer bg-transparent border-none p-0 disabled:opacity-60"
+          className="inline-flex min-h-10 items-center lg:min-h-0 text-[11px] tracking-[0.04em] text-destructive hover:text-destructive/80 transition-colors cursor-pointer bg-transparent border-none p-0 disabled:opacity-60"
         >
           {deleting ? "Deleting…" : "Delete"}
         </button>
@@ -220,11 +220,11 @@ export default function AddressesPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
+      <div className="bg-background min-h-screen pb-28 md:pb-20">
         <PageHeader crumbs={[{ label: "Account", href: "/account/profile" }, { label: "Addresses" }]} title="Manage Addresses" />
         <div className="px-4 md:px-8 py-8 max-w-2xl mx-auto space-y-4">
           {[1, 2].map((i) => (
-            <div key={i} className="h-36 bg-brand-bg-alt rounded animate-pulse" />
+            <div key={i} className="h-36 bg-muted rounded-md animate-pulse" />
           ))}
         </div>
       </div>
@@ -251,11 +251,11 @@ export default function AddressesPage() {
   const list = addresses ?? [];
 
   return (
-    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
+    <div className="bg-background min-h-screen pb-28 md:pb-20">
       <PageHeader crumbs={[{ label: "Account", href: "/account/profile" }, { label: "Addresses" }]} title="Manage Addresses" />
       <div className="px-4 md:px-8 py-8 max-w-2xl mx-auto">
         {list.length === 0 && !showForm && (
-          <p className="font-mono text-[12px] text-brand-muted mb-6">No addresses saved yet.</p>
+          <p className="text-[12px] text-muted-foreground mb-6">No addresses saved yet.</p>
         )}
 
         <div className="space-y-4 mb-6">
@@ -304,7 +304,7 @@ export default function AddressesPage() {
         ) : (
           <button
             onClick={() => setShowForm(true)}
-            className="font-mono text-[11px] tracking-[0.08em] uppercase py-2 px-5 border border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-white transition-colors cursor-pointer rounded-[var(--brand-radius)] bg-transparent"
+            className="rounded-md border border-input bg-background px-5 py-2 text-[12px] font-medium tracking-[0.04em] uppercase text-foreground shadow-xs transition-colors hover:bg-muted cursor-pointer"
           >
             + Add Address
           </button>
