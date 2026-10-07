@@ -65,14 +65,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-[900px] min-h-[540px] bg-card text-card-foreground flex overflow-hidden rounded-xl border border-border shadow-sm">
+    <div className="w-full max-w-[900px] min-h-[540px] bg-brand-white flex rounded-[var(--brand-radius)] overflow-hidden shadow-lg border border-brand-line">
       {/* Left panel — navy brand */}
-      <div className="hidden md:flex flex-col w-[280px] shrink-0 bg-neutral-950 p-8 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-primary opacity-90" />
-        <div className="absolute right-14 bottom-8 w-20 h-20 rounded-full bg-primary/30" />
+      <div className="hidden md:flex flex-col w-[280px] shrink-0 bg-brand-navy p-8 relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-brand-orange opacity-90" />
+        <div className="absolute right-14 bottom-8 w-20 h-20 rounded-full bg-[#0E2466] opacity-50" />
 
         <div className="relative z-10 space-y-4">
-          <div className="text-[10px] font-medium tracking-[0.12em] text-primary uppercase">
+          <div className="font-mono text-[10px] tracking-[0.12em] text-brand-orange/80 uppercase">
             JOIN THE PLATFORM
           </div>
           <h2 className="text-white text-[22px] font-semibold leading-tight tracking-tight">
@@ -85,15 +85,15 @@ export default function RegisterPage() {
               "Free returns on opening orders",
               "No exclusivity requirements",
             ].map((item) => (
-              <li key={item} className="flex items-start gap-2 text-[12px] text-neutral-400">
-                <span className="text-primary mt-0.5 shrink-0">✓</span>
+              <li key={item} className="flex items-start gap-2 text-[12px] text-[#9DAAC2]">
+                <span className="text-brand-orange mt-0.5 shrink-0">✓</span>
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="mt-auto relative z-10 text-[10px] font-medium text-neutral-500 uppercase tracking-[0.06em]">
+        <div className="mt-auto relative z-10 font-mono text-[10px] text-[#6B7A95] uppercase tracking-[0.06em]">
           Trusted by 4,200+ wholesale teams
         </div>
       </div>
@@ -109,18 +109,18 @@ export default function RegisterPage() {
           <div className="flex flex-col items-start gap-4">
             <CheckCircle size={40} className="text-green-500" />
             <div>
-              <h2 className="text-[20px] font-semibold tracking-tight text-foreground mb-2">
+              <h2 className="text-[20px] font-semibold tracking-tight text-brand-ink mb-2">
                 Application submitted!
               </h2>
-              <p className="text-[14px] text-muted-foreground leading-relaxed max-w-sm">
+              <p className="text-[14px] text-brand-muted leading-relaxed max-w-sm">
                 Registration successful. Your account is pending approval before you can log in.
-                We&apos;ll email you at <strong className="text-foreground">{form.email}</strong> once
+                We&apos;ll email you at <strong className="text-brand-ink">{form.email}</strong> once
                 your account has been reviewed.
               </p>
             </div>
             <Link
               href="/login"
-              className="mt-2 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[13px] font-medium text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors"
+              className="mt-2 inline-flex items-center gap-2 bg-brand-ink text-brand-white font-semibold text-[13px] px-5 py-2.5 rounded-[var(--brand-radius)] hover:bg-brand-navy transition-colors"
             >
               Back to sign in
             </Link>
@@ -128,26 +128,26 @@ export default function RegisterPage() {
         ) : (
           /* Registration form */
           <>
-            <div className="text-[10px] font-medium tracking-[0.1em] text-primary uppercase mb-2">
+            <div className="font-mono text-[10px] tracking-[0.1em] text-brand-orange uppercase mb-2">
               CREATE ACCOUNT
             </div>
-            <h1 className="text-[22px] font-semibold tracking-tight text-foreground mb-1">
+            <h1 className="text-[22px] font-semibold tracking-tight text-brand-ink mb-1">
               Apply for buyer access
             </h1>
-            <p className="text-[13px] text-muted-foreground mb-6">
+            <p className="text-[13px] text-brand-muted mb-6">
               Use your business email. We&apos;ll review your application within 1–2 business days.
             </p>
 
             {serverError && (
-              <div className="mb-4 rounded-lg border border-destructive/20 bg-destructive/5 p-3">
-                <p className="text-[13px] text-destructive">{serverError}</p>
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-[var(--brand-radius)]">
+                <p className="text-[13px] text-red-700">{serverError}</p>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {/* Name */}
               <div>
-                <label htmlFor="register-full-name" className="block text-[12px] font-medium text-foreground mb-1.5">
+                <label htmlFor="register-full-name" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Full name
                 </label>
                 <input id="register-full-name"
@@ -157,14 +157,14 @@ export default function RegisterPage() {
                   placeholder="Maya Okafor"
                   required
                   autoComplete="name"
-                  className={`w-full h-10 rounded-md border bg-background px-3 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 ${errors.name ? "border-destructive" : "border-input"}`}
+                  className={`w-full h-10 px-3 border rounded-[var(--brand-radius)] text-[14px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 bg-brand-white ${errors.name ? "border-red-400" : "border-brand-line"}`}
                 />
                 {errors.name && <p className="text-[11px] text-red-600 mt-1">{errors.name}</p>}
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="register-work-email" className="block text-[12px] font-medium text-foreground mb-1.5">
+                <label htmlFor="register-work-email" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Work email
                 </label>
                 <input id="register-work-email"
@@ -174,14 +174,14 @@ export default function RegisterPage() {
                   placeholder="you@company.com"
                   required
                   autoComplete="email"
-                  className={`w-full h-10 rounded-md border bg-background px-3 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 ${errors.email ? "border-destructive" : "border-input"}`}
+                  className={`w-full h-10 px-3 border rounded-[var(--brand-radius)] text-[14px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 bg-brand-white ${errors.email ? "border-red-400" : "border-brand-line"}`}
                 />
                 {errors.email && <p className="text-[11px] text-red-600 mt-1">{errors.email}</p>}
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="register-password" className="block text-[12px] font-medium text-foreground mb-1.5">
+                <label htmlFor="register-password" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Password
                 </label>
                 <input id="register-password"
@@ -191,18 +191,18 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
-                  className={`w-full h-10 rounded-md border bg-background px-3 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 ${errors.password ? "border-destructive" : "border-input"}`}
+                  className={`w-full h-10 px-3 border rounded-[var(--brand-radius)] text-[14px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 bg-brand-white ${errors.password ? "border-red-400" : "border-brand-line"}`}
                 />
                 {errors.password ? (
                   <p className="text-[11px] text-red-600 mt-1">{errors.password}</p>
                 ) : (
-                  <p className="text-[11px] text-muted-foreground mt-1">Minimum 8 characters.</p>
+                  <p className="text-[11px] text-brand-muted mt-1">Minimum 8 characters.</p>
                 )}
               </div>
 
               {/* Confirm password */}
               <div>
-                <label htmlFor="register-confirm-password" className="block text-[12px] font-medium text-foreground mb-1.5">
+                <label htmlFor="register-confirm-password" className="block text-[12px] font-semibold text-brand-ink mb-1.5">
                   Confirm password
                 </label>
                 <input id="register-confirm-password"
@@ -212,7 +212,7 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
-                  className={`w-full h-10 rounded-md border bg-background px-3 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 ${errors.password_confirmation ? "border-destructive" : "border-input"}`}
+                  className={`w-full h-10 px-3 border rounded-[var(--brand-radius)] text-[14px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 bg-brand-white ${errors.password_confirmation ? "border-red-400" : "border-brand-line"}`}
                 />
                 {errors.password_confirmation && (
                   <p className="text-[11px] text-red-600 mt-1">{errors.password_confirmation}</p>
@@ -222,16 +222,16 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-10 rounded-md bg-primary text-primary-foreground font-medium text-[13px] shadow-xs hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+                className="w-full h-10 bg-brand-ink text-brand-white font-semibold text-[13px] rounded-[var(--brand-radius)] hover:bg-brand-navy transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-1"
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
                 Submit application
               </button>
             </form>
 
-            <p className="mt-5 text-[12px] text-muted-foreground text-center">
+            <p className="mt-5 text-[12px] text-brand-muted text-center">
               Already have an account?{" "}
-              <Link href="/login" className="text-primary font-semibold hover:text-primary/80 transition-colors">
+              <Link href="/login" className="text-brand-blue font-semibold hover:text-brand-blue-deep transition-colors">
                 Sign in
               </Link>
             </p>

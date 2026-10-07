@@ -24,26 +24,26 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
           <div key={label} className="flex items-center">
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2.5">
               <span
-                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium shrink-0 ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] shrink-0 ${
                   active
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-brand-orange text-white"
                     : done
-                    ? "bg-primary/15 text-primary"
-                    : "bg-muted text-muted-foreground border border-border"
+                    ? "bg-brand-navy text-white"
+                    : "bg-brand-bg-alt text-brand-muted border border-brand-line"
                 }`}
               >
                 {done ? "✓" : n}
               </span>
               <span
-                className={`text-[10.5px] font-medium tracking-[0.06em] uppercase ${
-                  active ? "text-foreground" : "sr-only text-muted-foreground sm:not-sr-only"
+                className={`font-mono text-[10.5px] tracking-[0.06em] uppercase ${
+                  active ? "text-brand-ink" : "sr-only text-brand-muted sm:not-sr-only"
                 }`}
               >
                 {label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <span className="text-border text-[12px] select-none">→</span>
+              <span className="text-brand-line font-mono text-[12px] select-none">→</span>
             )}
           </div>
         );
@@ -71,26 +71,26 @@ function AddressCard({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && onSelect()}
-      className={`w-full rounded-lg border p-4 text-left shadow-xs transition-colors cursor-pointer ${
+      className={`w-full text-left p-4 border-2 transition-colors cursor-pointer ${
         selected
-          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-          : "border-border hover:border-primary/50 bg-card"
+          ? "border-brand-orange bg-brand-orange/5"
+          : "border-brand-line hover:border-brand-blue bg-brand-white"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           {address.label && (
-            <div className="text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground mb-1">
+            <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted mb-1">
               {address.label}
             </div>
           )}
-          <div className="text-[13px] font-medium text-foreground">
+          <div className="text-[13px] font-medium text-brand-ink">
             {address.first_name} {address.last_name}
           </div>
           {address.company && (
-            <div className="text-[12px] text-muted-foreground">{address.company}</div>
+            <div className="text-[12px] text-brand-muted">{address.company}</div>
           )}
-          <div className="text-[12px] text-muted-foreground mt-1 leading-relaxed">
+          <div className="text-[12px] text-brand-muted mt-1 leading-relaxed">
             {address.address_1}
             {address.address_2 && <>, {address.address_2}</>}
             <br />
@@ -105,13 +105,13 @@ function AddressCard({
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
             title="Edit address"
             aria-label="Edit address"
-            className="-m-2 w-9 h-9 lg:m-0 lg:w-5 lg:h-5 flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="-m-2 w-9 h-9 lg:m-0 lg:w-5 lg:h-5 flex items-center justify-center text-brand-muted hover:text-brand-ink transition-colors"
           >
             <Pencil size={11} />
           </button>
           {selected && (
-            <span className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-              <Check size={11} className="text-primary-foreground" />
+            <span className="w-5 h-5 bg-brand-orange rounded-full flex items-center justify-center">
+              <Check size={11} className="text-white" />
             </span>
           )}
         </div>
@@ -139,12 +139,12 @@ function AddressSelector({
 }) {
   return (
     <div>
-      <div className="text-[10.5px] font-semibold tracking-[0.1em] uppercase text-foreground border-b border-border pb-2 mb-3">
+      <div className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink border-b border-brand-ink pb-2 mb-3">
         {title}
       </div>
 
       {addresses.length === 0 && (
-        <p className="text-[12px] text-muted-foreground mb-3">No saved addresses.</p>
+        <p className="font-mono text-[12px] text-brand-muted mb-3">No saved addresses.</p>
       )}
 
       <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -161,7 +161,7 @@ function AddressSelector({
 
       <button
         onClick={onAdd}
-        className="flex min-h-10 lg:min-h-0 items-center gap-1.5 text-[10.5px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+        className="flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
       >
         <Plus size={12} />
         Add new address
@@ -202,8 +202,8 @@ function AddressField({
   const id = useId();
   return (
     <div className={half ? "flex-1" : "w-full"}>
-      <label htmlFor={id} className="block text-[10px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-1">
-        {label} {required && <span className="text-destructive">*</span>}
+      <label htmlFor={id} className="block font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">
+        {label} {required && <span className="text-[#B83434]">*</span>}
       </label>
       <input
         id={id}
@@ -211,7 +211,7 @@ function AddressField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 text-[12.5px] text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
+        className="w-full h-9 px-3 border border-brand-line text-[12.5px] bg-brand-white focus:outline-none focus:border-brand-blue rounded-[var(--brand-radius)]"
       />
     </div>
   );
@@ -270,19 +270,19 @@ function AddressModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/40" />
 
       {/* Panel */}
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-xl">
+      <div className="relative w-full max-w-lg bg-brand-white max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">
-          <span className="text-[10.5px] font-semibold tracking-[0.1em] uppercase text-foreground">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-brand-ink">
+          <span className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink">
             {initial ? "Edit address" : "New address"}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="text-brand-muted hover:text-brand-ink transition-colors"
           >
             <X size={16} />
           </button>
@@ -313,21 +313,21 @@ function AddressModal({
           </div>
 
           {error && (
-            <p className="mt-3 text-[11px] text-destructive">{error}</p>
+            <p className="mt-3 font-mono text-[11px] text-[#B83434]">{error}</p>
           )}
 
           <div className="mt-5 flex items-center gap-3">
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-primary px-5 py-2 text-[11px] font-medium tracking-[0.08em] uppercase text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className="bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase px-5 py-2 hover:bg-brand-navy/90 transition-colors disabled:opacity-50"
             >
               {isPending ? "Saving…" : initial ? "Update address" : "Save address"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-3 py-2 text-[11px] font-medium tracking-[0.06em] uppercase text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted hover:text-brand-ink transition-colors"
             >
               Cancel
             </button>
@@ -376,7 +376,7 @@ export default function CheckoutPage() {
 
   if (isLoading || !cartLoaded) {
     return (
-      <div className="flex items-center justify-center h-60 text-[11px] font-medium text-muted-foreground tracking-widest uppercase">
+      <div className="flex items-center justify-center h-60 font-mono text-[11px] text-brand-muted tracking-widest uppercase">
         Loading…
       </div>
     );
@@ -446,15 +446,15 @@ export default function CheckoutPage() {
     }
   };
 
-  const TH = "px-3 py-2 text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground border-b border-border text-left bg-muted/60";
-  const TD = "px-3 py-2.5 text-[12.5px] text-foreground border-b border-border align-middle";
+  const TH = "px-3 py-2 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
+  const TD = "px-3 py-2.5 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-28 md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Page header */}
-      <div className="border-b border-border bg-card px-4 py-5 sm:px-8">
+      <div className="border-b border-brand-line bg-brand-white px-4 py-5 sm:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <h1 className="text-[26px] sm:text-[32px] lg:text-[36px] font-semibold text-foreground tracking-tight leading-tight">
+          <h1 className="font-serif text-[26px] sm:text-[32px] lg:text-[36px] font-normal text-brand-ink leading-tight">
             Checkout
           </h1>
           <div className="max-w-full overflow-x-auto"><StepIndicator step={2} /></div>
@@ -465,7 +465,7 @@ export default function CheckoutPage() {
         {/* Left — form sections */}
         <div className="flex-1 min-w-0 space-y-8">
           {/* Billing address */}
-          <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <AddressSelector
               title="Billing address"
               addresses={addresses}
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
           </section>
 
           {/* Shipping address */}
-          <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
             <AddressSelector
               title="Shipping address"
               addresses={addresses}
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
             {billingAddr && shippingAddr?.id !== billingAddr?.id && (
               <button
                 onClick={() => setShippingAddr(billingAddr)}
-                className="mt-3 text-[10.5px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+                className="mt-3 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
               >
                 Use same as billing
               </button>
@@ -497,8 +497,8 @@ export default function CheckoutPage() {
           </section>
 
           {/* Order note */}
-          <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
-            <div className="text-[10.5px] font-semibold tracking-[0.1em] uppercase text-foreground border-b border-border pb-2 mb-3">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
+            <div className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink border-b border-brand-ink pb-2 mb-3">
               Order note
             </div>
             <textarea
@@ -506,19 +506,19 @@ export default function CheckoutPage() {
               onChange={(e) => setNote(e.target.value)}
               placeholder="Customer note / P.O. reference (optional)"
               rows={3}
-              className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-[12.5px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
+              className="w-full px-3 py-2 border border-brand-line text-[12.5px] bg-brand-white focus:outline-none focus:border-brand-blue resize-none rounded-[var(--brand-radius)] placeholder:text-brand-muted"
             />
           </section>
 
           {/* Order review */}
-          <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-6">
-            <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
-              <span className="text-[10.5px] font-semibold tracking-[0.1em] uppercase text-foreground">
+          <section className="bg-brand-white border border-brand-line p-4 sm:p-6">
+            <div className="flex items-center justify-between border-b border-brand-ink pb-2 mb-3">
+              <span className="font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-ink">
                 Order review · {items.length} line{items.length !== 1 ? "s" : ""}
               </span>
               <Link
                 href="/cart"
-                className="inline-flex min-h-6 items-center text-[10px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+                className="inline-flex min-h-6 items-center font-mono text-[10px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
               >
                 ← Edit in cart
               </Link>
@@ -537,12 +537,12 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <tr key={item.product_id}>
                     <td className={TD}>
-                      <div className="text-foreground">{item.name}</div>
-                      <div className="text-[10.5px] text-muted-foreground">{item.sku}</div>
+                      <div className="text-brand-ink">{item.name}</div>
+                      <div className="font-mono text-[10.5px] text-brand-muted">{item.sku}</div>
                     </td>
-                    <td className={`${TD} text-right`}>{item.quantity}</td>
-                    <td className={`${TD} text-right`}>${item.price.toFixed(2)}</td>
-                    <td className={`${TD} text-right font-semibold`}>
+                    <td className={`${TD} text-right font-mono`}>{item.quantity}</td>
+                    <td className={`${TD} text-right font-mono`}>${item.price.toFixed(2)}</td>
+                    <td className={`${TD} text-right font-mono font-semibold`}>
                       ${(item.price * item.quantity).toFixed(2)}
                     </td>
                   </tr>
@@ -554,44 +554,44 @@ export default function CheckoutPage() {
         </div>
 
         {/* Right — summary */}
-        <div className="w-full shrink-0 rounded-lg border border-border bg-card shadow-sm lg:w-[300px]">
-          <div className="px-5 py-4 border-b border-border">
-            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase text-foreground">
+        <div className="w-full shrink-0 border border-brand-line bg-brand-white lg:w-[300px]">
+          <div className="px-5 py-4 border-b border-brand-ink">
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-muted">
               Order summary
             </span>
           </div>
 
           <div className="px-5 py-4 space-y-3">
-            <div className="flex justify-between text-[12.5px]">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-foreground font-semibold">${subtotal.toFixed(2)}</span>
+            <div className="flex justify-between font-mono text-[12.5px]">
+              <span className="text-brand-muted">Subtotal</span>
+              <span className="text-brand-ink font-semibold">${subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-[12.5px]">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="text-muted-foreground">TBD</span>
+            <div className="flex justify-between font-mono text-[12.5px]">
+              <span className="text-brand-muted">Shipping</span>
+              <span className="text-brand-muted">TBD</span>
             </div>
-            <div className="border-t border-border pt-3 flex justify-between text-[13.5px]">
-              <span className="text-foreground font-semibold">Total</span>
-              <span className="text-foreground font-semibold">${subtotal.toFixed(2)}</span>
+            <div className="border-t border-brand-line pt-3 flex justify-between font-mono text-[13.5px]">
+              <span className="text-brand-ink font-semibold">Total</span>
+              <span className="text-brand-ink font-semibold">${subtotal.toFixed(2)}</span>
             </div>
           </div>
 
           <div className="px-5 pb-5">
             {error && (
-              <p className="mb-3 text-[11px] text-destructive leading-snug">{error}</p>
+              <p className="mb-3 font-mono text-[11px] text-[#B83434] leading-snug">{error}</p>
             )}
 
             <button
               onClick={handlePlaceOrder}
               disabled={submitting || !billingAddr || !shippingAddr || items.length === 0}
-              className="w-full rounded-md bg-primary px-5 py-3 text-[11px] font-medium tracking-[0.08em] uppercase text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full bg-brand-orange text-white font-mono text-[11px] tracking-[0.08em] uppercase px-5 py-3 hover:bg-brand-orange/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {submitting ? "Placing order…" : "Place order →"}
             </button>
 
             <Link
               href="/cart"
-              className="block mt-3 py-2 lg:py-0 text-center text-[10.5px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+              className="block mt-3 py-2 lg:py-0 text-center font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               ← Back to cart
             </Link>

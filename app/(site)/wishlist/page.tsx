@@ -16,14 +16,14 @@ function WishlistTable() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-        <table className="w-full border-collapse bg-card">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse bg-brand-white">
           <tbody>
             {Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i} className="border-b border-border">
+              <tr key={i} className="border-b border-brand-line">
                 {Array.from({ length: 5 }).map((__, j) => (
                   <td key={j} className="px-4 py-3">
-                    <div className="h-4 bg-muted rounded animate-pulse" />
+                    <div className="h-4 bg-brand-bg-alt rounded animate-pulse" />
                   </td>
                 ))}
               </tr>
@@ -36,12 +36,12 @@ function WishlistTable() {
 
   if (!Array.isArray(items) || items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-52 gap-4 rounded-lg border border-border bg-card shadow-sm">
-        <Heart size={32} className="text-muted-foreground" />
-        <p className="text-[12px] text-muted-foreground">Your wishlist is empty.</p>
+      <div className="flex flex-col items-center justify-center h-52 gap-4">
+        <Heart size={32} className="text-brand-muted" />
+        <p className="font-mono text-[12px] text-brand-muted">Your wishlist is empty.</p>
         <Link
           href="/shop"
-          className="text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+          className="font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors"
         >
           → Browse products to save items
         </Link>
@@ -49,12 +49,12 @@ function WishlistTable() {
     );
   }
 
-  const TH = "px-4 py-2.5 text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground border-b border-border text-left bg-muted/60";
-  const TD = "px-4 py-3 text-[12.5px] text-foreground border-b border-border align-middle";
+  const TH = "px-4 py-2.5 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left bg-brand-bg-alt";
+  const TD = "px-4 py-3 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-      <table className="w-full border-collapse bg-card">
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse bg-brand-white">
         <thead>
           <tr>
             <th className={`${TH} w-14`} />
@@ -68,10 +68,10 @@ function WishlistTable() {
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item.id} className="hover:bg-muted/40 transition-colors">
+            <tr key={item.id} className="hover:bg-brand-bg transition-colors">
               {/* Image */}
               <td className={TD}>
-                <div className="w-10 h-10 relative overflow-hidden rounded-md border border-border bg-muted shrink-0">
+                <div className="w-10 h-10 relative overflow-hidden border border-brand-line bg-brand-bg-alt shrink-0">
                   {item.image ? (
                     <Image
                       src={item.image}
@@ -85,7 +85,7 @@ function WishlistTable() {
                       className="w-full h-full"
                       style={{
                         background:
-                          "repeating-linear-gradient(135deg, var(--muted) 0 5px, var(--border) 5px 10px)",
+                          "repeating-linear-gradient(135deg, #E5DFD0 0 5px, #D9D3C5 5px 10px)",
                       }}
                     />
                   )}
@@ -96,14 +96,14 @@ function WishlistTable() {
               <td className={TD}>
                 <Link
                   href={`/product/${item.product_id}`}
-                  className="font-medium text-foreground hover:text-primary transition-colors"
+                  className="font-medium text-brand-ink hover:text-brand-blue transition-colors"
                 >
                   {item.name}
                 </Link>
               </td>
 
               {/* SKU */}
-              <td className={`${TD} text-[11.5px] text-muted-foreground`}>
+              <td className={`${TD} font-mono text-[11.5px] text-brand-muted`}>
                 {item.sku}
               </td>
 
@@ -113,7 +113,7 @@ function WishlistTable() {
               </td>
 
               {/* Added date */}
-              <td className={`${TD} text-[11.5px] text-muted-foreground`}>
+              <td className={`${TD} font-mono text-[11.5px] text-brand-muted`}>
                 {new Date(item.added_at).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -125,7 +125,7 @@ function WishlistTable() {
               <td className={TD}>
                 <Link
                   href={`/product/${item.product_id}`}
-                  className="text-[10.5px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+                  className="font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
                 >
                   See price →
                 </Link>
@@ -135,7 +135,7 @@ function WishlistTable() {
               <td className={`${TD} text-center`}>
                 <button
                   onClick={() => void toggle(item.product_id).catch(() => undefined)}
-                  className="-m-2 inline-grid h-9 w-9 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  className="-m-2 inline-grid h-9 w-9 place-items-center text-brand-muted hover:text-[#B83434] transition-colors"
                   aria-label="Remove from wishlist"
                 >
                   <X size={13} />
@@ -151,7 +151,7 @@ function WishlistTable() {
 
 export default function WishlistPage() {
   return (
-    <div className="min-h-screen bg-muted/30 pb-28 md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={[{ label: "Wishlist" }]}
         title="Wishlist"

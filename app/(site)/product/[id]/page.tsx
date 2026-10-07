@@ -26,10 +26,10 @@ function ImagePlaceholder() {
     <div
       className="w-full h-full flex items-center justify-center"
       style={{
-        background: "repeating-linear-gradient(135deg, var(--muted) 0 14px, var(--border) 14px 28px)",
+        background: "repeating-linear-gradient(135deg, #E5DFD0 0 14px, #D9D3C5 14px 28px)",
       }}
     >
-      <span className="text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground">
+      <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted">
         No image
       </span>
     </div>
@@ -45,7 +45,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
 
   if (sorted.length === 0) {
     return (
-      <div className="aspect-[4/3] relative overflow-hidden rounded-lg border border-border bg-muted">
+      <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg-alt border border-brand-line">
         <ImagePlaceholder />
       </div>
     );
@@ -54,7 +54,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
   return (
     <div className="flex flex-col gap-3">
       {/* Main image */}
-      <div className="group aspect-[4/3] relative overflow-hidden rounded-lg border border-border bg-muted shadow-sm">
+      <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg-alt border border-brand-line group">
         <Image
           src={imageVariant(sorted[active].url, sorted[active].variants, 1024)!}
           alt={name}
@@ -67,13 +67,13 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
           <>
             <button
               onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 rounded-md border border-border bg-card/90 text-foreground shadow-sm flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
             >
               <ChevronLeft size={14} />
             </button>
             <button
               onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 rounded-md border border-border bg-card/90 text-foreground shadow-sm flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 lg:w-7 lg:h-7 bg-brand-white/80 border border-brand-line flex items-center justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
             >
               <ChevronRight size={14} />
             </button>
@@ -88,8 +88,8 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`shrink-0 w-16 h-16 relative overflow-hidden rounded-md border-2 bg-card transition-colors ${
-                i === active ? "border-primary" : "border-border hover:border-primary/50"
+              className={`shrink-0 w-16 h-16 relative overflow-hidden border-2 transition-colors ${
+                i === active ? "border-brand-orange" : "border-brand-line hover:border-brand-blue"
               }`}
             >
               <Image src={imageVariant(img.url, img.variants, 256)!} alt={`${name} ${i + 1}`} fill sizes="64px" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
@@ -108,26 +108,26 @@ function PriceBlock({ product }: { product: Product }) {
     <PriceGate pricesVisible={product.prices_visible}>
       {product.on_sale && product.sale_price !== null ? (
         <div className="flex items-baseline gap-2">
-          <span className="text-[24px] font-semibold text-destructive">
+          <span className="font-mono text-[24px] font-semibold text-[#B83434]">
             ${product.sale_price.toFixed(2)}
           </span>
           {product.regular_price !== null && (
-            <span className="text-[16px] text-muted-foreground line-through">
+            <span className="font-mono text-[16px] text-brand-muted line-through">
               ${product.regular_price.toFixed(2)}
             </span>
           )}
           {product.regular_price !== null && product.sale_price !== null && (
-            <span className="rounded-sm bg-destructive px-1.5 py-0.5 text-[11px] font-medium text-destructive-foreground">
+            <span className="font-mono text-[11px] bg-[#B83434] text-white px-1.5 py-0.5">
               -{Math.round((1 - product.sale_price / product.regular_price) * 100)}%
             </span>
           )}
         </div>
       ) : product.current_price !== null ? (
-        <span className="text-[24px] font-semibold text-foreground">
+        <span className="font-mono text-[24px] font-semibold text-brand-ink">
           ${product.current_price.toFixed(2)}
         </span>
       ) : (
-        <span className="text-[13px] text-muted-foreground">Price not set</span>
+        <span className="font-mono text-[13px] text-brand-muted">Price not set</span>
       )}
     </PriceGate>
   );
@@ -145,23 +145,23 @@ function QtyStepper({
   disabled?: boolean;
 }) {
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-md border border-input bg-background shadow-xs">
+    <div className="inline-flex items-center border border-brand-line">
       <button
         onClick={() => onChange(Math.max(0, value - 1))}
         disabled={disabled || value <= 0}
         aria-label="Decrease quantity"
-        className="w-8 h-8 flex items-center justify-center text-[14px] text-foreground hover:bg-muted transition-colors disabled:opacity-30"
+        className="w-8 h-8 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors disabled:opacity-30"
       >
         −
       </button>
-      <span className="w-10 text-center text-[13px] text-foreground border-x border-border h-8 flex items-center justify-center">
+      <span className="w-10 text-center font-mono text-[13px] text-brand-ink border-x border-brand-line h-8 flex items-center justify-center">
         {value}
       </span>
       <button
         onClick={() => onChange(value + 1)}
         disabled={disabled}
         aria-label="Increase quantity"
-        className="w-8 h-8 flex items-center justify-center text-[14px] text-foreground hover:bg-muted transition-colors disabled:opacity-30"
+        className="w-8 h-8 flex items-center justify-center font-mono text-[14px] text-brand-ink hover:bg-brand-bg-alt transition-colors disabled:opacity-30"
       >
         +
       </button>
@@ -200,7 +200,7 @@ function SimpleAddToCart({ product }: { product: Product }) {
       <button
         onClick={handleAdd}
         disabled={qty === 0 || !product.in_stock}
-        className="flex-1 rounded-md bg-primary px-6 py-2 text-[11px] font-medium tracking-[0.08em] uppercase text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="flex-1 bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase px-6 py-2 hover:bg-brand-navy/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {!product.in_stock ? "Out of stock" : "Add to cart"}
       </button>
@@ -241,21 +241,21 @@ function GroupedVariantTable({ product }: { product: Product }) {
     setQtys({});
   };
 
-  const TD = "px-3 py-2 border-b border-border text-left align-middle";
-  const TH = "px-3 py-2 text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground border-b border-border bg-muted/60 text-left";
+  const TD = "px-3 py-2 border-b border-brand-line text-left align-middle";
+  const TH = "px-3 py-2 font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink text-left";
 
   if (children.length === 0) {
     return (
-      <p className="text-[12px] text-muted-foreground mt-4">No variants available.</p>
+      <p className="font-mono text-[12px] text-brand-muted mt-4">No variants available.</p>
     );
   }
 
   return (
     <div className="mt-6">
-      <div className="text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground pb-2 mb-0">
+      <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted border-b border-brand-ink pb-2 mb-0">
         Variants · {children.length} SKUs
       </div>
-      <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+      <div className="overflow-x-auto">
         <table className="w-full text-[12px]">
           <thead>
             <tr>
@@ -272,11 +272,11 @@ function GroupedVariantTable({ product }: { product: Product }) {
               const qty = qtys[child.id] ?? 0;
               const price = child.current_price ?? child.sale_price ?? 0;
               return (
-                <tr key={child.id} className="hover:bg-muted/40 transition-colors">
+                <tr key={child.id} className="hover:bg-brand-bg-alt/50 transition-colors">
                   <td className={TD}>
                     <div className="flex items-center gap-2">
                       {(child.image ?? product.image) ? (
-                        <div className="w-8 h-8 relative shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+                        <div className="w-8 h-8 relative shrink-0 border border-brand-line overflow-hidden bg-brand-bg-alt">
                           <Image
                             src={(child.image ? imageVariant(child.image, child.image_variants, 64) : imageVariant(product.image, product.image_variants, 64))!}
                             alt={child.name}
@@ -286,18 +286,18 @@ function GroupedVariantTable({ product }: { product: Product }) {
                           />
                         </div>
                       ) : null}
-                      <span className="text-foreground">{child.name}</span>
+                      <span className="text-brand-ink">{child.name}</span>
                     </div>
                   </td>
-                  <td className={`${TD} hidden sm:table-cell text-muted-foreground`}>{child.sku}</td>
+                  <td className={`${TD} hidden sm:table-cell font-mono text-brand-muted`}>{child.sku}</td>
                   <td className={`${TD} text-right`}>
                     <PriceGate pricesVisible={child.prices_visible}>
                       {child.on_sale && child.sale_price !== null ? (
-                        <span className="text-destructive font-semibold">${child.sale_price.toFixed(2)}</span>
+                        <span className="text-[#B83434] font-semibold">${child.sale_price.toFixed(2)}</span>
                       ) : price > 0 ? (
                         <span>${price.toFixed(2)}</span>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-brand-muted">—</span>
                       )}
                     </PriceGate>
                   </td>
@@ -307,7 +307,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                   <td className={`${TD} text-right`}>
                     <QtyStepper value={qty} onChange={(n) => setQty(child.id, n)} disabled={!child.in_stock} />
                   </td>
-                  <td className={`${TD} hidden sm:table-cell text-right text-foreground`}>
+                  <td className={`${TD} hidden sm:table-cell text-right font-mono text-brand-ink`}>
                     {qty > 0 && price > 0 ? `$${(qty * price).toFixed(2)}` : "—"}
                   </td>
                 </tr>
@@ -318,13 +318,13 @@ function GroupedVariantTable({ product }: { product: Product }) {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <span className="text-[11px] text-muted-foreground">
+        <span className="font-mono text-[11px] text-brand-muted">
           {selectedCount} variant{selectedCount !== 1 ? "s" : ""} selected
         </span>
         <button
           onClick={handleAddAll}
           disabled={selectedCount === 0}
-          className="rounded-md bg-primary px-6 py-2 text-[11px] font-medium tracking-[0.08em] uppercase text-primary-foreground shadow-xs hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase px-6 py-2 hover:bg-brand-navy/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Add to cart ({selectedCount})
         </button>
@@ -343,19 +343,19 @@ function SpecStrip({ attributes }: { attributes?: Record<string, string> }) {
   const entries = Object.entries(attributes);
 
   return (
-    <div className="border-t border-border bg-card mt-10">
-      <div className="px-4 md:px-6 lg:px-8 py-4 border-b border-border">
-        <span className="text-[10px] font-medium tracking-[0.1em] uppercase text-muted-foreground">
+    <div className="border-t border-brand-line mt-10">
+      <div className="px-4 md:px-6 lg:px-8 py-4 border-b border-brand-line">
+        <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-muted">
           Product specifications
         </span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:divide-x divide-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:divide-x divide-brand-line">
         {entries.map(([key, value]) => (
-          <div key={key} className="px-4 md:px-6 lg:px-8 py-5 border-b border-border">
-            <div className="text-[10px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-1">
+          <div key={key} className="px-4 md:px-6 lg:px-8 py-5 border-b border-brand-line">
+            <div className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-1">
               {key}
             </div>
-            <div className="text-[13px] text-foreground">{value}</div>
+            <div className="font-mono text-[13px] text-brand-ink">{value}</div>
           </div>
         ))}
       </div>
@@ -381,14 +381,14 @@ function ProductDetail({ id }: { id: string }) {
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="h-10 bg-muted border-b border-border" />
+        <div className="h-10 bg-brand-bg-alt border-b border-brand-line" />
         <div className="grid grid-cols-1 gap-8 p-4 md:grid-cols-2 md:p-8">
-          <div className="aspect-[4/3] rounded-lg bg-muted" />
+          <div className="aspect-[4/3] bg-brand-bg-alt" />
           <div className="space-y-4">
-            <div className="h-4 bg-muted rounded w-1/3" />
-            <div className="h-8 bg-muted rounded w-3/4" />
-            <div className="h-4 bg-muted rounded w-1/4" />
-            <div className="h-6 bg-muted rounded w-1/3" />
+            <div className="h-4 bg-brand-bg-alt rounded w-1/3" />
+            <div className="h-8 bg-brand-bg-alt rounded w-3/4" />
+            <div className="h-4 bg-brand-bg-alt rounded w-1/4" />
+            <div className="h-6 bg-brand-bg-alt rounded w-1/3" />
           </div>
         </div>
       </div>
@@ -398,8 +398,8 @@ function ProductDetail({ id }: { id: string }) {
   if (isError || !product) {
     return (
       <div className="flex flex-col items-center justify-center h-60 gap-4">
-        <p className="text-[12px] text-muted-foreground">Product not found.</p>
-        <Link href="/shop" className="text-[11px] font-medium text-primary hover:text-primary/80">
+        <p className="font-mono text-[12px] text-brand-muted">Product not found.</p>
+        <Link href="/shop" className="font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep">
           ← Back to shop
         </Link>
       </div>
@@ -417,44 +417,44 @@ function ProductDetail({ id }: { id: string }) {
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-28 md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       {/* Breadcrumb */}
-      <div className="px-4 md:px-6 lg:px-8 py-3.5 border-b border-border bg-card">
+      <div className="px-4 md:px-6 lg:px-8 py-3.5 border-b border-brand-line bg-brand-white">
         <Breadcrumb items={crumbs} />
       </div>
 
       {/* Hero */}
-      <div className="grid grid-cols-1 gap-0 border-b border-border bg-card shadow-sm md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-0 border-b border-brand-line md:grid-cols-2">
         {/* Left: images */}
-        <div className="min-w-0 p-4 md:p-6 lg:p-8 md:border-r border-b md:border-b-0 border-border bg-card">
+        <div className="min-w-0 p-4 md:p-6 lg:p-8 md:border-r border-b md:border-b-0 border-brand-line bg-brand-white">
           <ImageGallery images={images} name={product.name} />
         </div>
 
         {/* Right: summary */}
-        <div className="min-w-0 p-5 md:p-6 lg:p-8 bg-card">
+        <div className="min-w-0 p-5 md:p-6 lg:p-8 bg-brand-white">
           {/* Brand */}
           {product.brand && (
             <Link
               href={`/brand/${product.brand.id}`}
-              className="inline-flex min-h-6 items-center text-[10.5px] font-medium tracking-[0.1em] uppercase text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex min-h-6 items-center font-mono text-[10.5px] tracking-[0.1em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               {product.brand.name}
             </Link>
           )}
 
           {/* Name */}
-          <h1 className="text-[26px] md:text-[30px] lg:text-[38px] leading-[1.1] font-semibold tracking-tight mt-1 text-foreground">
+          <h1 className="font-serif text-[26px] md:text-[30px] lg:text-[38px] leading-[1.1] font-normal tracking-tight mt-1 text-brand-ink">
             {product.name}
           </h1>
 
           {/* SKU */}
-          <div className="text-[10.5px] font-medium tracking-[0.08em] text-muted-foreground uppercase mt-2">
+          <div className="font-mono text-[10.5px] tracking-[0.08em] text-brand-muted uppercase mt-2">
             SKU · {product.sku}
           </div>
 
           {/* Sale badge */}
           {product.on_sale && (
-            <span className="inline-block mt-3 rounded-sm bg-destructive px-1.5 py-0.5 text-[9px] font-medium tracking-[0.06em] text-destructive-foreground">
+            <span className="inline-block mt-3 bg-[#B83434] text-white font-mono text-[9px] tracking-[0.06em] px-1.5 py-0.5">
               SALE
             </span>
           )}
@@ -471,7 +471,7 @@ function ProductDetail({ id }: { id: string }) {
 
           {/* Description */}
           {description && (
-            <p className="mt-4 text-[13px] text-muted-foreground leading-relaxed border-t border-border pt-4">
+            <p className="mt-4 text-[13px] text-brand-muted leading-relaxed border-t border-brand-line pt-4">
               {description.length > 400 ? description.slice(0, 400) + "…" : description}
             </p>
           )}
@@ -480,19 +480,19 @@ function ProductDetail({ id }: { id: string }) {
           {product.type === "simple" && <SimpleAddToCart product={product} />}
 
           {/* Actions */}
-          <div className="mt-5 flex items-center gap-4 pt-4 border-t border-border">
+          <div className="mt-5 flex items-center gap-4 pt-4 border-t border-brand-line">
             <button
               onClick={() => { if (isAuthenticated) toggleWishlist(); }}
               aria-pressed={wishlisted}
               title={isAuthenticated ? (wishlisted ? "Remove from wishlist" : "Add to wishlist") : "Sign in to wishlist"}
-              className={`flex min-h-10 lg:min-h-0 items-center gap-1.5 text-[10.5px] font-medium tracking-[0.06em] uppercase transition-colors disabled:opacity-50 ${
-                wishlisted ? "text-destructive" : "text-muted-foreground hover:text-foreground"
+              className={`flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase transition-colors disabled:opacity-50 ${
+                wishlisted ? "text-[#B83434]" : "text-brand-muted hover:text-brand-ink"
               }`}
             >
               <Heart size={13} fill={wishlisted ? "currentColor" : "none"} />
               {wishlisted ? "Wishlisted" : "Wishlist"}
             </button>
-            <button className="flex min-h-10 lg:min-h-0 items-center gap-1.5 text-[10.5px] font-medium tracking-[0.06em] uppercase text-muted-foreground hover:text-foreground transition-colors">
+            <button className="flex min-h-10 lg:min-h-0 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.06em] uppercase text-brand-muted hover:text-brand-ink transition-colors">
               <GitCompare size={13} />
               Compare
             </button>

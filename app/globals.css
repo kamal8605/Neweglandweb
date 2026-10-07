@@ -1,9 +1,5 @@
 
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
 
 .category-track {
   scrollbar-width: none;
@@ -14,29 +10,44 @@
   display: none;
 }
 
-/* Legacy storefront aliases mapped to the selected shadcn Nova preset. */
+/* ── Forge & Co. theme (default) ─────────────────────────────── */
 :root,
-html[data-theme="forge"],
-html[data-theme="pallet"] {
-  --brand-bg: var(--background);
-  --brand-bg-alt: var(--muted);
-  --brand-ink: var(--foreground);
-  --brand-navy: oklch(0.205 0 0);
-  --brand-muted: var(--muted-foreground);
-  --brand-line: var(--border);
-  --brand-blue: var(--primary);
-  --brand-blue-deep: color-mix(in oklch, var(--primary), black 20%);
-  --brand-orange: var(--chart-4);
-  --brand-orange-soft: color-mix(in oklch, var(--chart-1), white 76%);
-  --brand-white: var(--card);
-  --brand-radius: var(--radius);
+html[data-theme="forge"] {
+  --brand-bg:          #F7F4EE;
+  --brand-bg-alt:      #EFEAE0;
+  --brand-ink:         #0A0A0A;
+  --brand-navy:        #0B1F3A;
+  --brand-muted:       #5A5751;
+  --brand-line:        #D9D3C5;
+  --brand-blue:        #1E5BFF;
+  --brand-blue-deep:   #0E3FCC;
+  --brand-orange:      #FF6B1A;
+  --brand-orange-soft: #FFE8D6;
+  --brand-white:       #FFFFFF;
+  --brand-radius:      0px;
 }
 
-/* Tailwind v4 and shadcn semantic tokens. */
+/* ── Pallet theme ─────────────────────────────────────────────── */
+html[data-theme="pallet"] {
+  --brand-bg:          #F7F8FB;
+  --brand-bg-alt:      #EEF2FB;
+  --brand-ink:         #0F172A;
+  --brand-navy:        #1B3A8A;
+  --brand-muted:       #475569;
+  --brand-line:        #E5E9F0;
+  --brand-blue:        #1B3A8A;
+  --brand-blue-deep:   #0E2466;
+  --brand-orange:      #F26B1F;
+  --brand-orange-soft: #FFF1E6;
+  --brand-white:       #FFFFFF;
+  --brand-radius:      0px;
+}
+
+/* ── Tailwind v4 theme tokens ─────────────────────────────────── */
 @theme inline {
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-geist-heading);
+  --font-sans:  var(--font-site);
+  --font-mono:  var(--font-site);
+  --font-serif: var(--font-site);
 
   --color-brand-bg:          var(--brand-bg);
   --color-brand-bg-alt:      var(--brand-bg-alt);
@@ -50,75 +61,43 @@ html[data-theme="pallet"] {
   --color-brand-orange-soft: var(--brand-orange-soft);
   --color-brand-white:       var(--brand-white);
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: white;
+  /* shadcn/ui compatible variables */
+  --color-background: var(--brand-bg);
+  --color-foreground: var(--brand-ink);
+  --color-border:     var(--brand-line);
+  --color-input:      var(--brand-line);
+  --color-ring:       var(--brand-blue);
+  --color-primary:    var(--brand-orange);
+  --color-primary-foreground: var(--brand-white);
+  --color-secondary: var(--brand-bg-alt);
+  --color-secondary-foreground: var(--brand-ink);
+  --color-muted:     var(--brand-bg-alt);
+  --color-muted-foreground: var(--brand-muted);
+  --color-accent:    var(--brand-orange-soft);
+  --color-accent-foreground: var(--brand-orange);
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
 
-  --font-heading: var(--font-geist-heading);
+  --radius: var(--brand-radius, 0px);
+}
 
-  --color-sidebar-ring: var(--sidebar-ring);
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-site), "Courier New", monospace;
+}
 
-  --color-sidebar-border: var(--sidebar-border);
-
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-
-  --color-sidebar-accent: var(--sidebar-accent);
-
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-
-  --color-sidebar-primary: var(--sidebar-primary);
-
-  --color-sidebar-foreground: var(--sidebar-foreground);
-
-  --color-sidebar: var(--sidebar);
-
-  --color-chart-5: var(--chart-5);
-
-  --color-chart-4: var(--chart-4);
-
-  --color-chart-3: var(--chart-3);
-
-  --color-chart-2: var(--chart-2);
-
-  --color-chart-1: var(--chart-1);
-
-  --color-popover-foreground: var(--popover-foreground);
-
-  --color-popover: var(--popover);
-
-  --color-card-foreground: var(--card-foreground);
-
-  --color-card: var(--card);
-
-  --radius-sm: calc(var(--radius) * 0.6);
-
-  --radius-md: calc(var(--radius) * 0.8);
-
-  --radius-lg: var(--radius);
-
-  --radius-xl: calc(var(--radius) * 1.4);
-
-  --radius-2xl: calc(var(--radius) * 1.8);
-
-  --radius-3xl: calc(var(--radius) * 2.2);
-
-  --radius-4xl: calc(var(--radius) * 2.6);
+button,
+input,
+select,
+textarea {
+  border-radius: 0;
 }
 
 :where(a, button, input, select, textarea):focus-visible {
-  outline-color: var(--ring);
+  outline-color: var(--brand-orange);
   outline-offset: 2px;
 }
 
@@ -362,96 +341,5 @@ body {
   select,
   textarea {
     font-size: 16px;
-  }
-}
-
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.488 0.243 264.376);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.837 0.128 66.29);
-  --chart-2: oklch(0.705 0.213 47.604);
-  --chart-3: oklch(0.646 0.222 41.116);
-  --chart-4: oklch(0.553 0.195 38.402);
-  --chart-5: oklch(0.47 0.157 37.304);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.546 0.245 262.881);
-  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.424 0.199 265.638);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.837 0.128 66.29);
-  --chart-2: oklch(0.705 0.213 47.604);
-  --chart-3: oklch(0.646 0.222 41.116);
-  --chart-4: oklch(0.553 0.195 38.402);
-  --chart-5: oklch(0.47 0.157 37.304);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.623 0.214 259.815);
-  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  html {
-    @apply font-sans;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-family: var(--font-geist-heading), sans-serif;
-    letter-spacing: -0.015em;
   }
 }

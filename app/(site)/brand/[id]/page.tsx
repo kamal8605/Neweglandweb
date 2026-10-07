@@ -19,10 +19,10 @@ function Placeholder({ label }: { label: string }) {
     <div
       className="w-full h-full flex items-center justify-center"
       style={{
-        background: "repeating-linear-gradient(135deg, var(--muted) 0 14px, var(--border) 14px 28px)",
+        background: "repeating-linear-gradient(135deg, #E5DFD0 0 14px, #D9D3C5 14px 28px)",
       }}
     >
-      <span className="rounded-md bg-background/90 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+      <span className="font-mono text-[10px] tracking-[0.08em] uppercase px-2 py-1 text-brand-muted bg-brand-bg/90">
         {label}
       </span>
     </div>
@@ -47,10 +47,10 @@ function BrandHero({ id }: { id: string }) {
       // Same boxes as the loaded header (breadcrumb, then image + fact sheet stacked on phones) so the
       // products below don't jump when the brand arrives.
       <div className="animate-pulse" aria-hidden="true">
-        <div className="h-[53px] border-b border-border bg-card" />
-        <div className="grid grid-cols-1 border-b border-border md:[grid-template-columns:1.2fr_1fr]">
-          <div className="min-h-[220px] bg-muted md:min-h-[280px]" />
-          <div className="h-[253px] bg-card md:h-auto" />
+        <div className="h-[53px] border-b border-brand-line bg-brand-white" />
+        <div className="grid grid-cols-1 border-b border-brand-line md:[grid-template-columns:1.2fr_1fr]">
+          <div className="min-h-[220px] bg-brand-bg-alt md:min-h-[280px]" />
+          <div className="h-[253px] bg-brand-white md:h-auto" />
         </div>
       </div>
     );
@@ -61,7 +61,7 @@ function BrandHero({ id }: { id: string }) {
   return (
     <>
       {/* Breadcrumb */}
-      <div className="px-4 md:px-8 py-3.5 border-b border-border bg-card">
+      <div className="px-4 md:px-8 py-3.5 border-b border-brand-line bg-brand-white">
         <Breadcrumb
           items={[
             { label: "Brands", href: "/brands" },
@@ -72,7 +72,7 @@ function BrandHero({ id }: { id: string }) {
 
       {/* Hero — two-column */}
       <div
-        className="grid grid-cols-1 border-b border-border md:[grid-template-columns:1.2fr_1fr]"
+        className="grid grid-cols-1 border-b border-brand-line md:[grid-template-columns:1.2fr_1fr]"
       >
         {/* Left: image with gradient overlay */}
         <div className="relative min-h-[220px] md:min-h-[280px] overflow-hidden">
@@ -91,23 +91,23 @@ function BrandHero({ id }: { id: string }) {
           />
           {/* Brand name overlay */}
           <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-8 md:right-8 text-white">
-            <div className="text-[10.5px] font-medium tracking-[0.12em] uppercase text-white/80 mb-2">
+            <div className="font-mono text-[10.5px] tracking-[0.12em] uppercase text-brand-orange mb-2">
               {brand.location ?? "USA"}
               {brand.founded_year ? ` · EST. ${brand.founded_year}` : ""}
             </div>
-            <h1 className="text-[34px] md:text-[44px] lg:text-[52px] leading-[1] font-semibold tracking-tight m-0">
+            <h1 className="font-serif text-[34px] md:text-[44px] lg:text-[52px] leading-[1] font-normal tracking-tight m-0">
               {brand.name}
             </h1>
           </div>
         </div>
 
         {/* Right: buyer fact sheet */}
-        <div className="bg-card px-4 md:px-7 py-6">
-          <div className="flex items-center justify-between pb-3 border-b border-border mb-1">
-            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase text-foreground">
+        <div className="bg-brand-white px-4 md:px-7 py-6">
+          <div className="flex items-center justify-between pb-3 border-b border-brand-ink mb-1">
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-brand-ink">
               Buyer fact sheet
             </span>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="font-mono text-[10px] text-brand-muted">
               {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}
             </span>
           </div>
@@ -122,11 +122,11 @@ function BrandHero({ id }: { id: string }) {
               },
               { l: "Terms", v: "Net-60" },
             ].map((s) => (
-              <div key={s.l} className="py-3 border-b border-border">
-                <div className="text-[10px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-0.5">
+              <div key={s.l} className="py-3 border-b border-brand-line">
+                <div className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted mb-0.5">
                   {s.l}
                 </div>
-                <div className="text-[15px] font-semibold text-foreground">
+                <div className="font-mono text-[15px] font-medium text-brand-ink">
                   {s.v}
                 </div>
               </div>
@@ -134,8 +134,8 @@ function BrandHero({ id }: { id: string }) {
           </div>
 
           {brand.description && (
-            <blockquote className="mt-4 pl-3 border-l-2 border-primary">
-              <p className="text-[13px] text-muted-foreground leading-relaxed italic">
+            <blockquote className="mt-4 pl-3 border-l-2 border-brand-orange">
+              <p className="text-[13px] text-brand-muted leading-relaxed italic">
                 {brand.description}
               </p>
             </blockquote>
@@ -144,7 +144,7 @@ function BrandHero({ id }: { id: string }) {
           <div className="mt-5 flex items-center gap-4">
             <Link
               href={`/brand/${id}#products`}
-              className="inline-flex min-h-6 items-center text-[11px] font-medium tracking-[0.06em] uppercase text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex min-h-6 items-center font-mono text-[11px] tracking-[0.06em] uppercase text-brand-blue hover:text-brand-blue-deep transition-colors"
             >
               → Shop all products
             </Link>
@@ -167,16 +167,16 @@ function BrandProducts({ id, brandName }: { id: string; brandName: string }) {
   return (
     <div id="products">
       {/* Tab bar */}
-      <div className="px-4 md:px-8 pt-0 border-b border-border bg-card flex items-center gap-0 overflow-x-auto">
+      <div className="px-4 md:px-8 pt-0 border-b border-brand-line bg-brand-white flex items-center gap-0 overflow-x-auto">
         {(Object.entries(TAB_CONFIG) as [Tab, (typeof TAB_CONFIG)[Tab]][]).map(
           ([key, cfg]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`px-5 py-3.5 text-[11px] font-medium tracking-[0.08em] uppercase border-b-2 transition-colors ${
+              className={`px-5 py-3.5 font-mono text-[11px] tracking-[0.08em] uppercase border-b-2 transition-colors ${
                 tab === key
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  ? "border-brand-orange text-brand-ink"
+                  : "border-transparent text-brand-muted hover:text-brand-ink"
               }`}
             >
               {cfg.label}
@@ -205,7 +205,7 @@ function BrandPageInner({ id }: { id: string }) {
   const { data: brand } = useBrand(id);
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="bg-brand-bg min-h-screen">
       <BrandHero id={id} />
       <BrandProducts id={id} brandName={brand?.name ?? ""} />
     </div>

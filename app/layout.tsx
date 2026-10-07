@@ -1,22 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import { SITE_URL, getHomepagePayload, getSiteSettings } from "@/lib/site";
-import { cn } from "@/lib/utils";
-import "./theme.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const geistHeading = Geist({
-  variable: "--font-geist-heading",
-  subsets: ["latin"],
-});
+import "./globals.css";
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-site",
   subsets: ["latin"],
 });
 
@@ -54,12 +43,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-theme={siteTheme}
-      className={cn(
-        inter.variable,
-        geistHeading.variable,
-        geistMono.variable,
-        "h-full font-sans antialiased",
-      )}
+      className={`${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-ink">
         <Providers initialHomepage={homepage}>{children}</Providers>

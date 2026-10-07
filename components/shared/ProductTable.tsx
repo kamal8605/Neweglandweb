@@ -29,7 +29,7 @@ function ImagePlaceholder({ size = 36 }: { size?: number }) {
         width: size,
         height: size,
         background:
-          "repeating-linear-gradient(135deg, var(--muted) 0 7px, var(--border) 7px 14px)",
+          "repeating-linear-gradient(135deg, #E5DFD0 0 7px, #D9D3C5 7px 14px)",
         flexShrink: 0,
       }}
     />
@@ -38,18 +38,18 @@ function ImagePlaceholder({ size = 36 }: { size?: number }) {
 
 function SkeletonRow({ showBrand }: { showBrand: boolean }) {
   return (
-    <tr className="border-b border-border">
+    <tr className="border-b border-brand-line">
       {[...Array(showBrand ? 8 : 7)].map((_, i) => (
         <td key={i} className="px-2.5 py-2">
-          <div className="h-4 animate-pulse rounded bg-muted" />
+          <div className="h-4 bg-brand-bg-alt rounded animate-pulse" />
         </td>
       ))}
     </tr>
   );
 }
 
-const TH = "whitespace-nowrap border-b border-border bg-muted/60 px-1.5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground sm:px-2.5";
-const TD = "border-b border-border px-1.5 py-2 align-middle text-[12.5px] text-foreground sm:px-2.5";
+const TH = "px-1.5 sm:px-2.5 py-2.5 text-left font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted font-medium border-b border-brand-line bg-brand-bg-alt whitespace-nowrap";
+const TD = "px-1.5 sm:px-2.5 py-2 text-[12.5px] text-brand-ink border-b border-brand-line align-middle";
 
 export function ProductTable({
   products,
@@ -81,8 +81,8 @@ export function ProductTable({
       <PriceGate pricesVisible={p.prices_visible}>
         {p.on_sale && p.sale_price !== null ? (
           <span className="flex flex-col leading-snug font-mono">
-            <span className="font-semibold text-destructive">${p.sale_price.toFixed(2)}</span>
-            <span className="text-[11px] text-muted-foreground line-through">${p.regular_price?.toFixed(2)}</span>
+            <span className="text-[#B83434] font-semibold">${p.sale_price.toFixed(2)}</span>
+            <span className="text-brand-muted line-through text-[11px]">${p.regular_price?.toFixed(2)}</span>
           </span>
         ) : (
           <span className="font-mono font-semibold">
@@ -94,9 +94,9 @@ export function ProductTable({
   }
 
   function renderDiscountPct(p: Product) {
-    if (!p.prices_visible || !p.on_sale || !p.sale_price || !p.regular_price) return <span className="text-muted-foreground">—</span>;
+    if (!p.prices_visible || !p.on_sale || !p.sale_price || !p.regular_price) return <span className="text-brand-muted">—</span>;
     const pct = Math.round((1 - p.sale_price / p.regular_price) * 100);
-    return <span className="font-mono font-semibold text-destructive">{pct}%</span>;
+    return <span className="font-mono text-[#B83434] font-semibold">{pct}%</span>;
   }
 
   function renderRow(p: Product, isChild = false): ReactNode {
@@ -106,26 +106,26 @@ export function ProductTable({
     return (
       <Fragment key={p.id}>
         <tr
-          className={`border-b border-border transition-colors hover:bg-muted/40 ${isChild ? "bg-muted/25" : ""}`}
+          className={`border-b border-brand-line hover:bg-brand-bg transition-colors ${isChild ? "bg-brand-bg/50" : ""}`}
         >
           {/* Expand toggle / indent for children */}
           <td className={`${TD} w-5 sm:w-7`}>
             {isGrouped ? (
               <button
                 onClick={() => toggleExpand(p.id)}
-                className="rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="text-brand-muted hover:text-brand-ink transition-colors"
                 aria-label={isOpen ? "Collapse variants" : "Expand variants"}
               >
                 {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
               </button>
             ) : isChild ? (
-              <span className="ml-2 block h-px w-3 bg-border" />
+              <span className="block w-3 h-px bg-brand-line ml-2" />
             ) : null}
           </td>
 
           {/* Image */}
           <td className={`${TD} w-14 hidden sm:table-cell`}>
-            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+            <div className="w-9 h-9 overflow-hidden rounded-[var(--brand-radius)] shrink-0">
               {p.image ? (
                 <Image
                   src={imageVariant(p.image, p.image_variants, 64)!}
@@ -143,7 +143,7 @@ export function ProductTable({
 
           {/* SKU */}
           <td className={`${TD} w-24 hidden md:table-cell`}>
-            <span className="font-mono text-[11px] text-muted-foreground">{p.sku}</span>
+            <span className="font-mono text-[11px] text-brand-muted">{p.sku}</span>
           </td>
 
           {/* Product name */}
@@ -151,17 +151,17 @@ export function ProductTable({
             <div className="flex items-center gap-2">
               <Link
                 href={`/product/${p.id}`}
-                className="font-medium text-foreground transition-colors hover:text-primary"
+                className="font-medium text-brand-ink hover:text-brand-blue transition-colors"
               >
                 {p.name}
               </Link>
               {p.on_sale && (
-                <span className="shrink-0 rounded-sm bg-destructive px-1.5 py-0.5 font-mono text-[9px] leading-none tracking-[0.06em] text-destructive-foreground">
+                <span className="bg-[#B83434] text-white font-mono text-[9px] tracking-[0.06em] px-1.5 py-0.5 leading-none shrink-0">
                   SALE
                 </span>
               )}
               {isGrouped && (
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="text-brand-muted font-mono text-[10px]">
                   · {p.children!.length} variants
                 </span>
               )}
@@ -174,12 +174,12 @@ export function ProductTable({
               {p.brand?.id ? (
                 <Link
                   href={`/brand/${p.brand.id}`}
-                  className="text-[12px] text-primary transition-colors hover:text-primary/80"
+                  className="text-brand-blue text-[12px] hover:text-brand-blue-deep transition-colors"
                 >
                   {p.brand.name}
                 </Link>
               ) : (
-                <span className="text-[12px] text-muted-foreground">{p.brand?.name}</span>
+                <span className="text-brand-muted text-[12px]">{p.brand?.name}</span>
               )}
             </td>
           )}
@@ -200,7 +200,7 @@ export function ProductTable({
           {/* Qty stepper */}
           <td className={`${TD} w-24 sm:w-28 text-right whitespace-nowrap`}>
             {isGrouped ? (
-              <span className="font-mono text-[11px] text-muted-foreground">— expand —</span>
+              <span className="text-brand-muted font-mono text-[11px]">— expand —</span>
             ) : (
               <QtyStepper
                 value={qtyMap[p.id] ?? 0}
@@ -218,8 +218,8 @@ export function ProductTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-      <table className="w-full border-collapse bg-card text-sm">
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse bg-brand-white text-sm">
         <thead>
           <tr>
             <th className={`${TH} w-5 sm:w-7`} />
@@ -242,7 +242,7 @@ export function ProductTable({
             <tr>
               <td
                 colSpan={showBrand ? 9 : 8}
-                className="px-4 py-12 text-center text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground"
+                className="px-4 py-12 text-center font-mono text-[11px] text-brand-muted tracking-[0.06em] uppercase"
               >
                 No products found
               </td>

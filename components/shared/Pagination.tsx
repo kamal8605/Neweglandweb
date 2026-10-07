@@ -30,11 +30,11 @@ export function Pagination({ currentPage, lastPage, onPageChange }: PaginationPr
   const pages = buildPages();
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-1 text-[12px] font-medium">
+    <div className="flex flex-wrap items-center justify-center gap-1 font-mono text-[12px]">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground shadow-xs transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8"
+        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center border border-brand-line rounded-[var(--brand-radius)] text-brand-muted hover:border-brand-ink hover:text-brand-ink disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         aria-label="Previous page"
       >
         <ChevronLeft size={14} />
@@ -42,7 +42,7 @@ export function Pagination({ currentPage, lastPage, onPageChange }: PaginationPr
 
       {pages.map((p, i) =>
         p === "..." ? (
-          <span key={`ellipsis-${i}`} className="flex h-9 w-9 items-center justify-center text-muted-foreground sm:h-8 sm:w-8">
+          <span key={`ellipsis-${i}`} className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-brand-muted">
             …
           </span>
         ) : (
@@ -50,10 +50,10 @@ export function Pagination({ currentPage, lastPage, onPageChange }: PaginationPr
             key={p}
             onClick={() => onPageChange(p)}
             className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-md border shadow-xs transition-colors sm:h-8 sm:w-8",
+              "w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center border rounded-[var(--brand-radius)] transition-colors",
               p === currentPage
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:bg-accent hover:text-foreground"
+                ? "bg-brand-ink text-brand-white border-brand-ink"
+                : "border-brand-line text-brand-muted hover:border-brand-ink hover:text-brand-ink"
             )}
           >
             {p}
@@ -64,7 +64,7 @@ export function Pagination({ currentPage, lastPage, onPageChange }: PaginationPr
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === lastPage}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground shadow-xs transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8"
+        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center border border-brand-line rounded-[var(--brand-radius)] text-brand-muted hover:border-brand-ink hover:text-brand-ink disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         aria-label="Next page"
       >
         <ChevronRight size={14} />

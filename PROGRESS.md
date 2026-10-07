@@ -46,7 +46,7 @@
    - Instrument Serif → `--font-serif` (regular + italic)
    - Default theme set via `data-theme="forge"` on `<html>`
 
-3. **Tailwind v4 design tokens** (`app/theme.css`)
+3. **Tailwind v4 design tokens** (`app/globals.css`)
    - Forge & Co. theme: warm cream `#F7F4EE`, sharp edges (radius: 2px), Geist + Instrument Serif
    - Pallet theme: clean blue/white `#F7F8FB`, rounded cards (radius: 10px), Inter-compatible
    - Both themes toggled via `html[data-theme]` CSS attribute selectors

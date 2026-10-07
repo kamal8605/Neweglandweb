@@ -71,7 +71,7 @@ const PdfPage = forwardRef<HTMLDivElement, { pageNumber: number; width: number; 
           renderMode="canvas"
           renderTextLayer={false}
           renderAnnotationLayer={false}
-          loading={<div className="grid h-full place-items-center bg-white text-xs font-semibold text-muted-foreground">Loading page {pageNumber}…</div>}
+          loading={<div className="grid h-full place-items-center bg-white text-xs font-semibold text-brand-muted">Loading page {pageNumber}…</div>}
         />
       ) : (
         <div className="h-full w-full bg-white" aria-hidden="true" />
@@ -383,7 +383,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
         onClick={onClose}
         aria-label="Close catalog"
         title="Close Catalog"
-        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white/80 backdrop-blur-sm transition hover:bg-primary hover:text-primary-foreground"
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white/80 backdrop-blur-sm transition hover:bg-brand-orange hover:text-white"
       >
         <X size={22} />
       </button>
@@ -423,7 +423,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
           }}
           loading={
             <div className="flex flex-col items-center gap-3 px-6 text-center text-white">
-              <LoaderCircle className="animate-spin text-white" size={44} />
+              <LoaderCircle className="animate-spin text-brand-orange" size={44} />
               <span className="text-sm font-semibold tracking-wide">
                 Loading catalog…{loadProgress !== null && loadProgress < 100 ? ` ${loadProgress}%` : ""}
               </span>
@@ -437,7 +437,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                 href={downloadUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-5 text-xs font-semibold uppercase tracking-wider text-primary-foreground no-underline hover:bg-primary/90"
+                className="inline-flex min-h-11 items-center gap-2 bg-brand-orange px-5 text-xs font-bold uppercase tracking-wider text-white no-underline hover:bg-brand-orange/90"
               >
                 <Download size={16} /> Open PDF
               </a>
@@ -543,7 +543,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
         >
           <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4 text-white">
             <div className="flex items-center gap-2">
-              <LayoutGrid size={16} className="text-white/80" />
+              <LayoutGrid size={16} className="text-brand-orange" />
               <span className="text-xs font-bold uppercase tracking-wider">Page Thumbnails</span>
               <span className="text-[11px] text-white/50">({pageCount} pages)</span>
             </div>
@@ -575,7 +575,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     }}
                     className={`group relative flex flex-col items-center gap-1.5 rounded-lg p-1.5 transition-all text-left ${
                       isActive
-                        ? "ring-2 ring-white/70 bg-white/15 shadow-lg scale-[1.02]"
+                        ? "ring-2 ring-brand-orange bg-brand-orange/20 shadow-lg scale-[1.02]"
                         : "hover:bg-white/10 opacity-75 hover:opacity-100"
                     }`}
                   >
@@ -597,7 +597,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     </div>
                     <span
                       className={`text-center text-[11px] font-semibold ${
-                        isActive ? "text-white font-bold" : "text-white/80 group-hover:text-white"
+                        isActive ? "text-brand-orange font-bold" : "text-white/80 group-hover:text-white"
                       }`}
                     >
                       {pageNum}
@@ -642,7 +642,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     }
                     setIsEditingPage(false);
                   }}
-                  className="w-10 text-center font-mono text-xs bg-slate-100 rounded border border-slate-300 py-0.5 outline-none focus:border-primary"
+                  className="w-10 text-center font-mono text-xs bg-slate-100 rounded border border-slate-300 py-0.5 outline-none focus:border-brand-orange"
                   autoFocus
                 />
               </form>
@@ -653,7 +653,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                   setInputPageValue(String(currentPage + 1));
                   setIsEditingPage(true);
                 }}
-                className="cursor-pointer tracking-tight whitespace-nowrap hover:text-primary"
+                className="cursor-pointer tracking-tight whitespace-nowrap hover:text-brand-orange"
                 title="Click to jump to page"
               >
                 {pageCount ? `${currentPage + 1}/${pageCount}` : "--/--"}
@@ -668,7 +668,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
             type="button"
             onClick={() => setShowThumbnails((prev) => !prev)}
             className={`df-ui-btn df-ui-thumbnail df-icon-grid-view df-sidemenu-trigger p-2.5 sm:p-2 rounded-lg transition hover:bg-slate-100 ${
-              showThumbnails ? "text-primary bg-slate-100" : "text-slate-600 hover:text-slate-900"
+              showThumbnails ? "text-brand-orange bg-slate-100" : "text-slate-600 hover:text-slate-900"
             }`}
             title="Toggle Thumbnails"
           >
@@ -732,7 +732,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
               type="button"
               onClick={() => setShowMoreMenu((prev) => !prev)}
               className={`df-ui-btn df-ui-more df-icon-more p-2.5 sm:p-2 rounded-lg transition hover:bg-slate-100 ${
-                showMoreMenu ? "text-primary bg-slate-100" : "text-slate-600 hover:text-slate-900"
+                showMoreMenu ? "text-brand-orange bg-slate-100" : "text-slate-600 hover:text-slate-900"
               }`}
               title="More Options"
             >
@@ -749,7 +749,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                   rel="noopener noreferrer"
                   href={downloadUrl}
                   onClick={() => setShowMoreMenu(false)}
-                  className="df-ui-btn df-ui-download df-icon-download flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-primary transition"
+                  className="df-ui-btn df-ui-download df-icon-download flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition"
                   title="Download PDF File"
                 >
                   <Download size={16} strokeWidth={2} className="text-slate-500" />
@@ -763,7 +763,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                       setPageMode(isSinglePage ? "double" : "single");
                       setShowMoreMenu(false);
                     }}
-                    className="df-ui-btn df-ui-pagemode df-icon-file flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-primary transition text-left"
+                    className="df-ui-btn df-ui-pagemode df-icon-file flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
                     title={isSinglePage ? "Double Page Mode" : "Single Page Mode"}
                   >
                     {isSinglePage ? (
@@ -786,7 +786,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     handleJumpToPage(1);
                     setShowMoreMenu(false);
                   }}
-                  className="df-ui-btn df-ui-start df-icon-first-page flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-primary transition text-left"
+                  className="df-ui-btn df-ui-start df-icon-first-page flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
                   title="Goto First Page"
                 >
                   <ChevronsLeft size={16} strokeWidth={2} className="text-slate-500" />
@@ -799,7 +799,7 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     handleJumpToPage(pageCount);
                     setShowMoreMenu(false);
                   }}
-                  className="df-ui-btn df-ui-end df-icon-last-page flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-primary transition text-left"
+                  className="df-ui-btn df-ui-end df-icon-last-page flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
                   title="Goto Last Page"
                 >
                   <ChevronsRight size={16} strokeWidth={2} className="text-slate-500" />
@@ -812,12 +812,12 @@ export default function CatalogFlipbook({ file, title, onClose }: FlipbookProps)
                     setSoundEnabled((prev) => !prev);
                     setShowMoreMenu(false);
                   }}
-                  className="df-ui-btn df-ui-sound df-icon-volume flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-primary transition text-left"
+                  className="df-ui-btn df-ui-sound df-icon-volume flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-100 hover:text-brand-orange transition text-left"
                   title="Turn on/off Sound"
                 >
                   {soundEnabled ? (
                     <>
-                      <Volume2 size={16} strokeWidth={2} className="text-primary" />
+                      <Volume2 size={16} strokeWidth={2} className="text-brand-orange" />
                       <span>Sound: On</span>
                     </>
                   ) : (

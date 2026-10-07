@@ -101,8 +101,8 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
             ? <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={className}>{image}</Link>
             : <div key={slide.image} aria-hidden={active !== index} className={className}>{image}</div>;
         })}
-        {carouselSlides.length > 1 && <><button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/60 text-white shadow-md transition hover:bg-primary"><ChevronLeft size={24} /></button>
-        <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/60 text-white shadow-md transition hover:bg-primary"><ChevronRight size={24} /></button></>}
+        {carouselSlides.length > 1 && <><button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
+        <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronRight size={24} /></button></>}
       </div>
     </section>
   );
@@ -147,7 +147,7 @@ function CategoryGrid({ section }: { section: HomepageSection }) {
   }, [categories.length, move]);
   if (!categories.length) return null;
   const hasCarousel = categories.length > 7;
-  return <section className="bg-background pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden rounded-md bg-muted"><Image src={category.image} alt={category.alt} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start rounded-lg border border-border bg-card p-2 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-primary ${index === active ? "w-6 bg-primary" : "w-1.5 bg-border"}`} /></button>)}</div>}</section>;
+  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><Image src={category.image} alt={category.alt} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} /></button>)}</div>}</section>;
 }
 
 function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
@@ -156,12 +156,12 @@ function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
     .map((item) => ({ ...item, sectionTitle: section.title })));
   if (banners.length === 0) return null;
   return (
-    <section className="w-full bg-background py-4">
+    <section className="w-full bg-white py-3">
       <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 px-2 md:grid-cols-2 md:px-0">
       {banners.map((banner) => {
         const image = <ResponsiveManagedImage desktopSrc={banner.desktop_image_url} mobileSrc={banner.mobile_image_url} alt={banner.alt_text} width={956} height={170} sizes="(max-width: 767px) 100vw, 50vw" className="block h-full w-full object-cover" />;
         return (
-          <div key={banner.id} className="relative aspect-[956/170] w-full overflow-hidden rounded-lg border border-border bg-muted shadow-sm">
+          <div key={banner.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">
             {banner.link_url ? <Link href={banner.link_url} aria-label={banner.alt_text} className="block h-full w-full">{image}</Link> : image}
           </div>
         );
@@ -185,28 +185,28 @@ function ProductCard({ product }: { product: Product }) {
     addItem({ product_id: product.id, name: product.name, sku: product.sku, image: image ?? null, price, parent_id: product.parent_id }, 1);
   }
   return (
-    <article className="product-card relative min-h-[390px] rounded-lg border border-border bg-card shadow-sm">
-      <div className="group relative z-0 flex min-h-[390px] flex-col rounded-lg bg-card px-3 pb-4 pt-4 transition-all duration-200 hover:z-10 hover:-translate-y-0.5 hover:shadow-md 2xl:px-4">
+    <article className="product-card relative min-h-[390px] bg-white">
+      <div className="group relative z-0 flex min-h-[390px] flex-col bg-white px-3 pb-4 pt-4 2xl:px-4 transition-shadow duration-200 after:pointer-events-none after:absolute after:bottom-4 after:right-0 after:top-4 after:w-px after:bg-brand-line after:content-[''] hover:z-10 hover:shadow-[0_3px_14px_rgba(0,0,0,0.22)] hover:outline hover:outline-1 hover:outline-brand-line hover:after:opacity-0">
         <Link href={`/product/${product.id}`} className="no-underline">
-          <div className="mb-2 min-h-[30px] text-[11px] font-medium uppercase leading-tight text-muted-foreground 2xl:min-h-[34px] 2xl:text-[12px]">{product.category?.name ?? "Wholesale"}</div>
-          <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-semibold uppercase leading-[1.18] text-foreground transition-colors group-hover:text-primary sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px]">{product.name}</h3>
+          <div className="mb-2 min-h-[30px] text-[11px] uppercase leading-tight 2xl:min-h-[34px] 2xl:text-[12px] text-[#7A8DA3]">{product.category?.name ?? "Wholesale"}</div>
+          <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-black uppercase leading-[1.18] sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
         </Link>
-        <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden rounded-md bg-card" aria-label={`View ${product.name}`}>
-          {image ? <Image src={imageVariant(image, product.image ? product.image_variants : null, 512)!} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-muted text-xs font-bold uppercase text-foreground/70">Product image</div>}
+        <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
+          {image ? <Image src={imageVariant(image, product.image ? product.image_variants : null, 512)!} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
         </Link>
         <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
           {!isAuthenticated ? (
-            <Link href="/login" className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-primary px-4 py-2.5 text-[14px] font-semibold text-primary-foreground no-underline shadow-sm transition hover:bg-primary/90">Login to Buy</Link>
+            <Link href="/login" className="inline-flex min-h-11 w-full items-center justify-center border-2 border-brand-navy bg-brand-navy px-4 py-2.5 text-[14px] font-bold text-white no-underline shadow-sm transition hover:border-brand-blue hover:bg-brand-blue">Login to Buy</Link>
           ) : !canShowPrice ? (
             <span className="inline-flex min-h-11 w-full items-center justify-center bg-brand-bg-alt px-4 py-2.5 text-center text-[12px] font-bold uppercase text-brand-muted">Pending Price Approval</span>
           ) : (
             <>
-              <span className="inline-flex flex-col"><span className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-primary">Wholesale</span><span className="mt-1 text-[20px] font-medium leading-none text-foreground xl:text-[18px] 2xl:text-[22px]">{money(price)}</span></span>
-              {canAdd ? <button type="button" onClick={addToCart} aria-label={`Add ${product.name} to cart`} className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground shadow-sm transition hover:bg-primary/90"><ShoppingCart size={20} /></button> : <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`} className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground no-underline transition group-hover:bg-primary group-hover:text-primary-foreground"><ArrowRight size={20} /></Link>}
+              <span className="inline-flex flex-col"><span className="font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-brand-orange">Wholesale</span><span className="mt-1 text-[20px] font-medium leading-none xl:text-[18px] 2xl:text-[22px] text-[#374151]">{money(price)}</span></span>
+              {canAdd ? <button type="button" onClick={addToCart} aria-label={`Add ${product.name} to cart`} className="grid h-11 w-11 shrink-0 place-items-center border border-brand-navy bg-brand-navy text-white shadow-sm transition hover:border-brand-blue hover:bg-brand-blue"><ShoppingCart size={20} /></button> : <Link href={`/product/${product.id}`} aria-label={`View ${product.name}`} className="grid h-11 w-11 shrink-0 place-items-center bg-[#E7E7E7] text-white no-underline transition group-hover:bg-brand-blue"><ArrowRight size={20} /></Link>}
             </>
           )}
         </div>
-        {!product.in_stock && <span className="absolute left-2 top-2 rounded-md bg-destructive px-2 py-1 text-[13px] font-bold text-white shadow-sm">Sold Out</span>}
+        {!product.in_stock && <span className="absolute left-0 top-0 bg-red-600 px-2 py-1 text-[13px] font-black text-white">Sold Out</span>}
       </div>
     </article>
   );
@@ -216,18 +216,18 @@ function ProductSection({ section, products, placeholders = 0 }: { section: Home
   const art = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
   const promos = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).slice(0, 2);
   return (
-    <section className="bg-background">
+    <section className="bg-white">
       <ImageHeading image={art} title={section.title} />
-      <div className="mx-auto grid max-w-[1513px] grid-cols-2 gap-3 px-3 pb-4 md:grid-cols-3 md:px-6 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
         {/* Same height as a card while the products load, so the sections below don't jump. */}
-        {products.length === 0 && Array.from({ length: placeholders }, (_, index) => <div key={index} aria-hidden="true" className="min-h-[390px] animate-pulse rounded-lg border border-border bg-muted" />)}
+        {products.length === 0 && Array.from({ length: placeholders }, (_, index) => <div key={index} aria-hidden="true" className="min-h-[390px] bg-white" />)}
       </div>
       {promos.length > 0 && (
-        <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-background px-3 py-4 md:grid-cols-2 md:px-6">
+        <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-white px-2 py-3 md:grid-cols-2 md:px-0">
           {promos.map((promo) => {
             const image = <ResponsiveManagedImage desktopSrc={promo.desktop_image_url} mobileSrc={promo.mobile_image_url} alt={promo.alt_text} width={956} height={170} sizes="(max-width: 767px) 100vw, 50vw" className="block h-full w-full object-cover" />;
-            return <div key={promo.id} className="relative aspect-[956/170] w-full overflow-hidden rounded-lg border border-border bg-muted shadow-sm">{promo.link_url ? <Link href={promo.link_url} aria-label={promo.alt_text} className="block h-full w-full">{image}</Link> : image}</div>;
+            return <div key={promo.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">{promo.link_url ? <Link href={promo.link_url} aria-label={promo.alt_text} className="block h-full w-full">{image}</Link> : image}</div>;
           })}
         </div>
       )}
@@ -240,11 +240,11 @@ function BrandStrip({ section }: { section: HomepageSection }) {
   const brandImages = section.items.filter((item) => item.kind === "brand" && item.desktop_image_url).slice(0, 14);
   if (brandImages.length === 0) return null;
   return (
-    <section className="bg-background pb-10">
+    <section className="bg-white pb-10">
       <ImageHeading image={headingImage} title={section.title} />
-      <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-2 rounded-xl bg-muted px-4 py-5 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7">
         {brandImages.map((item) => (
-          item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center rounded-lg border border-transparent bg-card p-3 no-underline transition hover:border-border hover:shadow-sm"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain transition group-hover:-translate-y-0.5" /></span></Link> : <div key={item.id} className="flex h-24 items-center justify-center rounded-lg bg-card p-3"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain" /></span></div>
+          item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center p-3 no-underline transition hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)]"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain transition group-hover:-translate-y-0.5" /></span></Link> : <div key={item.id} className="flex h-24 items-center justify-center p-3"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain" /></span></div>
         ))}
       </div>
     </section>
@@ -288,22 +288,22 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
 
   if (catalogs.length === 0) return null;
   return (
-    <section className="bg-background px-2 py-6 sm:px-4 lg:px-6 lg:py-10">
-      <div className="relative isolate overflow-hidden rounded-xl border border-border bg-brand-navy px-5 py-10 shadow-lg md:px-8 md:py-14 lg:px-12 lg:py-16">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-chart-2" />
+    <section className="bg-white px-2 py-6 sm:px-4 lg:px-6 lg:py-10">
+      <div className="relative isolate overflow-hidden border border-brand-navy/10 bg-brand-navy px-5 py-10 shadow-[0_18px_45px_rgba(11,31,58,0.22)] md:px-8 md:py-14 lg:px-12 lg:py-16">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-brand-orange" />
         {backgroundImage && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: tileBackground(backgroundImage, 220), backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue-deep/25 via-transparent to-black/25" />
         <div className="mx-auto grid max-w-[1600px] grid-cols-2 items-center gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-3 lg:gap-10 xl:gap-16">
         <div className="col-span-2 max-w-xl text-white lg:col-span-1 lg:pr-4">
-          {typeof section.settings.eyebrow === "string" && section.settings.eyebrow && <span className="mb-4 inline-block border-l-4 border-chart-2 pl-3 text-xs font-bold tracking-[0.12em] text-chart-2">{section.settings.eyebrow}</span>}
+          {typeof section.settings.eyebrow === "string" && section.settings.eyebrow && <span className="mb-4 inline-block border-l-4 border-brand-orange pl-3 text-xs font-bold tracking-[0.12em] text-brand-orange">{section.settings.eyebrow}</span>}
           <h2 className="flex min-h-16 items-center text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
             <span className="typing-cursor">{phrases.length > 0 ? typedText : section.title}</span>
           </h2>
           {typeof section.settings.description === "string" && section.settings.description && <p className="mt-5 max-w-lg text-sm leading-7 text-white/75 md:text-base">{section.settings.description}</p>}
-          <div aria-hidden="true" className="mt-7 h-px w-24 bg-chart-2" />
+          <div aria-hidden="true" className="mt-7 h-px w-24 bg-brand-orange" />
         </div>
         {catalogs.map((catalog) => (
-          <button key={catalog.id} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title || catalog.alt_text}`} className="catalog-book group mx-auto block w-full max-w-[350px] text-left focus-visible:outline-2 focus-visible:outline-chart-2">
+          <button key={catalog.id} type="button" onClick={() => setOpenCatalog(catalog)} aria-label={`Open ${catalog.title || catalog.alt_text}`} className="catalog-book group mx-auto block w-full max-w-[350px] text-left focus-visible:outline-2 focus-visible:outline-brand-orange">
             <div className="catalog-book-body relative aspect-[210/297]">
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
@@ -324,16 +324,16 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
 function NewsletterSection({ title, placeholder, buttonText }: { title?: string; placeholder?: string; buttonText?: string }) {
   if (!title) return null;
   return (
-    <section className="border-y border-border bg-muted px-5 py-5 md:px-10">
+    <section className="border-y border-brand-line bg-gradient-to-r from-brand-bg via-brand-white to-brand-orange-soft px-5 py-5 md:px-10">
       <div className="mx-auto flex max-w-[1513px] flex-col items-center gap-4 md:flex-row md:justify-between md:gap-10">
-        <div className="flex shrink-0 items-center gap-3 text-foreground">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary"><Send size={19} strokeWidth={2} /></span>
+        <div className="flex shrink-0 items-center gap-3 text-brand-navy">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-orange-soft text-brand-orange"><Send size={19} strokeWidth={2} /></span>
           <h2 className="text-base font-bold md:text-lg">{title}</h2>
         </div>
-        <form className="flex min-h-14 w-full max-w-2xl overflow-hidden rounded-lg border border-input bg-card shadow-sm transition focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/30" onSubmit={(event) => event.preventDefault()}>
+        <form className="flex min-h-14 w-full max-w-2xl overflow-hidden border border-[#ded2c4] bg-white shadow-[0_8px_24px_rgba(11,31,58,0.10)] transition focus-within:border-brand-orange focus-within:ring-2 focus-within:ring-brand-orange/20" onSubmit={(event) => event.preventDefault()}>
           <label htmlFor="newsletter-email" className="sr-only">Email address</label>
-          <input id="newsletter-email" name="email" type="email" required placeholder={placeholder} className="min-w-0 flex-1 bg-card px-7 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground" />
-          <button type="submit" className="min-w-28 shrink-0 bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">{buttonText}</button>
+          <input id="newsletter-email" name="email" type="email" required placeholder={placeholder} className="min-w-0 flex-1 bg-white px-7 py-3 text-base text-brand-navy outline-none placeholder:text-brand-muted" />
+          <button type="submit" className="min-w-28 shrink-0 bg-brand-orange px-7 py-3 text-sm font-extrabold text-white transition hover:bg-brand-navy focus-visible:bg-brand-navy">{buttonText}</button>
         </form>
       </div>
     </section>
@@ -372,10 +372,10 @@ export default function HomePage() {
   const products = data?.data ?? [];
   const productsLoading = data === undefined && selectedProductIds.length > 0;
   return (
-    <main className="bg-background">
+    <main className="bg-white">
       {site.homepage_heading && <h1 className="sr-only">{site.homepage_heading}</h1>}
       {!homepageLoaded && <div className="h-48 animate-pulse bg-brand-bg-alt" aria-label="Loading homepage" />}
-      {homepageLoaded && error && <section className="grid min-h-[420px] place-items-center bg-muted px-5 py-16"><div className="max-w-lg rounded-xl border border-border bg-card p-8 text-center shadow-sm"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-destructive">Connection unavailable</p><h1 className="mt-3 text-2xl font-semibold text-foreground">Storefront content could not be loaded</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Please check the configured API URL or try again in a moment.</p><button type="button" onClick={reload} className="mt-6 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">Try again</button></div></section>}
+      {homepageLoaded && error && <section className="grid min-h-[420px] place-items-center bg-brand-bg-alt px-5 py-16"><div className="max-w-lg border border-brand-line bg-white p-8 text-center shadow-[0_18px_45px_rgba(11,31,58,0.12)]"><p className="text-xs font-black uppercase tracking-[0.16em] text-brand-orange">Connection unavailable</p><h1 className="mt-3 text-2xl font-bold text-brand-navy">Storefront content could not be loaded</h1><p className="mt-3 text-sm leading-6 text-brand-muted">Please check the configured API URL or try again in a moment.</p><button type="button" onClick={reload} className="mt-6 bg-brand-navy px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-blue">Try again</button></div></section>}
       {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} productsLoading={productsLoading} catalogBackground={site.catalog_background_logo_url} />)}
       {site.newsletter_enabled && <NewsletterSection title={site.newsletter_title} placeholder={site.newsletter_placeholder} buttonText={site.newsletter_button_text} />}
     </main>

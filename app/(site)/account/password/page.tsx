@@ -54,11 +54,11 @@ export default function ChangePasswordPage() {
   }
 
   const INPUT =
-    "w-full min-h-10 rounded-md border border-input bg-background px-3 py-2 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 transition-colors";
-  const LABEL = "block text-[11px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-1";
+    "w-full bg-brand-white border border-brand-line rounded-[var(--brand-radius)] px-3 py-2 font-mono text-[13px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue transition-colors";
+  const LABEL = "block font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted mb-1";
 
   return (
-    <div className="bg-background min-h-screen pb-28 md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={[{ label: "Account", href: "/account/profile" }, { label: "Change Password" }]}
         title="Change Password"
@@ -76,7 +76,7 @@ export default function ChangePasswordPage() {
               autoComplete="current-password"
             />
             {fieldErrors.current_password && (
-              <p className="mt-1 text-[11px] text-destructive">{fieldErrors.current_password[0]}</p>
+              <p className="mt-1 font-mono text-[11px] text-[#B83434]">{fieldErrors.current_password[0]}</p>
             )}
           </div>
 
@@ -92,7 +92,7 @@ export default function ChangePasswordPage() {
               autoComplete="new-password"
             />
             {fieldErrors.password && (
-              <p className="mt-1 text-[11px] text-destructive">{fieldErrors.password[0]}</p>
+              <p className="mt-1 font-mono text-[11px] text-[#B83434]">{fieldErrors.password[0]}</p>
             )}
           </div>
 
@@ -108,21 +108,21 @@ export default function ChangePasswordPage() {
               autoComplete="new-password"
             />
             {fieldErrors.password_confirmation && (
-              <p className="mt-1 text-[11px] text-destructive">{fieldErrors.password_confirmation[0]}</p>
+              <p className="mt-1 font-mono text-[11px] text-[#B83434]">{fieldErrors.password_confirmation[0]}</p>
             )}
           </div>
 
           {error && !Object.keys(fieldErrors).length && (
-            <p className="text-[12px] text-destructive">{error}</p>
+            <p className="font-mono text-[12px] text-[#B83434]">{error}</p>
           )}
           {success && (
-            <p className="text-[12px] text-emerald-700">Password changed successfully.</p>
+            <p className="font-mono text-[12px] text-[#065F46]">Password changed successfully.</p>
           )}
 
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-md bg-primary px-4 py-2.5 text-[12px] font-medium tracking-[0.04em] uppercase text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:opacity-60 cursor-pointer"
+            className="w-full bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase py-2.5 px-4 hover:bg-brand-blue transition-colors disabled:opacity-60 cursor-pointer rounded-[var(--brand-radius)]"
           >
             {saving ? "Saving…" : "Change Password"}
           </button>

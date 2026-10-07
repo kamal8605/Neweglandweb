@@ -6,8 +6,8 @@ interface StockDotProps {
 export function StockDot({ inStock, stockQuantity }: StockDotProps) {
   if (!inStock) {
     return (
-      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground" />
+      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-brand-muted">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#9CA3AF] shrink-0" />
         Out of stock
       </span>
     );
@@ -15,8 +15,8 @@ export function StockDot({ inStock, stockQuantity }: StockDotProps) {
 
   if (stockQuantity === null) {
     return (
-      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-brand-muted">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#1F8A3A] shrink-0" />
         In stock
       </span>
     );
@@ -30,7 +30,7 @@ export function StockDot({ inStock, stockQuantity }: StockDotProps) {
       : "#1F8A3A";  // green — healthy stock
 
   return (
-    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-foreground">
+    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-brand-ink">
       <span
         className="w-1.5 h-1.5 rounded-full shrink-0"
         style={{ background: dotColor }}

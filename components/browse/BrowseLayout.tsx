@@ -210,7 +210,7 @@ export function BrowseLayout({
   const activeSubCatName = sidebarSubCats.find((sc) => sc.id === subCatId)?.name;
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-28 text-foreground md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader
         crumbs={
           crumbs ?? [
@@ -224,13 +224,13 @@ export function BrowseLayout({
 
       {/* Sub-category pills — category pages only */}
       {subCategories.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3 md:px-6 lg:px-8">
+        <div className="px-4 md:px-6 lg:px-8 py-3 border-b border-brand-line bg-brand-white flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setParam("sub_cat", null)}
-            className={`rounded-md border px-3 py-1 text-[11.5px] font-medium transition-colors ${
+            className={`px-3 py-1 text-[11.5px] border rounded-[var(--brand-radius)] transition-colors ${
               !subCatId
-                ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-accent"
+                ? "bg-brand-ink text-white border-brand-ink"
+                : "bg-brand-white text-brand-ink border-brand-line hover:border-brand-ink"
             }`}
           >
             All
@@ -239,10 +239,10 @@ export function BrowseLayout({
             <button
               key={sc.id}
               onClick={() => setParam("sub_cat", String(sc.id))}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-[11.5px] font-medium transition-colors ${
+              className={`px-3 py-1 text-[11.5px] border rounded-[var(--brand-radius)] transition-colors inline-flex items-center gap-1.5 ${
                 subCatId === sc.id
-                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-accent"
+                  ? "bg-brand-ink text-white border-brand-ink"
+                  : "bg-brand-white text-brand-ink border-brand-line hover:border-brand-ink"
               }`}
             >
               {sc.name}
@@ -265,12 +265,12 @@ export function BrowseLayout({
         )}
         {/* ── Filters sidebar (drawer below lg) ─────────────── */}
         <aside
-          className={`fixed inset-y-0 left-0 z-[60] w-[min(86vw,320px)] overflow-y-auto bg-background p-5 text-[12.5px] transition-transform duration-200 lg:static lg:z-auto lg:w-[220px] lg:shrink-0 lg:translate-x-0 lg:self-start lg:overflow-visible lg:rounded-lg lg:border lg:border-border lg:bg-card lg:p-4 lg:shadow-sm ${
-            filtersOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+          className={`fixed inset-y-0 left-0 z-[60] w-[min(86vw,320px)] overflow-y-auto bg-brand-white p-5 text-[12.5px] shadow-2xl transition-transform duration-200 lg:static lg:z-auto lg:w-[220px] lg:shrink-0 lg:translate-x-0 lg:overflow-visible lg:bg-transparent lg:p-0 lg:shadow-none ${
+            filtersOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
-            <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground">
+          <div className="flex items-center justify-between pb-2 border-b border-brand-ink mb-3">
+            <span className="font-mono text-[10px] tracking-[0.08em] uppercase flex items-center gap-1.5">
               <SlidersHorizontal size={11} />
               FILTERS{activeFilterCount > 0 && ` · ${activeFilterCount}`}
             </span>
@@ -278,7 +278,7 @@ export function BrowseLayout({
               {activeFilterCount > 0 && (
                 <button
                   onClick={clearAll}
-                  className="text-[11px] font-medium text-primary transition-colors hover:text-primary/80"
+                  className="text-[11px] text-brand-orange hover:text-brand-ink transition-colors"
                 >
                   Clear all
                 </button>
@@ -287,7 +287,7 @@ export function BrowseLayout({
                 type="button"
                 onClick={() => setFiltersOpen(false)}
                 aria-label="Close filters"
-                className="rounded-md p-1 text-foreground transition-colors hover:bg-accent lg:hidden"
+                className="p-1 text-brand-ink lg:hidden"
               >
                 <X size={18} />
               </button>
@@ -295,8 +295,8 @@ export function BrowseLayout({
           </div>
 
           {/* In stock */}
-          <div className="mb-4 border-b border-border pb-4">
-            <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground">
+          <div className="mb-4 pb-4 border-b border-brand-line">
+            <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-ink mb-2">
               Stock
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -304,7 +304,7 @@ export function BrowseLayout({
                 type="checkbox"
                 checked={inStock}
                 onChange={(e) => setParam("in_stock", e.target.checked ? "true" : null)}
-                className="h-4 w-4 accent-primary"
+                className="w-4 h-4 accent-brand-blue"
               />
               <span>In stock now</span>
             </label>
@@ -312,11 +312,11 @@ export function BrowseLayout({
 
           {/* Brand filter */}
           {!brandId && (
-            <div className="mb-4 border-b border-border pb-4">
-              <div className="mb-2 flex justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground">
+            <div className="mb-4 pb-4 border-b border-brand-line">
+              <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-ink mb-2 flex justify-between">
                 <span>Brand</span>
                 {activeBrandIds.length > 0 && (
-                  <span className="font-normal text-muted-foreground">{activeBrandIds.length} selected</span>
+                  <span className="text-brand-muted">{activeBrandIds.length} selected</span>
                 )}
               </div>
               <input
@@ -324,11 +324,11 @@ export function BrowseLayout({
                 value={brandSearch}
                 onChange={(e) => setBrandSearch(e.target.value)}
                 placeholder="Search brands…"
-                className="mb-2 h-8 w-full rounded-md border border-input bg-background px-2 text-[11.5px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
+                className="w-full h-7 px-2 mb-2 border border-brand-line text-[11.5px] bg-brand-white focus:outline-none focus:border-brand-blue rounded-[var(--brand-radius)] placeholder:text-brand-muted"
               />
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                 {filteredBrands.length === 0 ? (
-                  <p className="text-[11.5px] text-muted-foreground">No brands found</p>
+                  <p className="text-[11.5px] text-brand-muted">No brands found</p>
                 ) : (
                   filteredBrands.map((b) => (
                     <label key={b.id} className="flex min-h-7 items-center gap-2 cursor-pointer">
@@ -336,9 +336,9 @@ export function BrowseLayout({
                         type="checkbox"
                         checked={activeBrandIds.includes(b.id)}
                         onChange={() => toggleBrand(b.id)}
-                        className="h-4 w-4 shrink-0 accent-primary"
+                        className="w-4 h-4 accent-brand-blue shrink-0"
                       />
-                      <span className="truncate text-[12px] text-foreground">{b.name}</span>
+                      <span className="text-[12px] text-brand-ink truncate">{b.name}</span>
                     </label>
                   ))
                 )}
@@ -348,8 +348,8 @@ export function BrowseLayout({
 
           {/* Category filter — hidden on fixed category pages */}
           {!categoryId && (
-            <div className="mb-4 border-b border-border pb-4">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground">
+            <div className="mb-4 pb-4 border-b border-brand-line">
+              <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-ink mb-2">
                 Category
               </div>
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -359,9 +359,9 @@ export function BrowseLayout({
                       type="checkbox"
                       checked={catId === cat.id}
                       onChange={() => toggleCategory(cat.id)}
-                      className="h-4 w-4 shrink-0 accent-primary"
+                      className="w-4 h-4 accent-brand-blue shrink-0"
                     />
-                    <span className="truncate text-[12px] text-foreground">{cat.name}</span>
+                    <span className="text-[12px] text-brand-ink truncate">{cat.name}</span>
                   </label>
                 ))}
               </div>
@@ -370,8 +370,8 @@ export function BrowseLayout({
 
           {/* Sub-category filter — shown when parent has children */}
           {sidebarSubCats.length > 0 && (
-            <div className="mb-4 border-b border-border pb-4">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground">
+            <div className="mb-4 pb-4 border-b border-brand-line">
+              <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-ink mb-2">
                 Sub-category
               </div>
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -383,9 +383,9 @@ export function BrowseLayout({
                       onChange={() =>
                         setParam("sub_cat", subCatId === sc.id ? null : String(sc.id))
                       }
-                      className="h-4 w-4 shrink-0 accent-primary"
+                      className="w-4 h-4 accent-brand-blue shrink-0"
                     />
-                    <span className="truncate text-[12px] text-foreground">{sc.name}</span>
+                    <span className="text-[12px] text-brand-ink truncate">{sc.name}</span>
                   </label>
                 ))}
               </div>
@@ -397,11 +397,11 @@ export function BrowseLayout({
         {/* ── Main: toolbar + table + pagination ─────────── */}
         {/* The page already has a <main> (SiteLayout); this is the product results region. */}
         <section aria-label="Products" className="flex-1 min-w-0">
-          <div className="mb-0 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-            <div className="flex flex-wrap items-center gap-3 text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-y-2 py-2.5 border-b border-brand-ink mb-0">
+            <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.04em] text-brand-muted uppercase flex-wrap">
               {meta && (
                 <span>
-                  <span className="text-foreground">{meta.total.toLocaleString()} SKUs</span>
+                  <span className="text-brand-ink">{meta.total.toLocaleString()} SKUs</span>
                   {meta.from && meta.to && ` · ${meta.from}–${meta.to}`}
                 </span>
               )}
@@ -409,7 +409,7 @@ export function BrowseLayout({
                 <button
                   onClick={() => setParam("search", null)}
                   aria-label={`Clear search “${search}”`}
-                  className="flex max-w-[16rem] items-center gap-1 rounded-md border border-border bg-background px-2 py-0.5 text-[10.5px] font-normal normal-case tracking-normal text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+                  className="flex max-w-[16rem] items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
                 >
                   <span className="truncate">Search: {search}</span> <X size={10} className="shrink-0" />
                 </button>
@@ -417,7 +417,7 @@ export function BrowseLayout({
               {inStock && (
                 <button
                   onClick={() => setParam("in_stock", null)}
-                  className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-0.5 text-[10.5px] font-normal normal-case tracking-normal text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+                  className="flex items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
                 >
                   In stock <X size={10} />
                 </button>
@@ -428,7 +428,7 @@ export function BrowseLayout({
                   <button
                     key={bid}
                     onClick={() => toggleBrand(bid)}
-                    className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-0.5 text-[10.5px] font-normal normal-case tracking-normal text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+                    className="flex items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
                   >
                     {brand?.name ?? bid} <X size={10} />
                   </button>
@@ -437,7 +437,7 @@ export function BrowseLayout({
               {!categoryId && catId && (
                 <button
                   onClick={() => toggleCategory(catId)}
-                  className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-0.5 text-[10.5px] font-normal normal-case tracking-normal text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+                  className="flex items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
                 >
                   {activeCatName ?? catId} <X size={10} />
                 </button>
@@ -445,7 +445,7 @@ export function BrowseLayout({
               {subCatId && (
                 <button
                   onClick={() => setParam("sub_cat", null)}
-                  className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-0.5 text-[10.5px] font-normal normal-case tracking-normal text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+                  className="flex items-center gap-1 px-2 py-0.5 border border-brand-line bg-brand-white text-brand-ink text-[10.5px] normal-case tracking-normal rounded-[var(--brand-radius)] hover:border-brand-ink"
                 >
                   {activeSubCatName ?? subCatId} <X size={10} />
                 </button>
@@ -456,19 +456,19 @@ export function BrowseLayout({
               <button
                 type="button"
                 onClick={() => setFiltersOpen(true)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-[10.5px] font-medium uppercase tracking-[0.06em] text-foreground transition-colors hover:border-primary/50 hover:bg-accent lg:hidden"
+                className="inline-flex h-9 items-center gap-1.5 border border-brand-line bg-brand-white px-3 font-mono text-[10.5px] uppercase tracking-[0.06em] text-brand-ink hover:border-brand-ink lg:hidden"
               >
                 <SlidersHorizontal size={13} />
                 Filters{activeFilterCount > 0 && ` · ${activeFilterCount}`}
               </button>
-              <div className="flex items-center overflow-hidden rounded-md border border-border bg-background shadow-xs">
+              <div className="flex items-center border border-brand-line rounded-[var(--brand-radius)] overflow-hidden">
                 <button
                   onClick={() => switchView("list")}
                   title="List view"
                   className={`px-2.5 py-2 lg:px-2 lg:py-1.5 transition-colors ${
                     view === "list"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+                      ? "bg-brand-ink text-white"
+                      : "bg-brand-white text-brand-muted hover:text-brand-ink"
                   }`}
                 >
                   <LayoutList size={13} />
@@ -476,23 +476,23 @@ export function BrowseLayout({
                 <button
                   onClick={() => switchView("grid")}
                   title="Grid view"
-                  className={`border-l border-border px-2.5 py-2 transition-colors lg:px-2 lg:py-1.5 ${
+                  className={`px-2.5 py-2 lg:px-2 lg:py-1.5 transition-colors border-l border-brand-line ${
                     view === "grid"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+                      ? "bg-brand-ink text-white"
+                      : "bg-brand-white text-brand-muted hover:text-brand-ink"
                   }`}
                 >
                   <LayoutGrid size={13} />
                 </button>
               </div>
 
-              <span className="text-[10px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+              <span className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted">
                 SORT
               </span>
               <select
                 value={sort}
                 onChange={(e) => setParam("sort", e.target.value)}
-                className="h-9 rounded-md border border-input bg-background px-2 text-[11.5px] text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20 lg:h-7"
+                className="h-9 lg:h-7 px-2 border border-brand-line text-[11.5px] bg-brand-white rounded-[var(--brand-radius)] focus:outline-none focus:border-brand-blue"
               >
                 {SORT_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>

@@ -15,7 +15,7 @@ export default function EditProfilePage() {
   // account, never on updateUser() after a save, so unsaved edits are not overwritten.
   if (isLoading || !user) {
     return (
-      <div className="flex h-60 items-center justify-center text-[11px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex h-60 items-center justify-center font-mono text-[11px] uppercase tracking-widest text-brand-muted">
         Loading…
       </div>
     );
@@ -56,11 +56,11 @@ function ProfileForm({ user }: { user: User }) {
   }
 
   const INPUT =
-    "w-full min-h-10 rounded-md border border-input bg-background px-3 py-2 text-[14px] text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 transition-colors";
-  const LABEL = "block text-[11px] font-medium tracking-[0.06em] uppercase text-muted-foreground mb-1";
+    "w-full bg-brand-white border border-brand-line rounded-[var(--brand-radius)] px-3 py-2 font-mono text-[13px] text-brand-ink placeholder:text-brand-muted focus:outline-none focus:border-brand-blue transition-colors";
+  const LABEL = "block font-mono text-[11px] tracking-[0.06em] uppercase text-brand-muted mb-1";
 
   return (
-    <div className="bg-background min-h-screen pb-28 md:pb-20">
+    <div className="bg-brand-bg min-h-screen pb-28 md:pb-20">
       <PageHeader crumbs={[{ label: "Account", href: "/account/profile" }, { label: "Edit Profile" }]} title="Edit Profile" />
       <div className="px-4 md:px-8 py-8 max-w-lg mx-auto">
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -112,16 +112,16 @@ function ProfileForm({ user }: { user: User }) {
           </div>
 
           {error && (
-            <p className="text-[12px] text-destructive">{error}</p>
+            <p className="font-mono text-[12px] text-[#B83434]">{error}</p>
           )}
           {success && (
-            <p className="text-[12px] text-emerald-700">Profile updated successfully.</p>
+            <p className="font-mono text-[12px] text-[#065F46]">Profile updated successfully.</p>
           )}
 
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-md bg-primary px-4 py-2.5 text-[12px] font-medium tracking-[0.04em] uppercase text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:opacity-60 cursor-pointer"
+            className="w-full bg-brand-navy text-white font-mono text-[11px] tracking-[0.08em] uppercase py-2.5 px-4 hover:bg-brand-blue transition-colors disabled:opacity-60 cursor-pointer rounded-[var(--brand-radius)]"
           >
             {saving ? "Saving…" : "Save Changes"}
           </button>
