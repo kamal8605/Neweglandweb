@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { preloadFillImage } from "@/lib/preloadImage";
 import { apiSaysNotFound, excerpt, fetchApi } from "@/lib/site";
 
 interface PublicBrand {
@@ -28,5 +29,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function BrandLayout({ children, params }: { children: ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9]+$/.test(id) || (await apiSaysNotFound(`/brands/${id}`))) notFound();
+  // Start the hero image (the LCP) with the HTML instead of after the client fetches the brand.
+  const brand = await fetchApi<PublicBrand>(`/brands/${id}`);
+  if (brand?.image) preloadFillImage(brand.image, "(max-width: 767px) 100vw, 55vw");
   return children;
 }

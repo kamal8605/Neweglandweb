@@ -5,12 +5,12 @@ import { type ReactNode } from "react";
 import queryClient from "@/lib/queryClient";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
-import { SiteConfigProvider } from "@/context/SiteConfigContext";
+import { SiteConfigProvider, type HomepagePayload } from "@/context/SiteConfigContext";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children, initialHomepage }: { children: ReactNode; initialHomepage?: HomepagePayload | null }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteConfigProvider>
+      <SiteConfigProvider initialHomepage={initialHomepage}>
         <AuthProvider>
           <CartProvider>
             {children}

@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- managed image URLs are runtime values and include responsive picture sources */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
@@ -42,10 +42,15 @@ function ResponsiveManagedImage({
   const { props: { srcSet: mobileSrcSet } } = getImageProps({ ...common, src: mobileSrc });
   return (
     <picture>
-      <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
+      <source media="(max-width: 640px)" srcSet={mobileSrcSet} sizes={sizes} />
       <img {...desktopProps} alt={alt} className={className} />
     </picture>
   );
+}
+
+function subscribeWindowLoad(onChange: () => void) {
+  window.addEventListener("load", onChange);
+  return () => window.removeEventListener("load", onChange);
 }
 
 function HeroCarousel({ section }: { section: HomepageSection }) {
@@ -62,12 +67,16 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
   }, [carouselSlides.length, section.settings.interval_ms]);
   const move = (direction: number) => setActive((value) => (value + direction + carouselSlides.length) % carouselSlides.length);
 
+  const pageLoaded = useSyncExternalStore(subscribeWindowLoad, () => document.readyState === "complete", () => false);
+
   if (carouselSlides.length === 0) return null;
-  const mountedIndexes = new Set([
+  // Only the visible slide and its neighbours are mounted (so the next/previous fade has no blank frame);
+  // the neighbours wait for the page load so they don't compete with the first slide (the LCP image).
+  const mountedIndexes = new Set(pageLoaded ? [
     active,
     (active - 1 + carouselSlides.length) % carouselSlides.length,
     (active + 1) % carouselSlides.length,
-  ]);
+  ] : [active]);
   return (
     <section className="relative overflow-hidden border-b border-brand-line bg-brand-navy" aria-label="Featured promotions">
       <div className={`relative aspect-[1920/622] w-full ${hasMobileArt ? "min-h-[210px] sm:min-h-0" : ""}`}>
@@ -102,7 +111,8 @@ function ImageHeading({ image, title }: { image?: string; title: string }) {
   if (!image) return <h2 className="sr-only">{title}</h2>;
   // The art is a 32:1 strip with the title centred in ~30% of its width. A fixed height per breakpoint keeps the
   // title fully inside the viewport on phones/tablets (object-cover crops only the decorative sides).
-  return <div className="relative mt-6 h-9 w-full overflow-hidden bg-brand-navy sm:h-12 md:h-14 lg:aspect-[24/1] lg:h-auto"><Image src={image} alt={title} fill sizes="100vw" loading="lazy" className="object-cover" /><h2 className="sr-only">{title}</h2></div>;
+  // Because of that crop the image is drawn wider than the box (36px × 32 ≈ 1150px on a phone, 133vw at lg+).
+  return <div className="relative mt-6 h-9 w-full overflow-hidden bg-brand-navy sm:h-12 md:h-14 lg:aspect-[24/1] lg:h-auto"><Image src={image} alt={title} fill sizes="(max-width: 1023px) 1920px, 134vw" loading="lazy" className="object-cover" /><h2 className="sr-only">{title}</h2></div>;
 }
 
 function CategoryGrid({ section }: { section: HomepageSection }) {
@@ -201,7 +211,7 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-function ProductSection({ section, products }: { section: HomepageSection; products: Product[] }) {
+function ProductSection({ section, products, placeholders = 0 }: { section: HomepageSection; products: Product[]; placeholders?: number }) {
   const art = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
   const promos = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).slice(0, 2);
   return (
@@ -209,6 +219,8 @@ function ProductSection({ section, products }: { section: HomepageSection; produ
       <ImageHeading image={art} title={section.title} />
       <div className="mx-auto grid max-w-[1513px] grid-cols-2 border-l border-brand-line md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
+        {/* Same height as a card while the products load, so the sections below don't jump. */}
+        {products.length === 0 && Array.from({ length: placeholders }, (_, index) => <div key={index} aria-hidden="true" className="min-h-[390px] bg-white" />)}
       </div>
       {promos.length > 0 && (
         <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-white px-2 py-3 md:grid-cols-2 md:px-0">
@@ -236,6 +248,17 @@ function BrandStrip({ section }: { section: HomepageSection }) {
       </div>
     </section>
   );
+}
+
+/** CSS background for a small repeated tile, served by the image optimizer at 1x/2x instead of the full-size original. */
+function tileBackground(src: string, size: number) {
+  const { props } = getImageProps({ src, alt: "", width: size, height: size });
+  const quote = (url: string) => `url("${url.replace(/["\\]/g, "")}")`;
+  const candidates = (props.srcSet ?? "").split(", ").filter(Boolean).map((entry) => {
+    const [url, density] = entry.split(" ");
+    return `${quote(url)} ${density}`;
+  });
+  return candidates.length ? `image-set(${candidates.join(", ")})` : quote(props.src);
 }
 
 function CatalogSection({ section, backgroundImage }: { section: HomepageSection; backgroundImage?: string | null }) {
@@ -267,7 +290,7 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
     <section className="bg-white px-2 py-6 sm:px-4 lg:px-6 lg:py-10">
       <div className="relative isolate overflow-hidden border border-brand-navy/10 bg-brand-navy px-5 py-10 shadow-[0_18px_45px_rgba(11,31,58,0.22)] md:px-8 md:py-14 lg:px-12 lg:py-16">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-brand-orange" />
-        {backgroundImage && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: `url("${backgroundImage.replace(/["\\]/g, "")}")`, backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />}
+        {backgroundImage && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 opacity-[0.055]" style={{ backgroundImage: tileBackground(backgroundImage, 220), backgroundPosition: "center", backgroundRepeat: "repeat", backgroundSize: "220px 220px" }} />}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue-deep/25 via-transparent to-black/25" />
         <div className="mx-auto grid max-w-[1600px] grid-cols-2 items-center gap-x-4 gap-y-8 sm:gap-x-8 lg:grid-cols-3 lg:gap-10 xl:gap-16">
         <div className="col-span-2 max-w-xl text-white lg:col-span-1 lg:pr-4">
@@ -316,7 +339,7 @@ function NewsletterSection({ title, placeholder, buttonText }: { title?: string;
   );
 }
 
-function ManagedSection({ section, products, catalogBackground }: { section: HomepageSection; products: Product[]; catalogBackground?: string | null }) {
+function ManagedSection({ section, products, productsLoading, catalogBackground }: { section: HomepageSection; products: Product[]; productsLoading: boolean; catalogBackground?: string | null }) {
   switch (section.type) {
     case "hero":
       return <HeroCarousel section={section} />;
@@ -329,7 +352,7 @@ function ManagedSection({ section, products, catalogBackground }: { section: Hom
       const byId = new Map(products.map((product) => [product.id, product]));
       const selected = ids.map((id) => byId.get(id)).filter((product): product is Product => Boolean(product));
       const limit = typeof section.settings.limit === "number" ? section.settings.limit : 14;
-      return <ProductSection section={section} products={selected.slice(0, limit)} />;
+      return <ProductSection section={section} products={selected.slice(0, limit)} placeholders={productsLoading ? Math.min(ids.length, limit) : 0} />;
     }
     case "brand_showcase":
       return <BrandStrip section={section} />;
@@ -346,12 +369,13 @@ export default function HomePage() {
   const selectedProductIds = useMemo(() => Array.from(new Set(sections.flatMap((section) => section.type === "product_carousel" ? section.data?.product_ids ?? [] : []))), [sections]);
   const { data } = useProducts({ ids: selectedProductIds, per_page: Math.max(selectedProductIds.length, 1) });
   const products = data?.data ?? [];
+  const productsLoading = data === undefined && selectedProductIds.length > 0;
   return (
     <main className="bg-white">
       {site.homepage_heading && <h1 className="sr-only">{site.homepage_heading}</h1>}
       {!homepageLoaded && <div className="h-48 animate-pulse bg-brand-bg-alt" aria-label="Loading homepage" />}
       {homepageLoaded && error && <section className="grid min-h-[420px] place-items-center bg-brand-bg-alt px-5 py-16"><div className="max-w-lg border border-brand-line bg-white p-8 text-center shadow-[0_18px_45px_rgba(11,31,58,0.12)]"><p className="text-xs font-black uppercase tracking-[0.16em] text-brand-orange">Connection unavailable</p><h1 className="mt-3 text-2xl font-bold text-brand-navy">Storefront content could not be loaded</h1><p className="mt-3 text-sm leading-6 text-brand-muted">Please check the configured API URL or try again in a moment.</p><button type="button" onClick={reload} className="mt-6 bg-brand-navy px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-blue">Try again</button></div></section>}
-      {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} catalogBackground={site.catalog_background_logo_url} />)}
+      {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} productsLoading={productsLoading} catalogBackground={site.catalog_background_logo_url} />)}
       {site.newsletter_enabled && <NewsletterSection title={site.newsletter_title} placeholder={site.newsletter_placeholder} buttonText={site.newsletter_button_text} />}
     </main>
   );

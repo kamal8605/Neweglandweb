@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { preloadFillImage } from "@/lib/preloadImage";
 import { apiSaysNotFound, excerpt, fetchApi } from "@/lib/site";
 
 interface PublicProduct {
@@ -8,6 +9,7 @@ interface PublicProduct {
   name: string;
   sku: string | null;
   image: string | null;
+  images?: { url: string; is_primary: boolean }[];
   short_description: string | null;
   description: string | null;
   brand: { name: string } | null;
@@ -44,5 +46,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ProductLayout({ children, params }: { children: ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9]+$/.test(id) || (await apiSaysNotFound(`/products/${id}`))) notFound();
+  // Start the main gallery image (the LCP) with the HTML instead of after the client fetches the product.
+  const product = await fetchApi<PublicProduct>(`/products/${id}`);
+  const images = product?.images ?? (product?.image ? [{ url: product.image, is_primary: true }] : []);
+  const main = images.find((image) => image.is_primary) ?? images[0];
+  if (main) preloadFillImage(main.url, "(max-width: 767px) 100vw, 50vw");
   return children;
 }

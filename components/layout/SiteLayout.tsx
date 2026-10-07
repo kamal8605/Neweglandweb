@@ -10,7 +10,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
      
       <UtilityBar />
       <NavBar />
-      <main className="flex-1">{children}</main>
+      {/* At least one screen tall: pages that load their content on the client would otherwise show the footer
+          first and then push it down (layout shift). */}
+      <main className="min-h-svh flex-1">{children}</main>
       <Footer />
     </div>
   );

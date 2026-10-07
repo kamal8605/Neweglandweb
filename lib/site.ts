@@ -2,6 +2,8 @@
  * Server-side helpers for metadata, robots and sitemaps (no browser APIs, no auth).
  * Catalogue responses fetched here are public and cached by Next for `revalidate` seconds.
  */
+import type { HomepagePayload } from "@/context/SiteConfigContext";
+
 export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "") + "/api";
 
 /**
@@ -56,10 +58,17 @@ export interface PublicSiteSettings {
   logo_url?: string | null;
 }
 
-export async function getSiteSettings(): Promise<PublicSiteSettings> {
+/**
+ * Public homepage payload (site settings + managed sections). The root layout passes it to the client so
+ * header, footer and homepage render in the initial HTML; Next dedupes this request within one render.
+ */
+export async function getHomepagePayload(): Promise<HomepagePayload | null> {
   const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
-  const payload = await fetchApi<{ site?: PublicSiteSettings }>(`/homepage?client=${encodeURIComponent(client)}`);
-  return payload?.site ?? {};
+  return fetchApi<HomepagePayload>(`/homepage?client=${encodeURIComponent(client)}`);
+}
+
+export async function getSiteSettings(): Promise<PublicSiteSettings> {
+  return (await getHomepagePayload())?.site ?? {};
 }
 
 /** Plain-text excerpt for meta descriptions (strips tags, collapses whitespace). */

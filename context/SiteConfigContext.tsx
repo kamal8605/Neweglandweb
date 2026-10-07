@@ -70,9 +70,10 @@ interface SiteConfigValue {
 
 const SiteConfigContext = createContext<SiteConfigValue>({ homepage: null, site: {}, loaded: false, error: null, reload: () => undefined });
 
-export function SiteConfigProvider({ children }: { children: ReactNode }) {
-  const [homepage, setHomepage] = useState<HomepagePayload | null>(null);
-  const [loaded, setLoaded] = useState(false);
+export function SiteConfigProvider({ children, initialHomepage = null }: { children: ReactNode; initialHomepage?: HomepagePayload | null }) {
+  // The server passes the payload it already fetched, so the first render (and the HTML) has the real content.
+  const [homepage, setHomepage] = useState<HomepagePayload | null>(initialHomepage);
+  const [loaded, setLoaded] = useState(initialHomepage !== null);
   const [error, setError] = useState<string | null>(null);
   const [requestVersion, setRequestVersion] = useState(0);
   const reload = useCallback(() => {
@@ -82,6 +83,7 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (requestVersion === 0 && initialHomepage) return;
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
     const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
     const controller = new AbortController();
@@ -99,7 +101,7 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
       })
       .finally(() => setLoaded(true));
     return () => controller.abort();
-  }, [requestVersion]);
+  }, [initialHomepage, requestVersion]);
 
   // Title and description are rendered on the server (app/layout.tsx and per-page metadata);
   // overwriting document.title here used to give every page the same title.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
-import { SITE_URL, getSiteSettings } from "@/lib/site";
+import { SITE_URL, getHomepagePayload, getSiteSettings } from "@/lib/site";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -33,11 +33,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const homepage = await getHomepagePayload();
   return (
     <html
       lang="en"
@@ -45,7 +46,7 @@ export default function RootLayout({
       className={`${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-ink">
-        <Providers>{children}</Providers>
+        <Providers initialHomepage={homepage}>{children}</Providers>
       </body>
     </html>
   );
