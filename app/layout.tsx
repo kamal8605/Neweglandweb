@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { SITE_URL, getHomepagePayload, getSiteSettings } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import "./globals.css";
+import "./theme.css";
 
 const inter = Inter({
   variable: "--font-inter",
