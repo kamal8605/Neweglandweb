@@ -71,7 +71,7 @@ function BrandHero({ id }: { id: string }) {
         {/* Left: image with gradient overlay */}
         <div className="relative min-h-[220px] md:min-h-[280px] overflow-hidden">
           {brand.image ? (
-            <Image src={brand.image} alt={brand.name} fill sizes="(max-width: 768px) 100vw, 50vw" loading="eager" className="object-cover" />
+            <Image src={brand.image} alt={brand.name} fill sizes="(max-width: 767px) 100vw, 55vw" loading="eager" fetchPriority="high" className="object-cover" />
           ) : (
             <Placeholder label={`${brand.name} · studio`} />
           )}

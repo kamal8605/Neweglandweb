@@ -15,12 +15,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       ...configuredImagePatterns,
       new URL("https://c8.alamy.com/comp/**"),
+      new URL("https://hotpink-parrot-228156.hostingersite.com/storage/**"),
       new URL("https://erp.centralsmokedistro.com/uploads/**"),
       new URL("https://nes-gateway.cloud.bbtl.app/storage/**"),
       new URL("http://127.0.0.1:8000/storage/**"),
       new URL("http://localhost:8000/storage/**"),
     ],
-    qualities: [75, 100],
+    qualities: [75],
   },
   webpack(config) {
     // The modern PDF.js bundle contains its own Webpack runtime and crashes

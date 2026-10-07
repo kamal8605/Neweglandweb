@@ -6,9 +6,10 @@ import { useSiteConfig } from "@/context/SiteConfigContext";
 
 interface LogoProps {
   size?: number;
+  loading?: "eager" | "lazy";
 }
 
-export function Logo({ size = 48 }: LogoProps) {
+export function Logo({ size = 48, loading = "lazy" }: LogoProps) {
   const { site } = useSiteConfig();
   if (!site.logo_url) return null;
   return (
@@ -23,9 +24,7 @@ export function Logo({ size = 48 }: LogoProps) {
         alt={site.site_name || "Website logo"}
         fill
         sizes={`${size}px`}
-        priority
-        quality={100}
-        unoptimized
+        loading={loading}
         className="object-contain"
       />
     </Link>

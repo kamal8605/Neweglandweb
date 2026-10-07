@@ -58,9 +58,9 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
           src={sorted[active].url}
           alt={name}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes="(max-width: 767px) 100vw, 50vw"
           className="object-contain"
-          priority
+          fetchPriority="high"
         />
         {sorted.length > 1 && (
           <>
@@ -91,7 +91,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
                 i === active ? "border-brand-orange" : "border-brand-line hover:border-brand-blue"
               }`}
             >
-              <Image src={img.url} alt={`${name} ${i + 1}`} fill sizes="(max-width: 1024px) 100vw, 50vw" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
+              <Image src={img.url} alt={`${name} ${i + 1}`} fill sizes="64px" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
             </button>
           ))}
         </div>
@@ -280,6 +280,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                             src={(child.image ?? product.image)!}
                             alt={child.name}
                             fill
+                            sizes="32px"
                             className="object-contain"
                           />
                         </div>

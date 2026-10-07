@@ -42,7 +42,7 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
             src={product.image}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (

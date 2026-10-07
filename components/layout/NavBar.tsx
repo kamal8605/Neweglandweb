@@ -73,7 +73,7 @@ export function NavBar() {
                       {group.items.length > 0 ? group.items.map((category) => (
                         <Link key={category.id} href={`/category/${category.id}`} onClick={() => setOpenMenu(null)} className="flex min-h-12 items-center gap-3 rounded-none px-2 py-2 text-sm font-medium text-brand-ink no-underline hover:bg-brand-bg-alt hover:text-brand-blue">
                           <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-none border border-brand-line bg-brand-bg">
-                            {category.image ? <Image src={category.image} alt="" fill sizes="36px" className="object-contain" unoptimized /> : <span className="flex h-full items-center justify-center text-xs font-black text-brand-blue">{category.name.slice(0, 1)}</span>}
+                            {category.image ? <Image src={category.image} alt="" fill sizes="36px" className="object-contain" /> : <span className="flex h-full items-center justify-center text-xs font-black text-brand-blue">{category.name.slice(0, 1)}</span>}
                           </span>
                           <span>{category.name}</span>
                         </Link>
@@ -117,7 +117,7 @@ export function NavBar() {
                   <Link href={activeMobileGroup.href} onClick={() => setMobileOpen(false)} className="block border-b border-white/10 px-5 py-4 text-sm font-black uppercase text-white no-underline">Shop all {activeMobileGroup.label}</Link>
                   {activeMobileGroup.items.map((category) => (
                     <Link key={category.id} href={`/category/${category.id}`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 border-b border-white/10 px-5 py-3 text-sm text-white/85 no-underline">
-                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-none bg-white/10">{category.image && <Image src={category.image} alt="" fill sizes="36px" className="object-contain" unoptimized />}</span>{category.name}
+                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-none bg-white/10">{category.image && <Image src={category.image} alt="" fill sizes="36px" className="object-contain" />}</span>{category.name}
                     </Link>
                   ))}
                 </>

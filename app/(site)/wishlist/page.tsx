@@ -77,6 +77,7 @@ function WishlistTable() {
                       src={item.image}
                       alt={item.name}
                       fill
+                      sizes="40px"
                       className="object-contain"
                     />
                   ) : (

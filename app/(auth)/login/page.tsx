@@ -96,7 +96,7 @@ export default function LoginPage() {
       {/* Right panel — form */}
       <div className="flex-1 flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-10">
         <div className="mb-8">
-          <Logo />
+          <Logo loading="eager" />
         </div>
 
         <div className="font-mono text-[10px] tracking-[0.1em] text-brand-orange uppercase mb-2">

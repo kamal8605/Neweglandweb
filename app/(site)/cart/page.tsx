@@ -220,6 +220,7 @@ export default function CartPage() {
                           src={firstItem.image}
                           alt={productName ?? ""}
                           fill
+                          sizes="48px"
                           className="object-contain"
                         />
                       </div>

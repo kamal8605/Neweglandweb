@@ -117,8 +117,8 @@ export function ProductGrid({
                   src={p.image}
                   alt={p.name}
                   fill
+                  sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
                   className="object-contain"
-                  unoptimized
                 />
               ) : (
                 <ImagePlaceholder />

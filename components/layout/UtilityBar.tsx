@@ -33,7 +33,7 @@ export function UtilityBar() {
     return (
       <header className="border-t-[3px] border-brand-ink bg-white">
         <div className="mx-auto flex min-h-[76px] max-w-[1500px] items-center gap-5 px-4 py-3 lg:px-10">
-          <Logo size={88} />
+          <Logo size={88} loading="eager" />
 
           <div className="mx-auto hidden items-center gap-7 text-[12px] text-brand-muted md:flex">
             {site.phone && <a href={phoneHref} className="inline-flex items-center gap-2 text-brand-muted no-underline hover:text-brand-blue"><Phone size={14} /> {site.phone}</a>}
@@ -75,7 +75,7 @@ export function UtilityBar() {
       </div>
 
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-4 px-4 py-5 lg:flex-nowrap lg:gap-8 lg:px-10">
-        <Logo size={88} />
+        <Logo size={88} loading="eager" />
         {isAuthenticated && (
           <form onSubmit={handleSearch} className="order-3 flex w-full overflow-hidden rounded-none border border-brand-line bg-white shadow-sm transition-all focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-brand-blue/15 lg:order-none lg:mx-auto lg:max-w-[720px]">
             <label htmlFor="site-search" className="sr-only">Search products, brands, or categories</label>

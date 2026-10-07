@@ -131,8 +131,8 @@ export function ProductTable({
                   alt={p.name}
                   width={36}
                   height={36}
+                  sizes="36px"
                   className="object-cover w-full h-full"
-                  unoptimized
                 />
               ) : (
                 <ImagePlaceholder />

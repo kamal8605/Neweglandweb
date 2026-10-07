@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight, Send, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +12,41 @@ import { useProducts, type Product } from "@/hooks/useProducts";
 import { useSiteConfig, type HomepageItem, type HomepageSection } from "@/context/SiteConfigContext";
 
 const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbook"), { ssr: false });
+
+function ResponsiveManagedImage({
+  desktopSrc,
+  mobileSrc,
+  alt,
+  width,
+  height,
+  sizes,
+  loading = "lazy",
+  fetchPriority = "auto",
+  className,
+}: {
+  desktopSrc: string;
+  mobileSrc?: string | null;
+  alt: string;
+  width: number;
+  height: number;
+  sizes: string;
+  loading?: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
+  className: string;
+}) {
+  const common = { alt, width, height, sizes, loading, fetchPriority };
+  const { props: desktopProps } = getImageProps({ ...common, src: desktopSrc });
+
+  if (!mobileSrc) return <img {...desktopProps} alt={alt} className={className} />;
+
+  const { props: { srcSet: mobileSrcSet } } = getImageProps({ ...common, src: mobileSrc });
+  return (
+    <picture>
+      <source media="(max-width: 640px)" srcSet={mobileSrcSet} />
+      <img {...desktopProps} alt={alt} className={className} />
+    </picture>
+  );
+}
 
 function HeroCarousel({ section }: { section: HomepageSection }) {
   const slides = section.items.filter((item) => item.kind === "slide" && item.desktop_image_url);
@@ -28,17 +63,34 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
   const move = (direction: number) => setActive((value) => (value + direction + carouselSlides.length) % carouselSlides.length);
 
   if (carouselSlides.length === 0) return null;
+  const mountedIndexes = new Set([
+    active,
+    (active - 1 + carouselSlides.length) % carouselSlides.length,
+    (active + 1) % carouselSlides.length,
+  ]);
   return (
     <section className="relative overflow-hidden border-b border-brand-line bg-brand-navy" aria-label="Featured promotions">
       <div className={`relative aspect-[1920/622] w-full ${hasMobileArt ? "min-h-[210px] sm:min-h-0" : ""}`}>
-        {carouselSlides.map((slide, index) => (
-          slide.href ? <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-            <picture>
-              {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
-              <img src={slide.image} alt={slide.alt} loading={index === 0 ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-cover" />
-            </picture>
-          </Link> : <div key={slide.image} aria-hidden={active !== index} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}><picture>{slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}<img src={slide.image} alt={slide.alt} loading={index === 0 ? "eager" : "lazy"} className="absolute inset-0 h-full w-full object-cover" /></picture></div>
-        ))}
+        {carouselSlides.map((slide, index) => {
+          if (!mountedIndexes.has(index)) return null;
+          const image = (
+            <ResponsiveManagedImage
+              desktopSrc={slide.image}
+              mobileSrc={slide.mobileImage}
+              alt={slide.alt}
+              width={1920}
+              height={622}
+              sizes="100vw"
+              loading={index === active ? "eager" : "lazy"}
+              fetchPriority={index === active ? "high" : "low"}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          );
+          const className = `absolute inset-0 transition-opacity duration-700 ${active === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`;
+          return slide.href
+            ? <Link key={slide.image} href={slide.href} aria-hidden={active !== index} className={className}>{image}</Link>
+            : <div key={slide.image} aria-hidden={active !== index} className={className}>{image}</div>;
+        })}
         {carouselSlides.length > 1 && <><button type="button" onClick={() => move(-1)} aria-label="Previous promotion" className="absolute left-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronLeft size={24} /></button>
         <button type="button" onClick={() => move(1)} aria-label="Next promotion" className="absolute right-3 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center bg-black/55 text-white transition hover:bg-brand-orange"><ChevronRight size={24} /></button></>}
       </div>
@@ -50,7 +102,7 @@ function ImageHeading({ image, title }: { image?: string; title: string }) {
   if (!image) return <h2 className="sr-only">{title}</h2>;
   // The art is a 32:1 strip with the title centred in ~30% of its width. A fixed height per breakpoint keeps the
   // title fully inside the viewport on phones/tablets (object-cover crops only the decorative sides).
-  return <div className="relative mt-6 h-9 w-full overflow-hidden bg-brand-navy sm:h-12 md:h-14 lg:aspect-[24/1] lg:h-auto"><img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" /><h2 className="sr-only">{title}</h2></div>;
+  return <div className="relative mt-6 h-9 w-full overflow-hidden bg-brand-navy sm:h-12 md:h-14 lg:aspect-[24/1] lg:h-auto"><Image src={image} alt={title} fill sizes="100vw" loading="lazy" className="object-cover" /><h2 className="sr-only">{title}</h2></div>;
 }
 
 function CategoryGrid({ section }: { section: HomepageSection }) {
@@ -84,7 +136,7 @@ function CategoryGrid({ section }: { section: HomepageSection }) {
   }, [categories.length, move]);
   if (!categories.length) return null;
   const hasCarousel = categories.length > 7;
-  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><img src={category.image} alt={category.alt} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} /></button>)}</div>}</section>;
+  return <section className="bg-white pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden bg-brand-bg-alt"><Image src={category.image} alt={category.alt} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start bg-white p-2 no-underline md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-brand-orange ${index === active ? "w-6 bg-brand-orange" : "w-1.5 bg-brand-line"}`} /></button>)}</div>}</section>;
 }
 
 function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
@@ -96,10 +148,7 @@ function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
     <section className="w-full bg-white py-3">
       <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 px-2 md:grid-cols-2 md:px-0">
       {banners.map((banner) => {
-        const image = <picture>
-          {banner.mobile_image_url && <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />}
-          <img src={banner.desktop_image_url} alt={banner.alt_text} width={956} height={170} className="block h-full w-full object-cover" />
-        </picture>;
+        const image = <ResponsiveManagedImage desktopSrc={banner.desktop_image_url} mobileSrc={banner.mobile_image_url} alt={banner.alt_text} width={956} height={170} sizes="(max-width: 767px) 100vw, 50vw" className="block h-full w-full object-cover" />;
         return (
           <div key={banner.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">
             {banner.link_url ? <Link href={banner.link_url} aria-label={banner.alt_text} className="block h-full w-full">{image}</Link> : image}
@@ -132,7 +181,7 @@ function ProductCard({ product }: { product: Product }) {
           <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-black uppercase leading-[1.18] sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
         </Link>
         <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
-          {image ? <Image src={image} alt={product.name} fill unoptimized sizes="(max-width: 768px) 50vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
+          {image ? <Image src={image} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
         </Link>
         <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
           {!isAuthenticated ? (
@@ -164,7 +213,7 @@ function ProductSection({ section, products }: { section: HomepageSection; produ
       {promos.length > 0 && (
         <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-white px-2 py-3 md:grid-cols-2 md:px-0">
           {promos.map((promo) => {
-            const image = <picture>{promo.mobile_image_url && <source media="(max-width: 640px)" srcSet={promo.mobile_image_url} />}<img src={promo.desktop_image_url} alt={promo.alt_text} width={956} height={170} loading="lazy" className="block h-full w-full object-cover" /></picture>;
+            const image = <ResponsiveManagedImage desktopSrc={promo.desktop_image_url} mobileSrc={promo.mobile_image_url} alt={promo.alt_text} width={956} height={170} sizes="(max-width: 767px) 100vw, 50vw" className="block h-full w-full object-cover" />;
             return <div key={promo.id} className="relative aspect-[956/170] w-full overflow-hidden bg-brand-navy">{promo.link_url ? <Link href={promo.link_url} aria-label={promo.alt_text} className="block h-full w-full">{image}</Link> : image}</div>;
           })}
         </div>
@@ -182,7 +231,7 @@ function BrandStrip({ section }: { section: HomepageSection }) {
       <ImageHeading image={headingImage} title={section.title} />
       <div className="mx-auto grid max-w-[1600px] grid-cols-2 bg-brand-bg-alt px-4 py-5 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7">
         {brandImages.map((item) => (
-          item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center p-3 no-underline transition hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)]"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain transition group-hover:-translate-y-0.5" /></Link> : <div key={item.id} className="flex h-24 items-center justify-center p-3"><img src={item.desktop_image_url} alt={item.alt_text} loading="lazy" className="max-h-full max-w-full object-contain" /></div>
+          item.link_url ? <Link key={item.id} href={item.link_url} className="group flex h-24 items-center justify-center p-3 no-underline transition hover:bg-white hover:shadow-[0_8px_24px_rgba(11,31,58,0.08)]"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain transition group-hover:-translate-y-0.5" /></span></Link> : <div key={item.id} className="flex h-24 items-center justify-center p-3"><span className="relative block h-full w-full"><Image src={item.desktop_image_url} alt={item.alt_text} fill sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-contain" /></span></div>
         ))}
       </div>
     </section>
@@ -234,7 +283,7 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
             <div className="catalog-book-body relative aspect-[210/297]">
               <div aria-hidden="true" className="catalog-book-pages" />
               <div className="catalog-book-cover">
-                <img src={catalog.desktop_image_url} alt={catalog.alt_text} loading="lazy" className="h-full w-full object-cover" />
+                <Image src={catalog.desktop_image_url} alt={catalog.alt_text} fill sizes="(max-width: 1023px) 50vw, 350px" className="object-cover" />
                 <span className="catalog-book-title absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-center text-[11px] font-medium text-brand-navy">{catalog.title || catalog.alt_text}</span>
               </div>
               <span aria-hidden="true" className="catalog-book-spine" />
