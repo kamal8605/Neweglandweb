@@ -7,6 +7,7 @@ import { StockDot } from "./StockDot";
 import { QtyStepper } from "./QtyStepper";
 import { PriceGate } from "./PriceGate";
 import { type Product } from "@/hooks/useProducts";
+import { imageVariant } from "@/lib/imageVariants";
 
 interface ProductGridProps {
   products: Product[];
@@ -114,7 +115,7 @@ export function ProductGrid({
             <Link href={`/product/${p.id}`} className="block relative aspect-square overflow-hidden bg-brand-bg-alt">
               {p.image ? (
                 <Image
-                  src={p.image}
+                  src={imageVariant(p.image, p.image_variants, 512)!}
                   alt={p.name}
                   fill
                   sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"

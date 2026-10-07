@@ -25,6 +25,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
+// Rendered on first request, then served from the cache and refreshed every 5 minutes (ISR) instead of
+// being rendered on every request. The HTML holds no per-user content: prices and auth load in the browser.
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  return [];
+}
+
 // A missing/disabled brand answers with a real 404 status (not a "soft 404" page with status 200).
 export default async function BrandLayout({ children, params }: { children: ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;

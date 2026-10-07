@@ -44,8 +44,14 @@ function BrandHero({ id }: { id: string }) {
 
   if (brandLoading) {
     return (
-      <div className="animate-pulse">
-        <div className="h-[280px] bg-brand-bg-alt" />
+      // Same boxes as the loaded header (breadcrumb, then image + fact sheet stacked on phones) so the
+      // products below don't jump when the brand arrives.
+      <div className="animate-pulse" aria-hidden="true">
+        <div className="h-[53px] border-b border-brand-line bg-brand-white" />
+        <div className="grid grid-cols-1 border-b border-brand-line md:[grid-template-columns:1.2fr_1fr]">
+          <div className="min-h-[220px] bg-brand-bg-alt md:min-h-[280px]" />
+          <div className="h-[253px] bg-brand-white md:h-auto" />
+        </div>
       </div>
     );
   }

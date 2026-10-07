@@ -8,6 +8,7 @@ import { StockDot } from "./StockDot";
 import { QtyStepper } from "./QtyStepper";
 import { PriceGate } from "./PriceGate";
 import { type Product } from "@/hooks/useProducts";
+import { imageVariant } from "@/lib/imageVariants";
 
 export type { Product };
 
@@ -127,7 +128,7 @@ export function ProductTable({
             <div className="w-9 h-9 overflow-hidden rounded-[var(--brand-radius)] shrink-0">
               {p.image ? (
                 <Image
-                  src={p.image}
+                  src={imageVariant(p.image, p.image_variants, 64)!}
                   alt={p.name}
                   width={36}
                   height={36}

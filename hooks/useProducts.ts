@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import type { ImageVariants } from "@/lib/imageVariants";
 
 export interface Product {
   id: number;
@@ -17,13 +18,14 @@ export interface Product {
   stock_quantity: number | null;
   prices_visible: boolean;
   image: string | null;
+  image_variants?: ImageVariants | null;
   type: "simple" | "grouped";
   parent_id?: number | null;
   children?: Product[];
   description?: string;
   short_description?: string;
   attributes?: Record<string, string>;
-  images?: { url: string; is_primary: boolean }[];
+  images?: { url: string; is_primary: boolean; variants?: ImageVariants | null }[];
 }
 
 export interface ProductsMeta {

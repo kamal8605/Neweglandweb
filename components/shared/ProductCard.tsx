@@ -6,12 +6,13 @@ import { Heart } from "lucide-react";
 import { StockDot } from "./StockDot";
 import { PriceGate } from "./PriceGate";
 import { type Product } from "@/hooks/useProducts";
+import { imageVariant } from "@/lib/imageVariants";
 
 export type ProductCardData = Pick<
   Product,
   "id" | "name" | "sku" | "brand" | "current_price" |
   "sale_price" | "regular_price" | "on_sale" | "in_stock" | "stock_quantity" |
-  "prices_visible" | "image"
+  "prices_visible" | "image" | "image_variants"
 >;
 
 interface ProductCardProps {
@@ -39,7 +40,7 @@ export function ProductCard({ product, onWishlistToggle, wishlisted = false }: P
       <Link href={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden bg-brand-bg-alt">
         {product.image ? (
           <Image
-            src={product.image}
+            src={imageVariant(product.image, product.image_variants, 512)!}
             alt={product.name}
             fill
             sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"

@@ -9,6 +9,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, Send, ShoppingCart } from "lucid
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useProducts, type Product } from "@/hooks/useProducts";
+import { imageVariant } from "@/lib/imageVariants";
 import { useSiteConfig, type HomepageItem, type HomepageSection } from "@/context/SiteConfigContext";
 
 const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbook"), { ssr: false });
@@ -191,7 +192,7 @@ function ProductCard({ product }: { product: Product }) {
           <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-black uppercase leading-[1.18] sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px] text-brand-blue group-hover:text-brand-blue-deep">{product.name}</h3>
         </Link>
         <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden bg-white" aria-label={`View ${product.name}`}>
-          {image ? <Image src={image} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
+          {image ? <Image src={imageVariant(image, product.image ? product.image_variants : null, 512)!} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-brand-bg-alt text-xs font-bold uppercase text-brand-muted">Product image</div>}
         </Link>
         <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
           {!isAuthenticated ? (

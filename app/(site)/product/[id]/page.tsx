@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, GitCompare, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProduct } from "@/hooks/useProducts";
+import { imageVariant, type ImageVariants } from "@/lib/imageVariants";
 import { type Product } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -35,7 +36,7 @@ function ImagePlaceholder() {
   );
 }
 
-function ImageGallery({ images, name }: { images: { url: string; is_primary: boolean }[]; name: string }) {
+function ImageGallery({ images, name }: { images: { url: string; is_primary: boolean; variants?: ImageVariants | null }[]; name: string }) {
   const sorted = [...images].sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
   const [active, setActive] = useState(0);
 
@@ -55,7 +56,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
       {/* Main image */}
       <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg-alt border border-brand-line group">
         <Image
-          src={sorted[active].url}
+          src={imageVariant(sorted[active].url, sorted[active].variants, 1024)!}
           alt={name}
           fill
           sizes="(max-width: 767px) 100vw, 50vw"
@@ -91,7 +92,7 @@ function ImageGallery({ images, name }: { images: { url: string; is_primary: boo
                 i === active ? "border-brand-orange" : "border-brand-line hover:border-brand-blue"
               }`}
             >
-              <Image src={img.url} alt={`${name} ${i + 1}`} fill sizes="64px" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
+              <Image src={imageVariant(img.url, img.variants, 256)!} alt={`${name} ${i + 1}`} fill sizes="64px" loading={i === 0 ? "eager" : "lazy"} className="object-contain" />
             </button>
           ))}
         </div>
@@ -277,7 +278,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                       {(child.image ?? product.image) ? (
                         <div className="w-8 h-8 relative shrink-0 border border-brand-line overflow-hidden bg-brand-bg-alt">
                           <Image
-                            src={(child.image ?? product.image)!}
+                            src={(child.image ? imageVariant(child.image, child.image_variants, 64) : imageVariant(product.image, product.image_variants, 64))!}
                             alt={child.name}
                             fill
                             sizes="32px"
@@ -405,7 +406,7 @@ function ProductDetail({ id }: { id: string }) {
     );
   }
 
-  const images = product.images ?? (product.image ? [{ url: product.image, is_primary: true }] : []);
+  const images = product.images ?? (product.image ? [{ url: product.image, is_primary: true, variants: product.image_variants }] : []);
   const description = product.short_description || product.description;
 
   const crumbs = [
