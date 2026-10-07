@@ -53,7 +53,7 @@ export function UserAccountMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-border bg-background text-foreground shadow-lg">
           <div className="border-b border-border px-4 pb-3 pt-3">
             <p className="font-heading text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Account</p>
             <p className="mt-1 truncate text-xs font-medium text-foreground">{user?.name}</p>

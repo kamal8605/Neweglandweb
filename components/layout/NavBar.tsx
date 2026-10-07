@@ -62,7 +62,7 @@ export function NavBar() {
               {group.label}<ChevronDown size={12} />
             </button>
             {openMenu === group.label && (
-              <div className="absolute left-1/2 top-full w-[min(1120px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-b-lg border border-t-0 border-border bg-popover text-popover-foreground shadow-lg">
+              <div className="absolute left-1/2 top-full w-[min(1120px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-b-lg border border-t-0 border-border bg-background text-foreground shadow-lg">
                 <div className="grid grid-cols-[1fr_220px]">
                   <div className="p-6">
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
