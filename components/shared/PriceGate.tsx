@@ -16,7 +16,7 @@ export function PriceGate({ pricesVisible, children }: PriceGateProps) {
   if (!pricesVisible) {
     if (isAuthenticated && !isApproved) {
       return (
-        <span className="inline-flex items-center gap-1 font-mono text-[11px] text-brand-muted">
+        <span className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
           <Lock size={11} />
           Pending approval
         </span>
@@ -25,7 +25,7 @@ export function PriceGate({ pricesVisible, children }: PriceGateProps) {
     return (
       <Link
         href="/login"
-        className="inline-flex items-center gap-1 font-mono text-[11px] text-brand-blue hover:text-brand-blue-deep transition-colors no-underline"
+        className="inline-flex items-center gap-1 text-[11px] font-medium text-primary no-underline transition-colors hover:text-primary/80"
       >
         <Lock size={11} />
         Sign in to see prices

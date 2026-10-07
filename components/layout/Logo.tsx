@@ -16,7 +16,7 @@ export function Logo({ size = 48, loading = "lazy" }: LogoProps) {
     <Link
       href="/"
       aria-label={`${site.site_name || "Website"} home`}
-      className="relative block shrink-0 no-underline"
+      className="relative block shrink-0 rounded-md no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       style={{ width: size, height: size }}
     >
       <Image

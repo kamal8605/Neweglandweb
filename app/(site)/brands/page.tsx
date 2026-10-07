@@ -11,10 +11,10 @@ function Placeholder({ label }: { label: string }) {
     <div
       className="w-full h-full flex items-center justify-center"
       style={{
-        background: "repeating-linear-gradient(135deg, #E5DFD0 0 14px, #D9D3C5 14px 28px)",
+        background: "repeating-linear-gradient(135deg, var(--muted) 0 14px, var(--border) 14px 28px)",
       }}
     >
-      <span className="font-mono text-[10px] tracking-[0.08em] uppercase px-2 py-1 text-brand-muted bg-brand-bg/90 rounded-[2px]">
+      <span className="rounded-md bg-background/90 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </span>
     </div>
@@ -25,7 +25,7 @@ export default function BrandsPage() {
   const { data: brands, isLoading } = useBrands();
 
   return (
-    <div className="bg-brand-bg min-h-screen">
+    <div className="min-h-screen bg-muted/30">
       <PageHeader
         crumbs={[{ label: "Brands" }]}
         title="All Brands"
@@ -36,17 +36,17 @@ export default function BrandsPage() {
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-brand-white border border-brand-line animate-pulse">
-                <div className="aspect-[4/3] bg-brand-bg-alt" />
+              <div key={i} className="overflow-hidden rounded-lg border border-border bg-card shadow-sm animate-pulse">
+                <div className="aspect-[4/3] bg-muted" />
                 <div className="p-4 space-y-2">
-                  <div className="h-4 bg-brand-bg-alt rounded w-3/4" />
-                  <div className="h-3 bg-brand-bg-alt rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         ) : !brands?.length ? (
-          <div className="flex items-center justify-center h-40 font-mono text-[11px] text-brand-muted tracking-widest uppercase">
+          <div className="flex items-center justify-center h-40 text-[11px] font-medium text-muted-foreground tracking-widest uppercase">
             No brands found
           </div>
         ) : (
@@ -55,7 +55,7 @@ export default function BrandsPage() {
               <Link
                 key={brand.id}
                 href={`/brand/${brand.id}`}
-                className="bg-brand-white border border-brand-line hover:border-brand-blue transition-colors no-underline group block"
+                className="group block overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm no-underline transition-colors hover:border-primary/50"
               >
                 <div className="aspect-[4/3] relative overflow-hidden">
                   {brand.image ? (
@@ -72,25 +72,25 @@ export default function BrandsPage() {
                 </div>
                 <div className="px-4 pt-4 pb-5">
                   {brand.location && (
-                    <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-brand-muted mb-1">
+                    <div className="text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground mb-1">
                       {brand.location}
                     </div>
                   )}
-                  <div className="font-serif text-[20px] text-brand-ink font-normal leading-tight">
+                  <div className="text-[20px] text-foreground font-semibold leading-tight tracking-tight">
                     {brand.name}
                   </div>
                   {brand.description && (
-                    <p className="text-[12px] text-brand-muted leading-relaxed mt-1.5 line-clamp-2">
+                    <p className="text-[12px] text-muted-foreground leading-relaxed mt-1.5 line-clamp-2">
                       {brand.description}
                     </p>
                   )}
                   <div className="flex items-center justify-between mt-3">
                     {brand.products_count !== undefined && (
-                      <span className="font-mono text-[10px] tracking-[0.06em] uppercase text-brand-muted">
+                      <span className="text-[10px] font-medium tracking-[0.06em] uppercase text-muted-foreground">
                         {brand.products_count} SKUs
                       </span>
                     )}
-                    <ArrowRight size={14} className="text-brand-blue ml-auto" />
+                    <ArrowRight size={14} className="text-primary ml-auto" />
                   </div>
                 </div>
               </Link>

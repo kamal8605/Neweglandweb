@@ -16,17 +16,17 @@ export function QtyStepper({ value, onChange, min = 0, max, disabled = false }: 
   };
 
   return (
-    <div className="inline-flex border border-brand-line h-8 md:h-[26px] items-stretch rounded-[var(--brand-radius)] overflow-hidden">
+    <div className="inline-flex h-8 items-stretch overflow-hidden rounded-md border border-border bg-background shadow-xs md:h-[26px]">
       <button
         type="button"
         onClick={decrement}
         disabled={disabled || value <= min}
         aria-label="Decrease quantity"
-        className="w-8 md:w-[22px] flex items-center justify-center border-r border-brand-line text-brand-muted text-[13px] hover:bg-brand-bg-alt disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="flex w-8 items-center justify-center border-r border-border text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 md:w-[22px]"
       >
         −
       </button>
-      <span className="w-8 md:w-9 flex items-center justify-center font-mono text-[12px] text-brand-ink select-none">
+      <span className="flex w-8 select-none items-center justify-center font-mono text-[12px] text-foreground md:w-9">
         {value}
       </span>
       <button
@@ -34,7 +34,7 @@ export function QtyStepper({ value, onChange, min = 0, max, disabled = false }: 
         onClick={increment}
         disabled={disabled || (max !== undefined && value >= max)}
         aria-label="Increase quantity"
-        className="w-8 md:w-[22px] flex items-center justify-center border-l border-brand-line text-brand-ink text-[13px] bg-brand-bg-alt hover:bg-brand-line disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="flex w-8 items-center justify-center border-l border-border bg-muted text-[13px] text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 md:w-[22px]"
       >
         +
       </button>
