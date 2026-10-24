@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRequireAuth } from "@/components/auth/withAuth";
 import { PageHeader } from "@/components/shared/PageHeader";
 import api from "@/lib/axios";
+import { tokenStore } from "@/lib/authToken";
 
 export default function ChangePasswordPage() {
   const { isLoading } = useRequireAuth();
@@ -36,7 +37,7 @@ export default function ChangePasswordPage() {
         password: newPassword,
         password_confirmation: confirmPassword,
       });
-      if (res.data.access_token) localStorage.setItem("auth_token", res.data.access_token);
+      tokenStore.set(res.data.access_token);
       setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");

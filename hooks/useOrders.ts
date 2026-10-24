@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/axios";
+import { isValidOrderId, requestOrder } from "@/lib/orderId";
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentStatus = "due" | "paid" | "refunded";
@@ -98,10 +99,10 @@ export function useOrder(id: number | string) {
   const { user, isApproved } = useAuth();
   return useQuery<Order>({
     queryKey: ["order", user?.id, id],
+    // A malformed id (from the URL) never builds a request; the page then shows "Order not found".
     queryFn: () =>
-      api
-        .get<Record<string, unknown>>(`/orders/${id}`)
+      requestOrder((path) => api.get<Record<string, unknown>>(path), id)
         .then((r) => parseOrder(r.data)),
-    enabled: !!id && isApproved,
+    enabled: isValidOrderId(id) && isApproved,
   });
 }

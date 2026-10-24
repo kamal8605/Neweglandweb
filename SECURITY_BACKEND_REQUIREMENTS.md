@@ -11,7 +11,13 @@ The backend is not part of this repository. The following controls must be imple
 - Require CSRF protection for state-changing cookie-authenticated requests. `SameSite` is defense in depth, not a complete replacement.
 - Keep `/auth/login`, `/auth/refresh`, and `/auth/logout` rate-limited and return non-enumerating login errors.
 
-The frontend Axios client now sends credentials (`withCredentials: true`) so it is ready to receive secure cookies without another client transport change.
+Frontend behavior (`lib/axios.ts`, `lib/authToken.ts`):
+
+- Default (bearer mode): the access token is kept in `localStorage` and sent as `Authorization: Bearer …`; requests are sent without credentials (`withCredentials: false`).
+- `NEXT_PUBLIC_COOKIE_AUTH=true` (cookie mode): requests, including `/auth/refresh`, are sent with credentials (`withCredentials: true`). No token is written to or read from `localStorage` (a leftover one is removed), no `Authorization` header is sent, and any `access_token` the API still returns from login, refresh or password change is ignored.
+- The frontend does not implement CSRF tokens. If the API's CSRF scheme needs a request header (for example `X-XSRF-TOKEN`), the frontend must be extended for it before cookie mode is enabled.
+
+Setting the flag alone does not make cookie authentication secure: every control in this section must be implemented and tested in the API first.
 
 ## Authorization and IDOR prevention
 

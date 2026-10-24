@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { COOKIE_AUTH_ENABLED, tokenStore } from "@/lib/authToken";
 
 export interface User {
   id: number;
@@ -35,7 +36,6 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const COOKIE_AUTH_ENABLED = process.env.NEXT_PUBLIC_COOKIE_AUTH === "true";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // On mount: validate stored token by fetching current user
   useEffect(() => {
-    const stored = localStorage.getItem("auth_token");
+    const stored = tokenStore.get();
     if (!stored && !COOKIE_AUTH_ENABLED) {
       queueMicrotask(() => setIsLoading(false));
       return;
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(res.data);
       })
       .catch(() => {
-        localStorage.removeItem("auth_token");
+        tokenStore.clear();
         setToken(null);
       })
       .finally(() => setIsLoading(false));
@@ -80,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }>("/auth/login", { email, password });
     const { access_token, user: userData } = res.data;
     queryClient.clear();
-    if (access_token && !COOKIE_AUTH_ENABLED) localStorage.setItem("auth_token", access_token);
-    setToken(access_token ?? null);
+    tokenStore.set(access_token);
+    setToken(COOKIE_AUTH_ENABLED ? null : access_token ?? null);
     setUser(userData);
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["products"] }),
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore errors — clear local state regardless
     }
-    localStorage.removeItem("auth_token");
+    tokenStore.clear();
     setToken(null);
     setUser(null);
     queryClient.clear();
