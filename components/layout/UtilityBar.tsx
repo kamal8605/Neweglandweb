@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlistCount } from "@/hooks/useWishlist";
 import { UserAccountMenu } from "./UserAccountMenu";
 import { Logo } from "./Logo";
+import { GetAppButton } from "./AppDownload";
 import { useSiteConfig } from "@/context/SiteConfigContext";
 
 export function UtilityBar() {
@@ -41,6 +42,7 @@ export function UtilityBar() {
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
+            <GetAppButton />
             <Link href="/login" className="inline-flex min-h-10 items-center gap-2 rounded-md bg-primary px-5 text-xs font-semibold text-primary-foreground no-underline shadow-sm transition-colors hover:bg-primary/90">
               <UserRound size={15} /> {site.login_text}
             </Link>
@@ -85,6 +87,7 @@ export function UtilityBar() {
         )}
 
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
+          <GetAppButton />
           {isAuthenticated ? (
             <>
               <Link href="/wishlist" aria-label={`${wishlistCount} items in wishlist`} className="hidden min-h-12 flex-col items-center justify-center gap-1 rounded-md px-3 text-[10px] font-semibold uppercase text-muted-foreground no-underline transition-colors hover:bg-accent hover:text-accent-foreground sm:flex"><span className="relative"><Heart size={21} />{wishlistCount > 0 && <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">{wishlistCount}</span>}</span><span>Wishlist</span></Link>

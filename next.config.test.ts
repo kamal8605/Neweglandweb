@@ -50,6 +50,15 @@ describe("image allowlist (FE-SEC-009)", () => {
     }
   });
 
+  it("lifts the private-IP image guard only on the dev server or for a local API", () => {
+    expect(load(PHASE_DEVELOPMENT_SERVER, { NEXT_PUBLIC_API_URL: "http://127.0.0.1:8000" }).images?.dangerouslyAllowLocalIP).toBe(true);
+    expect(load(PHASE_PRODUCTION_BUILD, { NEXT_PUBLIC_API_URL: "http://localhost:8000" }).images?.dangerouslyAllowLocalIP).toBe(true);
+    for (const phase of [PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER]) {
+      expect(load(phase, { NEXT_PUBLIC_API_URL: PROD_API }).images?.dangerouslyAllowLocalIP).toBe(false);
+      expect(load(phase, {}).images?.dangerouslyAllowLocalIP).toBe(false);
+    }
+  });
+
   it("keeps the configured IMAGE_CDN_URL pattern", () => {
     const hosts = imageHosts(load(PHASE_PRODUCTION_BUILD, { NEXT_PUBLIC_API_URL: PROD_API, IMAGE_CDN_URL: "https://cdn.example.com/**" }));
     expect(hosts[0]).toBe("https://cdn.example.com/**");

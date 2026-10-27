@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { API_BASE, homepageApiPath, parseHomepagePayload } from "@/lib/homepage";
 
 export interface SiteSettings {
   site_name?: string;
@@ -24,6 +25,10 @@ export interface SiteSettings {
   footer_copyright?: string;
   footer_legal_notice?: string;
   business_hours_title?: string;
+  /** Always sent by current backends (null = not set). Undefined only from a backend that predates the setting. */
+  nicotine_warning?: string | null;
+  app_store_url?: string | null;
+  play_store_url?: string | null;
   nav_groups?: { label: string; keywords: string[]; url?: string }[];
   footer_columns?: { title: string; links: { label: string; url: string }[] }[];
   business_hours?: string[];
@@ -33,7 +38,8 @@ export interface HomepageItem {
   id: number;
   kind: "content" | "heading" | "slide" | "brand" | "catalog";
   title: string | null;
-  desktop_image_url: string;
+  /** null when the item has neither an uploaded image nor an external URL. */
+  desktop_image_url: string | null;
   mobile_image_url: string | null;
   pdf_url: string | null;
   alt_text: string;
@@ -84,13 +90,13 @@ export function SiteConfigProvider({ children, initialHomepage = null }: { child
 
   useEffect(() => {
     if (requestVersion === 0 && initialHomepage) return;
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
-    const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
     const controller = new AbortController();
-    fetch(`${apiUrl}/api/homepage?client=${encodeURIComponent(client)}`, { signal: controller.signal })
+    fetch(`${API_BASE}${homepageApiPath()}`, { headers: { Accept: "application/json" }, signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Homepage API returned ${response.status}`);
-        return response.json() as Promise<HomepagePayload>;
+        const payload = parseHomepagePayload(await response.json());
+        if (!payload) throw new Error("Homepage API returned an unexpected response");
+        return payload;
       })
       .then((payload) => setHomepage(payload))
       .catch((error: unknown) => {

@@ -29,8 +29,6 @@ interface SecurityEnv {
  * build whose API is itself on this machine); a production build pointed at the real API never fetches loopback URLs.
  */
 export function imageRemotePatterns(env: SecurityEnv, dev: boolean): URL[] {
-  const apiOrigin = httpOrigin(env.apiUrl);
-  const localApi = apiOrigin !== null && LOOPBACK_HOSTNAMES.has(new URL(apiOrigin).hostname);
   return [
     ...(env.imageCdnUrl ? [new URL(env.imageCdnUrl)] : []),
     new URL("https://c8.alamy.com/comp/**"),
@@ -40,10 +38,19 @@ export function imageRemotePatterns(env: SecurityEnv, dev: boolean): URL[] {
     new URL("https://hotpink-parrot-228156.hostingersite.com/api/media/**"),
     new URL("https://erp.centralsmokedistro.com/uploads/**"),
     new URL("https://nes-gateway.cloud.bbtl.app/storage/**"),
-    ...(dev || localApi
+    ...(allowLocalImages(env, dev)
       ? [new URL("http://127.0.0.1:8000/storage/**"), new URL("http://localhost:8000/storage/**")]
       : []),
   ];
+}
+
+/**
+ * Next 16 refuses to optimize images whose host resolves to a private IP (SSRF guard). Lift it only where the loopback
+ * storage hosts above are allowed; production against the real API keeps the guard on.
+ */
+export function allowLocalImages(env: SecurityEnv, dev: boolean): boolean {
+  const apiOrigin = httpOrigin(env.apiUrl);
+  return dev || (apiOrigin !== null && LOOPBACK_HOSTNAMES.has(new URL(apiOrigin).hostname));
 }
 
 /**
@@ -101,6 +108,7 @@ export default function nextConfig(phase: string): NextConfig {
     },
     images: {
       remotePatterns: imageRemotePatterns(env, dev),
+      dangerouslyAllowLocalIP: allowLocalImages(env, dev),
       qualities: [75],
     },
     async headers() {

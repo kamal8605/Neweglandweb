@@ -3,8 +3,9 @@
  * Catalogue responses fetched here are public and cached by Next for `revalidate` seconds.
  */
 import type { HomepagePayload } from "@/context/SiteConfigContext";
+import { API_BASE, homepageApiPath, parseHomepagePayload } from "@/lib/homepage";
 
-export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "") + "/api";
+export { API_BASE };
 
 /**
  * Public origin of the storefront, used for canonical URLs, sitemaps and Open Graph.
@@ -63,8 +64,7 @@ export interface PublicSiteSettings {
  * header, footer and homepage render in the initial HTML; Next dedupes this request within one render.
  */
 export async function getHomepagePayload(): Promise<HomepagePayload | null> {
-  const client = process.env.NEXT_PUBLIC_HOMEPAGE_CLIENT || "new-england";
-  return fetchApi<HomepagePayload>(`/homepage?client=${encodeURIComponent(client)}`);
+  return parseHomepagePayload(await fetchApi<unknown>(homepageApiPath()));
 }
 
 export async function getSiteSettings(): Promise<PublicSiteSettings> {

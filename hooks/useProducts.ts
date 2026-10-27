@@ -5,11 +5,13 @@ import type { ImageVariants } from "@/lib/imageVariants";
 export interface Product {
   id: number;
   name: string;
+  slug?: string;
   sku: string;
   /** Nested brand object as returned by the API */
   brand?: { id: number; name: string; slug: string } | null;
   /** Nested category object as returned by the API */
   category?: { id: number; name: string; slug: string } | null;
+  sub_category?: { id: number; name: string; slug: string } | null;
   current_price: number | null;
   sale_price: number | null;
   regular_price: number | null;
@@ -69,8 +71,9 @@ function normalizeProduct(p: Product): Product {
   };
 }
 
-export function useProducts(params: ProductsParams = {}) {
+export function useProducts(params: ProductsParams = {}, { enabled = true }: { enabled?: boolean } = {}) {
   return useQuery<ProductsResponse>({
+    enabled,
     queryKey: ["products", params],
     queryFn: () =>
       api

@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- managed image URLs are runtime values and include responsive picture sources */
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import dynamic from "next/dynamic";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
@@ -11,6 +11,15 @@ import { useCart } from "@/context/CartContext";
 import { useProducts, type Product } from "@/hooks/useProducts";
 import { imageVariant } from "@/lib/imageVariants";
 import { useSiteConfig, type HomepageItem, type HomepageSection } from "@/context/SiteConfigContext";
+import { MobileAppButton } from "@/components/layout/AppDownload";
+import { BackToTop } from "@/components/layout/BackToTop";
+import api from "@/lib/axios";
+import { productRowBadge } from "@/lib/homepage";
+import { subscribeToNewsletter, type NewsletterResult } from "@/lib/newsletter";
+
+type ImageItem = HomepageItem & { desktop_image_url: string };
+/** Items without an image (the API sends null) cannot be drawn and are skipped. */
+const hasImage = (item: HomepageItem): item is ImageItem => typeof item.desktop_image_url === "string" && item.desktop_image_url !== "";
 
 const CatalogFlipbook = dynamic(() => import("@/components/catalog/CatalogFlipbook"), { ssr: false });
 
@@ -55,7 +64,7 @@ function subscribeWindowLoad(onChange: () => void) {
 }
 
 function HeroCarousel({ section }: { section: HomepageSection }) {
-  const slides = section.items.filter((item) => item.kind === "slide" && item.desktop_image_url);
+  const slides = section.items.filter(hasImage).filter((item) => item.kind === "slide");
   const carouselSlides = slides.map((item) => ({ image: item.desktop_image_url, mobileImage: item.mobile_image_url, alt: item.alt_text, href: item.link_url }));
   // Without dedicated mobile art, keep the banner's own ratio so its text isn't cropped off on phones.
   const hasMobileArt = carouselSlides.length > 0 && carouselSlides.every((slide) => slide.mobileImage);
@@ -108,7 +117,7 @@ function HeroCarousel({ section }: { section: HomepageSection }) {
   );
 }
 
-function ImageHeading({ image, title }: { image?: string; title: string }) {
+function ImageHeading({ image, title }: { image?: string | null; title: string }) {
   if (!image) return <h2 className="sr-only">{title}</h2>;
   // The art is a 32:1 strip with the title centred in ~30% of its width. A fixed height per breakpoint keeps the
   // title fully inside the viewport on phones/tablets (object-cover crops only the decorative sides).
@@ -118,7 +127,7 @@ function ImageHeading({ image, title }: { image?: string; title: string }) {
 
 function CategoryGrid({ section }: { section: HomepageSection }) {
   const headingImage = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
-  const categories = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).map((item) => ({ key: String(item.id), name: item.title || item.alt_text, alt: item.alt_text, image: item.desktop_image_url, href: item.link_url }));
+  const categories = section.items.filter(hasImage).filter((item) => item.kind === "content").map((item) => ({ key: String(item.id), name: item.title || item.alt_text, alt: item.alt_text, image: item.desktop_image_url, href: item.link_url }));
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const scrollToPhysicalIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
@@ -141,17 +150,22 @@ function CategoryGrid({ section }: { section: HomepageSection }) {
       return next;
     });
   }, [categories.length, scrollToPhysicalIndex]);
+  // Autoplay pauses while the pointer or keyboard focus is inside the carousel.
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
-    if (categories.length <= 7) return;    const timer = window.setInterval(() => move(1), 5000);
+    if (categories.length <= 7 || paused) return;
+    const timer = window.setInterval(() => move(1), 5000);
     return () => window.clearInterval(timer);
-  }, [categories.length, move]);
+  }, [categories.length, move, paused]);
   if (!categories.length) return null;
   const hasCarousel = categories.length > 7;
-  return <section className="bg-background pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10"><div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden rounded-md bg-muted"><Image src={category.image} alt={category.alt} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start rounded-lg border border-border bg-card p-2 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-primary ${index === active ? "w-6 bg-primary" : "w-1.5 bg-border"}`} /></button>)}</div>}</section>;
+  const arrowClass = "absolute top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-border bg-card/95 text-foreground shadow-md transition hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary";
+  return <section className="bg-background pb-8"><ImageHeading image={headingImage} title={section.title} /><div className="relative mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-10" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>{hasCarousel && <><button type="button" onClick={() => move(-1)} aria-label="Previous categories" className={`${arrowClass} left-1`}><ChevronLeft size={22} /></button><button type="button" onClick={() => move(1)} aria-label="Next categories" className={`${arrowClass} right-1`}><ChevronRight size={22} /></button></>}<div ref={trackRef} className="category-track flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1">{categories.map((category) => { const image = <div className="relative aspect-square overflow-hidden rounded-md bg-muted"><Image src={category.image} alt={category.alt} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 15vw" className="object-cover transition duration-300 group-hover:scale-105" /></div>; const className = "group w-[calc((100%-12px)/2)] shrink-0 snap-start rounded-lg border border-border bg-card p-2 no-underline shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)] xl:w-[calc((100%-72px)/7)]"; return category.href ? <Link key={category.key} href={category.href} aria-label={category.name || undefined} className={className}>{image}</Link> : <div key={category.key} className={className}>{image}</div>; })}</div></div>{hasCarousel && <div className="mt-2 flex flex-wrap justify-center">{categories.map((category, index) => <button key={category.key} type="button" onClick={() => goToCategory(index)} aria-label={`Show category ${index + 1}`} aria-current={index === active ? "true" : undefined} className="group grid min-h-6 min-w-6 place-items-center px-0.5">{/* small dot, 24px tap area */}<span className={`block h-1.5 rounded-full transition-all group-hover:bg-primary ${index === active ? "w-6 bg-primary" : "w-1.5 bg-border"}`} /></button>)}</div>}</section>;
 }
 
 function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
   const banners = sections.flatMap((section) => section.items
+    .filter(hasImage)
     .filter((item) => item.kind !== "heading")
     .map((item) => ({ ...item, sectionTitle: section.title })));
   if (banners.length === 0) return null;
@@ -173,7 +187,7 @@ function ManagedBanners({ sections }: { sections: HomepageSection[] }) {
 
 const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, badge }: { product: Product; badge?: string }) {
   const { isAuthenticated, isApproved } = useAuth();
   const { addItem } = useCart();
   const image = product.image ?? product.images?.find((item) => item.is_primary)?.url;
@@ -188,15 +202,19 @@ function ProductCard({ product }: { product: Product }) {
     <article className="product-card relative min-h-[390px] rounded-lg border border-border bg-card shadow-sm">
       <div className="group relative z-0 flex min-h-[390px] flex-col rounded-lg bg-card px-3 pb-4 pt-4 transition-all duration-200 hover:z-10 hover:-translate-y-0.5 hover:shadow-md 2xl:px-4">
         <Link href={`/product/${product.id}`} className="no-underline">
-          <div className="mb-2 min-h-[30px] text-[11px] font-medium uppercase leading-tight text-muted-foreground 2xl:min-h-[34px] 2xl:text-[12px]">{product.category?.name ?? "Wholesale"}</div>
+          <div className="mb-2 min-h-[30px] text-[11px] font-medium uppercase leading-tight text-muted-foreground 2xl:min-h-[34px] 2xl:text-[12px]">{product.category?.name}</div>
           <h3 title={product.name} className="line-clamp-4 h-[4.72em] text-[13px] font-semibold uppercase leading-[1.18] text-foreground transition-colors group-hover:text-primary sm:text-[14px] xl:text-[12.5px] 2xl:text-[15px]">{product.name}</h3>
+          {product.sku && <p className="mt-1 truncate text-[11px] text-muted-foreground">SKU: {product.sku}</p>}
         </Link>
         <Link href={`/product/${product.id}`} className="relative mt-2 block h-[185px] overflow-hidden rounded-md bg-card" aria-label={`View ${product.name}`}>
           {image ? <Image src={imageVariant(image, product.image ? product.image_variants : null, 512)!} alt={product.name} fill sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 15vw" className="object-contain" /> : <div className="grid h-full place-items-center bg-muted text-xs font-bold uppercase text-foreground/70">Product image</div>}
         </Link>
         <div className="mt-auto flex min-h-[70px] items-end justify-between gap-3 border-b border-transparent pb-3 pt-4 transition-colors group-hover:border-brand-line">
           {!isAuthenticated ? (
-            <Link href="/login" className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-primary px-4 py-2.5 text-[14px] font-semibold text-primary-foreground no-underline shadow-sm transition hover:bg-primary/90">Login to Buy</Link>
+            <div className="flex w-full flex-col gap-2">
+              <span className="text-[12px] font-medium text-muted-foreground">Login to see prices</span>
+              <Link href="/login" className="inline-flex min-h-11 w-full items-center justify-center rounded-md bg-primary px-4 py-2.5 text-[14px] font-semibold text-primary-foreground no-underline shadow-sm transition hover:bg-primary/90">Login to Buy</Link>
+            </div>
           ) : !canShowPrice ? (
             <span className="inline-flex min-h-11 w-full items-center justify-center bg-brand-bg-alt px-4 py-2.5 text-center text-[12px] font-bold uppercase text-brand-muted">Pending Price Approval</span>
           ) : (
@@ -206,22 +224,33 @@ function ProductCard({ product }: { product: Product }) {
             </>
           )}
         </div>
-        {!product.in_stock && <span className="absolute left-2 top-2 rounded-md bg-destructive px-2 py-1 text-[13px] font-bold text-white shadow-sm">Sold Out</span>}
+        {(badge || !product.in_stock) && (
+          <div className="pointer-events-none absolute right-2 top-2 flex flex-col items-end gap-1">
+            {badge && <span className="rounded-sm bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">{badge}</span>}
+            {!product.in_stock && <span className="rounded-sm bg-destructive px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">Out of Stock</span>}
+          </div>
+        )}
       </div>
     </article>
   );
 }
 
-function ProductSection({ section, products, placeholders = 0 }: { section: HomepageSection; products: Product[]; placeholders?: number }) {
+type ProductsStatus = "loading" | "error" | "ready";
+
+function ProductSection({ section, products, status, expected, onRetry }: { section: HomepageSection; products: Product[]; status: ProductsStatus; expected: number; onRetry: () => void }) {
   const art = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
-  const promos = section.items.filter((item) => item.kind === "content" && item.desktop_image_url).slice(0, 2);
+  const promos = section.items.filter(hasImage).filter((item) => item.kind === "content");
+  const badge = productRowBadge(section) ?? undefined;
+  const notice = "flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/40 px-4 py-8 text-center text-sm text-muted-foreground";
   return (
     <section className="bg-background">
       <ImageHeading image={art} title={section.title} />
       <div className="mx-auto grid max-w-[1513px] grid-cols-2 gap-3 px-3 pb-4 md:grid-cols-3 md:px-6 lg:grid-cols-4 xl:grid-cols-7">
-        {products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} />)}
+        {status === "ready" && products.map((product) => <ProductCard key={`${section.id}-${product.id}`} product={product} badge={badge} />)}
         {/* Same height as a card while the products load, so the sections below don't jump. */}
-        {products.length === 0 && Array.from({ length: placeholders }, (_, index) => <div key={index} aria-hidden="true" className="min-h-[390px] animate-pulse rounded-lg border border-border bg-muted" />)}
+        {status === "loading" && Array.from({ length: expected }, (_, index) => <div key={index} aria-hidden="true" className="min-h-[390px] animate-pulse rounded-lg border border-border bg-muted" />)}
+        {status === "error" && <div role="alert" className={`col-span-full ${notice}`}><span>These products could not be loaded.</span><button type="button" onClick={onRetry} className="min-h-11 rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">Try again</button></div>}
+        {status === "ready" && products.length === 0 && <p className={`col-span-full ${notice}`}>No products to show here right now.</p>}
       </div>
       {promos.length > 0 && (
         <div className="mx-auto grid w-full max-w-[1513px] grid-cols-1 gap-3 bg-background px-3 py-4 md:grid-cols-2 md:px-6">
@@ -237,7 +266,7 @@ function ProductSection({ section, products, placeholders = 0 }: { section: Home
 
 function BrandStrip({ section }: { section: HomepageSection }) {
   const headingImage = section.items.find((item) => item.kind === "heading")?.desktop_image_url;
-  const brandImages = section.items.filter((item) => item.kind === "brand" && item.desktop_image_url).slice(0, 14);
+  const brandImages = section.items.filter(hasImage).filter((item) => item.kind === "brand");
   if (brandImages.length === 0) return null;
   return (
     <section className="bg-background pb-10">
@@ -263,7 +292,7 @@ function tileBackground(src: string, size: number) {
 }
 
 function CatalogSection({ section, backgroundImage }: { section: HomepageSection; backgroundImage?: string | null }) {
-  const catalogs = section.items.filter((item) => item.kind === "catalog" && item.desktop_image_url && item.pdf_url);
+  const catalogs = section.items.filter(hasImage).filter((item) => item.kind === "catalog" && item.pdf_url);
   const phrases = useMemo(() => Array.isArray(section.settings.heading_phrases) ? section.settings.heading_phrases.filter((value): value is string => typeof value === "string" && value.trim().length > 0) : [], [section.settings.heading_phrases]);
   const [wordIndex, setWordIndex] = useState(0);
   const [typedText, setTypedText] = useState("");
@@ -322,7 +351,16 @@ function CatalogSection({ section, backgroundImage }: { section: HomepageSection
 }
 
 function NewsletterSection({ title, placeholder, buttonText }: { title?: string; placeholder?: string; buttonText?: string }) {
+  const [status, setStatus] = useState<{ sending: boolean; result: NewsletterResult | null }>({ sending: false, result: null });
   if (!title) return null;
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setStatus({ sending: true, result: null });
+    const result = await subscribeToNewsletter((path, body) => api.post(path, body), String(form.get("email") ?? ""), String(form.get("website") ?? ""));
+    setStatus({ sending: false, result });
+    if (result.ok) (event.target as HTMLFormElement).reset();
+  }
   return (
     <section className="border-y border-border bg-muted px-5 py-5 md:px-10">
       <div className="mx-auto flex max-w-[1513px] flex-col items-center gap-4 md:flex-row md:justify-between md:gap-10">
@@ -330,17 +368,22 @@ function NewsletterSection({ title, placeholder, buttonText }: { title?: string;
           <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary"><Send size={19} strokeWidth={2} /></span>
           <h2 className="text-base font-bold md:text-lg">{title}</h2>
         </div>
-        <form className="flex min-h-14 w-full max-w-2xl overflow-hidden rounded-lg border border-input bg-card shadow-sm transition focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/30" onSubmit={(event) => event.preventDefault()}>
-          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
-          <input id="newsletter-email" name="email" type="email" required placeholder={placeholder} className="min-w-0 flex-1 bg-card px-7 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground" />
-          <button type="submit" className="min-w-28 shrink-0 bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">{buttonText}</button>
-        </form>
+        <div className="w-full max-w-2xl">
+          <form className="flex min-h-14 w-full overflow-hidden rounded-lg border border-input bg-card shadow-sm transition focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/30" onSubmit={submit}>
+            <label htmlFor="newsletter-email" className="sr-only">Email address</label>
+            <input id="newsletter-email" name="email" type="email" required maxLength={255} autoComplete="email" placeholder={placeholder} className="min-w-0 flex-1 bg-card px-7 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground" />
+            {/* Honeypot: hidden from people, often filled in by bots. */}
+            <input name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
+            <button type="submit" disabled={status.sending} className="min-w-28 shrink-0 bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-70">{buttonText}</button>
+          </form>
+          <p role="status" aria-live="polite" className={`mt-2 min-h-5 text-sm ${status.result?.ok === false ? "text-destructive" : "text-muted-foreground"}`}>{status.result?.message}</p>
+        </div>
       </div>
     </section>
   );
 }
 
-function ManagedSection({ section, products, productsLoading, catalogBackground }: { section: HomepageSection; products: Product[]; productsLoading: boolean; catalogBackground?: string | null }) {
+function ManagedSection({ section, products, productsStatus, onRetryProducts, catalogBackground }: { section: HomepageSection; products: Product[]; productsStatus: ProductsStatus; onRetryProducts: () => void; catalogBackground?: string | null }) {
   switch (section.type) {
     case "hero":
       return <HeroCarousel section={section} />;
@@ -349,11 +392,11 @@ function ManagedSection({ section, products, productsLoading, catalogBackground 
     case "featured_category":
       return <CategoryGrid section={section} />;
     case "product_carousel": {
+      // The API already applies the section's limit and drops inactive products (HomepageController::resolveProductCarousel).
       const ids = section.data?.product_ids ?? [];
       const byId = new Map(products.map((product) => [product.id, product]));
       const selected = ids.map((id) => byId.get(id)).filter((product): product is Product => Boolean(product));
-      const limit = typeof section.settings.limit === "number" ? section.settings.limit : 14;
-      return <ProductSection section={section} products={selected.slice(0, limit)} placeholders={productsLoading ? Math.min(ids.length, limit) : 0} />;
+      return <ProductSection section={section} products={selected} status={ids.length === 0 ? "ready" : productsStatus} expected={ids.length} onRetry={onRetryProducts} />;
     }
     case "brand_showcase":
       return <BrandStrip section={section} />;
@@ -368,16 +411,22 @@ export default function HomePage() {
   const { homepage, site, loaded: homepageLoaded, error, reload } = useSiteConfig();
   const sections = useMemo(() => homepage?.sections ?? [], [homepage]);
   const selectedProductIds = useMemo(() => Array.from(new Set(sections.flatMap((section) => section.type === "product_carousel" ? section.data?.product_ids ?? [] : []))), [sections]);
-  const { data } = useProducts({ ids: selectedProductIds, per_page: Math.max(selectedProductIds.length, 1) });
+  // One /products?ids=… request for every product row; skipped when no row has products configured.
+  const { data, isError, refetch } = useProducts({ ids: selectedProductIds, per_page: Math.max(selectedProductIds.length, 1) }, { enabled: selectedProductIds.length > 0 });
   const products = data?.data ?? [];
-  const productsLoading = data === undefined && selectedProductIds.length > 0;
+  const productsStatus: ProductsStatus = data ? "ready" : isError ? "error" : "loading";
+  const retryProducts = useCallback(() => { void refetch(); }, [refetch]);
   return (
     <main className="bg-background">
       {site.homepage_heading && <h1 className="sr-only">{site.homepage_heading}</h1>}
       {!homepageLoaded && <div className="h-48 animate-pulse bg-brand-bg-alt" aria-label="Loading homepage" />}
       {homepageLoaded && error && <section className="grid min-h-[420px] place-items-center bg-muted px-5 py-16"><div className="max-w-lg rounded-xl border border-border bg-card p-8 text-center shadow-sm"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-destructive">Connection unavailable</p><h1 className="mt-3 text-2xl font-semibold text-foreground">Storefront content could not be loaded</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Please check the configured API URL or try again in a moment.</p><button type="button" onClick={reload} className="mt-6 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">Try again</button></div></section>}
-      {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} productsLoading={productsLoading} catalogBackground={site.catalog_background_logo_url} />)}
+      {homepageLoaded && !error && sections.length === 0 && <section className="grid min-h-[320px] place-items-center bg-muted px-5 py-16 text-center"><p className="max-w-md text-sm leading-6 text-muted-foreground">The storefront is being updated. Please check back shortly, or browse the <Link href="/shop" className="font-semibold text-primary">full catalog</Link>.</p></section>}
+      {sections.map((section) => <ManagedSection key={section.id} section={section} products={products} productsStatus={productsStatus} onRetryProducts={retryProducts} catalogBackground={site.catalog_background_logo_url} />)}
       {site.newsletter_enabled && <NewsletterSection title={site.newsletter_title} placeholder={site.newsletter_placeholder} buttonText={site.newsletter_button_text} />}
+      {/* Homepage only: other pages (product detail) have their own fixed bottom bar. */}
+      <MobileAppButton />
+      <BackToTop />
     </main>
   );
 }

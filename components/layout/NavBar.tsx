@@ -4,19 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useCategories, type Category } from "@/hooks/useCategories";
+import { useCategories } from "@/hooks/useCategories";
 import { useSiteConfig } from "@/context/SiteConfigContext";
-
-function matches(category: Category, keywords: readonly string[]) {
-  const value = `${category.name} ${category.slug}`.toLowerCase();
-  return keywords.some((keyword) => value.includes(keyword));
-}
-function categoryItems(category: Category) {
-  return category.children && category.children.length > 0 ? category.children : [category];
-}
+import { buildNavGroups } from "@/lib/navGroups";
 
 export function NavBar() {
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], isPending: categoriesLoading, isError: categoriesFailed } = useCategories();
   const { site } = useSiteConfig();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,20 +29,7 @@ export function NavBar() {
     };
   }, [mobileOpen]);
 
-  const groups = useMemo(
-    () =>
-      (site.nav_groups ?? []).map((group, index) => {
-        const matched = categories.filter((category) => matches(category, group.keywords));
-        const fallback = categories[index] ? [categories[index]] : [];
-        const roots = matched.length > 0 ? matched : fallback;
-        return {
-          ...group,
-          items: roots.flatMap(categoryItems).slice(0, 18),
-          href: group.url || (roots[0] ? `/category/${roots[0].id}` : "/shop"),
-        };
-      }),
-    [categories, site.nav_groups]
-  );
+  const groups = useMemo(() => buildNavGroups(site.nav_groups ?? [], categories), [categories, site.nav_groups]);
 
   const activeMobileGroup = groups.find((group) => group.label === mobileSection);
 
@@ -77,7 +57,7 @@ export function NavBar() {
                           </span>
                           <span>{category.name}</span>
                         </Link>
-                      )) : <p className="col-span-3 py-8 text-sm text-muted-foreground">Categories are loading…</p>}
+                      )) : <p className="col-span-3 py-8 text-sm text-muted-foreground">{categoriesLoading ? "Categories are loading…" : categoriesFailed ? "Categories could not be loaded. Use “View all” to browse." : "Browse everything in this department with “View all”."}</p>}
                     </div>
                   </div>
                   <Link href={group.href} onClick={() => setOpenMenu(null)} className="flex flex-col justify-end border-l border-border bg-muted p-6 no-underline transition-colors hover:bg-accent">

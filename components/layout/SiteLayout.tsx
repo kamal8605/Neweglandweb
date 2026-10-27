@@ -2,12 +2,14 @@ import { type ReactNode } from "react";
 import { UtilityBar } from "./UtilityBar";
 import { NavBar } from "./NavBar";
 import { Footer } from "./Footer";
+import { NicotineWarning } from "./NicotineWarning";
 
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
      
+      <NicotineWarning />
       <UtilityBar />
       <NavBar />
       {/* At least one screen tall: pages that load their content on the client would otherwise show the footer
