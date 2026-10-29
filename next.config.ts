@@ -39,7 +39,13 @@ export function imageRemotePatterns(env: SecurityEnv, dev: boolean): URL[] {
     new URL("https://erp.centralsmokedistro.com/uploads/**"),
     new URL("https://nes-gateway.cloud.bbtl.app/storage/**"),
     ...(allowLocalImages(env, dev)
-      ? [new URL("http://127.0.0.1:8000/storage/**"), new URL("http://localhost:8000/storage/**")]
+      ? [
+          new URL("http://127.0.0.1:8000/storage/**"),
+          new URL("http://localhost:8000/storage/**"),
+          // WebP product image variants (see lib/imageVariants.ts), served by a local Gateway at /api/media
+          new URL("http://127.0.0.1:8000/api/media/**"),
+          new URL("http://localhost:8000/api/media/**"),
+        ]
       : []),
   ];
 }

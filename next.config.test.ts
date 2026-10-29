@@ -46,7 +46,14 @@ describe("image allowlist (FE-SEC-009)", () => {
       load(PHASE_DEVELOPMENT_SERVER, { NEXT_PUBLIC_API_URL: PROD_API }),
       load(PHASE_PRODUCTION_BUILD, { NEXT_PUBLIC_API_URL: "http://localhost:8000" }),
     ]) {
-      expect(imageHosts(config)).toEqual(expect.arrayContaining(["http://127.0.0.1:8000/storage/**", "http://localhost:8000/storage/**"]));
+      expect(imageHosts(config)).toEqual(
+        expect.arrayContaining([
+          "http://127.0.0.1:8000/storage/**",
+          "http://localhost:8000/storage/**",
+          "http://127.0.0.1:8000/api/media/**",
+          "http://localhost:8000/api/media/**",
+        ]),
+      );
     }
   });
 
