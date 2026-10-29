@@ -190,7 +190,7 @@ Checkbox · Image · SKU · Product name (+ SALE badge) · Brand · Price (strik
    - Response interceptor: on 401, call `/auth/refresh`, update token, retry once. On retry failure, clear token + redirect to `/login`
 
 8. Create `src/lib/queryClient.js`:
-   - Export a shared `QueryClient` with sensible defaults (staleTime: 5 min for catalogue)
+   - Export `getQueryClient()` with sensible defaults (staleTime: 5 min for catalogue): a new client per server render (never share a query cache between requests), one client per browser tab
 
 9. Create theme toggle utility:
    - `src/lib/theme.js` — `getTheme()`, `setTheme(name)` (reads/writes `data-theme` on `<html>` + persists to localStorage)

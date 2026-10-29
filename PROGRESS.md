@@ -67,7 +67,9 @@
    - Response interceptor: on 401, attempts token refresh once; on failure, clears token and redirects to `/login`
    - Queues concurrent requests during refresh (single refresh promise)
 
-7. **`lib/queryClient.ts`** — Shared TanStack QueryClient
+7. **`lib/queryClient.ts`** — TanStack QueryClient factory (`getQueryClient()`)
+   - Server: a new client per render, so no query cache is shared between requests or users
+   - Browser: one client per tab, so cached queries survive client-side navigation
    - `staleTime: 5min` for catalogue data
    - `retry: 1`, `refetchOnWindowFocus: false`
 
@@ -90,7 +92,7 @@
 - [x] Both Forge and Pallet themes defined via `data-theme` selectors
 - [x] Brand Tailwind color tokens mapped (`bg-brand-bg`, `text-brand-ink`, etc.)
 - [x] Axios instance exports correctly with interceptors
-- [x] QueryClient exported with staleTime defaults
+- [x] QueryClient factory exported with staleTime defaults (per-request on the server)
 - [x] Theme utility reads/writes localStorage and `data-theme`
 - [ ] `npm run dev` verified (pending Phase 2 layout shell before smoke-test)
 
@@ -550,3 +552,28 @@ All 15 phases built. Full user journeys supported:
 - Register: form validation, success state, pending approval message
 - Approved user: prices visible, add to cart, grouped product variants, wishlist, cart → checkout → order confirmation
 - Order history with status tracker and line item detail
+
+---
+
+## Security release — FE-SEC-001, 005–009 ✅
+
+**Released:** 2026-10-24 · commit `44a242801ae731a725e89f26085f8baf1e21169b` (on top of `675529a`, Next.js 16.4.2 / sharp 0.35.5) · Vercel production deployment `7302459414` (previous: `94eb944`).
+
+### What changed
+
+- Order ids from the URL are validated (`lib/orderId.ts`); malformed `/orders/[id]` links return HTTP 404 and never reach the API.
+- All token storage goes through `lib/authToken.ts`; cookie mode (`NEXT_PUBLIC_COOKIE_AUTH=true`) stores, reads and sends no bearer token. Cookie mode stays **off** until the API supports it (`SECURITY_BACKEND_REQUIREMENTS.md`).
+- Security headers and CSP come from `next.config.ts` (single source); `connect-src` is this site plus the API origin.
+- `getQueryClient()` creates a QueryClient per server render and one per browser tab.
+- Loopback image hosts are allowed only on the dev server or for a build against a local API.
+
+### Verification
+
+- Before release: Vitest 103/103, ESLint, `tsc --noEmit`, `git diff --check`, `next build` (28/28 pages).
+- After release, on the production domain: expected CSP and security headers present (one CSP header); malformed order ids return 404; public, product, category and brand pages render; `next/image` and catalog PDF requests succeed; the compiled bundle targets the production API and has cookie mode off.
+- Not yet verified: browser console and signed-in flows (login, refresh, cart, wishlist, checkout up to placing an order). See `RELEASE_CHECKLIST.md` §2.
+
+### Follow-ups
+
+- Backend: email change without re-authentication; no cookie/CSRF support; production refresh-token lifetime (`SECURITY_BACKEND_REQUIREMENTS.md`).
+- Dependencies: `follow-redirects` 1.16.0 (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c) and `source-map-js` 1.2.1 (GHSA-68fv-2mgg-jv7q). Lockfile-only update prepared separately (`chore/deps-advisories`); not yet released.

@@ -32,3 +32,10 @@ Every endpoint must authorize the authenticated user on the server, independent 
 - Verify that selected billing/shipping addresses belong to the authenticated account.
 
 Add automated tests that attempt cross-account reads and mutations for every resource above and assert `403` or `404`.
+
+## Open backend follow-ups (reviewed 24 Oct 2026, API repository at `5f89f20`)
+
+- **Email change without re-authentication:** `PATCH /users/{id}` accepts a new `email` without `current_password`. Require the current password (as `PATCH /users/me/password` already does) and notify the old address, so a stolen token cannot be turned into an account takeover through the password-reset flow.
+- **Cookie authentication is not supported:** the API's CORS configuration has `supports_credentials => false` and login/refresh return bearer tokens. Keep `NEXT_PUBLIC_COOKIE_AUTH` unset or `false` until every control in "Session cookies" is implemented.
+- **Refresh-token lifetime:** `JWT_REFRESH_TTL` defaults to 14 days (from the original login, not sliding). Confirm the production value is as short as the business allows.
+- Already in place: named rate limits on login, refresh, registration, password reset and password change (observed live: `X-RateLimit-Limit` on `/api/auth/refresh`), and per-user scoping of cart, wishlist, address and order queries (code review; add the cross-account tests above).
