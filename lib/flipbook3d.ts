@@ -260,6 +260,7 @@ export function mountFlipbook(host: HTMLElement, pdfUrl: string, options: { redu
   host.appendChild(node);
 
   let scene: FlipbookScene | null = null;
+  let readyAt = 0;
   let closed = false;
   // The engine reports a PDF that fails to load as a message inside its own view; watch for it until the book is ready.
   const errorWatch = window.setInterval(() => {
@@ -273,10 +274,11 @@ export function mountFlipbook(host: HTMLElement, pdfUrl: string, options: { redu
     if (closed) {
       readyHandlers.delete(node);
       // The engine still has work queued for this scene after the ready callback; dispose once it has run.
-      window.setTimeout(() => disposeScene(ready), 0);
+      window.setTimeout(() => disposeScene(ready), SCENE_SETTLE_MS);
       return;
     }
     scene = ready;
+    readyAt = Date.now();
     options.onReady?.();
   });
   locale.render();
@@ -285,12 +287,20 @@ export function mountFlipbook(host: HTMLElement, pdfUrl: string, options: { redu
     closed = true;
     window.clearInterval(errorWatch);
     if (scene) {
+      const settled = scene;
       readyHandlers.delete(node);
-      disposeScene(scene);
+      window.setTimeout(() => disposeScene(settled), Math.max(0, readyAt + SCENE_SETTLE_MS - Date.now()));
     }
     node.remove();
   };
 }
+
+/**
+ * A new book schedules its own first animation 100 ms after it is created (client.min.js Book init:
+ * setTimeout(notifyBeforeAnimation, 100)), which reads the book's materials. Disposing before that timer runs made it
+ * throw "undefined is not iterable" in Book.setVisualMode, so a scene is never disposed sooner than this after ready.
+ */
+const SCENE_SETTLE_MS = 250;
 
 function disposeScene(scene: FlipbookScene) {
   try {
