@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { FLIPBOOK_BASE, buildClientLocale, firstPageRenders, initSkin, paintedRatio, pdfJsFiles, shouldUseStablePdfJs } from "./flipbook3d";
+import { FLIPBOOK_BASE, PAGE_CHECK_TIMEOUT_MS, buildClientLocale, firstPageRenders, initSkin, paintedRatio, pdfJsFiles, shouldUseStablePdfJs } from "./flipbook3d";
 
 const locale = buildClientLocale("https://shop.example", { html: "<div class=\"main\"></div>", styles: ["/*fa*/", "/*skin*/"] });
 
@@ -73,6 +73,22 @@ describe("first-page check (PDFs the engine's pdf.js cannot draw)", () => {
       setTimeout, clearTimeout,
     });
     await expect(firstPageRenders("https://api.example/catalog.pdf")).resolves.toBe(true);
+    vi.unstubAllGlobals();
+  });
+
+  it("uses the 2D viewer when page 1 does not render in time (never the 3D book with possibly white pages)", async () => {
+    vi.useFakeTimers();
+    let destroyed = false;
+    vi.stubGlobal("window", {
+      PDFJS_LOCALE: { pdfJsWorker: "/w.js", pdfJsCMapUrl: "/c/" },
+      pdfjsLib: { GlobalWorkerOptions: { workerSrc: "" }, getDocument: () => ({ promise: new Promise(() => {}), destroy: () => { destroyed = true; } }) },
+      setTimeout: globalThis.setTimeout, clearTimeout: globalThis.clearTimeout,
+    });
+    const result = firstPageRenders("https://api.example/catalog.pdf");
+    await vi.advanceTimersByTimeAsync(PAGE_CHECK_TIMEOUT_MS + 1);
+    await expect(result).resolves.toBe(false);
+    expect(destroyed).toBe(true);
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 });

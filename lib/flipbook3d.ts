@@ -260,13 +260,16 @@ export function paintedRatio(rgba: ArrayLike<number>): number {
 
 /** A first page with less painted than this is treated as blank. */
 const BLANK_PAGE_RATIO = 0.005;
-const PAGE_CHECK_TIMEOUT_MS = 20_000;
+/** The server can take ~10s to answer the first request; the book would be waiting for the same data anyway. */
+export const PAGE_CHECK_TIMEOUT_MS = 40_000;
 
 /**
  * Renders page 1 small with the engine's own pdf.js and reports whether anything was painted. The engine's pdf.js cannot
  * decode some image encodings (for example the JPEG 2000 pages of the Product Catalog): it skips the image, paints a blank
  * page and still reports the book as ready, so the viewer would show white pages. The caller then uses the 2D viewer
- * (pdf.js 5) instead. When the check cannot run, fails or times out it answers true, so the engine decides as before.
+ * (pdf.js 5) instead. A timeout also answers false: the 2D viewer draws every PDF, the 3D book might show white pages.
+ * When the check cannot run at all (no pdf.js on the page) or the PDF fails to load, it answers true and the engine
+ * reports that failure itself.
  */
 export async function firstPageRenders(pdfUrl: string): Promise<boolean> {
   const lib = window.pdfjsLib ?? window["pdfjs-dist/build/pdf"];
@@ -291,7 +294,7 @@ export async function firstPageRenders(pdfUrl: string): Promise<boolean> {
       return paintedRatio(context.getImageData(0, 0, canvas.width, canvas.height).data) >= BLANK_PAGE_RATIO;
     })();
     const timeout = new Promise<boolean>((resolve) => {
-      timer = window.setTimeout(() => resolve(true), PAGE_CHECK_TIMEOUT_MS);
+      timer = window.setTimeout(() => resolve(false), PAGE_CHECK_TIMEOUT_MS);
     });
     return await Promise.race([check, timeout]);
   } catch {
