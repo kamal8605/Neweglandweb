@@ -15,7 +15,7 @@ const CLOSE_DELAY = 200;
 /** Keeps an open menu this far from the viewport edge. */
 const EDGE = 16;
 
-/** Up to 6 categories in one column, up to 12 in two, more in three. Columns (16rem: the longest category name fits on one line) are filled top to bottom. */
+/** Up to 6 categories in one column, up to 12 in two, more in three. Columns are as wide as their longest name and filled top to bottom, so they stay balanced. */
 function menuColumns(count: number) {
   return count > 12 ? 3 : count > 6 ? 2 : 1;
 }
@@ -192,7 +192,7 @@ export function NavBar() {
                   style={{ left: menuOffset }}
                   className="absolute top-full z-50 w-max max-w-[calc(100vw-32px)] rounded-b-md border border-t-0 border-border bg-background text-foreground shadow-lg"
                 >
-                  <div className="flex items-center justify-between gap-8 border-b border-border px-4 py-2.5">
+                  <div className="flex items-center justify-between gap-6 border-b border-border px-4 py-2">
                     <span className="text-[13px] font-semibold">{group.label}</span>
                     <Link href={group.href} onClick={closeMenu} className="inline-flex items-center gap-0.5 text-[13px] font-medium text-primary no-underline hover:underline">
                       View all<ChevronRight size={14} aria-hidden="true" />
@@ -200,8 +200,8 @@ export function NavBar() {
                   </div>
                   {group.items.length > 0 ? (
                     <ul
-                      className="grid grid-flow-col gap-x-4 px-2 py-2"
-                      style={{ gridTemplateColumns: `repeat(${columns}, 16rem)`, gridTemplateRows: `repeat(${Math.ceil(group.items.length / columns)}, auto)` }}
+                      className="grid min-w-44 grid-flow-col gap-x-4 px-2 py-1.5"
+                      style={{ gridTemplateColumns: `repeat(${columns}, max-content)`, gridTemplateRows: `repeat(${Math.ceil(group.items.length / columns)}, auto)` }}
                     >
                       {group.items.map((category) => {
                         const href = `/category/${category.id}`;
@@ -211,7 +211,7 @@ export function NavBar() {
                               href={href}
                               onClick={closeMenu}
                               aria-current={pathname === href ? "page" : undefined}
-                              className={`block rounded px-2 py-1.5 text-sm leading-5 no-underline transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${pathname === href ? "font-medium text-primary" : "text-foreground/85"}`}
+                              className={`block whitespace-nowrap rounded px-2.5 py-1 text-[13px] leading-5 no-underline transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${pathname === href ? "font-medium text-primary" : "text-foreground/85"}`}
                             >
                               {category.name}
                             </Link>
