@@ -74,8 +74,23 @@ export interface ClientLocale {
   render?: () => void;
 }
 
+/** The few pdf.js calls the first-page check uses (the engine ships pdf.js 4.3, or 2.5 for Safari). */
+interface PdfViewport {
+  width: number;
+  height: number;
+}
+interface PdfJsLib {
+  GlobalWorkerOptions: { workerSrc: string };
+  getDocument(source: { url: string; cMapUrl: string; cMapPacked: boolean }): {
+    promise: Promise<{ getPage(pageNumber: number): Promise<{ getViewport(options: { scale: number }): PdfViewport; render(options: { canvasContext: CanvasRenderingContext2D; viewport: PdfViewport }): { promise: Promise<unknown> } }> }>;
+    destroy(): unknown;
+  };
+}
+
 declare global {
   interface Window {
+    pdfjsLib?: PdfJsLib;
+    "pdfjs-dist/build/pdf"?: PdfJsLib;
     jQuery?: JQueryStatic;
     FB3D_CLIENT_LOCALE?: ClientLocale;
     FB3D_LOCALE?: { dictionary: Record<string, string> };
@@ -231,6 +246,60 @@ export function loadFlipbookEngine(): Promise<void> {
     throw error;
   });
   return engine;
+}
+
+/** Share of pixels (RGBA bytes) that are not near-white. */
+export function paintedRatio(rgba: ArrayLike<number>): number {
+  const pixels = Math.floor(rgba.length / 4);
+  let painted = 0;
+  for (let i = 0; i < pixels * 4; i += 4) {
+    if (rgba[i] < 245 || rgba[i + 1] < 245 || rgba[i + 2] < 245) painted++;
+  }
+  return pixels === 0 ? 0 : painted / pixels;
+}
+
+/** A first page with less painted than this is treated as blank. */
+const BLANK_PAGE_RATIO = 0.005;
+const PAGE_CHECK_TIMEOUT_MS = 20_000;
+
+/**
+ * Renders page 1 small with the engine's own pdf.js and reports whether anything was painted. The engine's pdf.js cannot
+ * decode some image encodings (for example the JPEG 2000 pages of the Product Catalog): it skips the image, paints a blank
+ * page and still reports the book as ready, so the viewer would show white pages. The caller then uses the 2D viewer
+ * (pdf.js 5) instead. When the check cannot run, fails or times out it answers true, so the engine decides as before.
+ */
+export async function firstPageRenders(pdfUrl: string): Promise<boolean> {
+  const lib = window.pdfjsLib ?? window["pdfjs-dist/build/pdf"];
+  const worker = window.PDFJS_LOCALE?.pdfJsWorker;
+  if (!lib || !worker) return true;
+
+  lib.GlobalWorkerOptions.workerSrc = worker;
+  const task = lib.getDocument({ url: pdfUrl, cMapUrl: window.PDFJS_LOCALE?.pdfJsCMapUrl ?? "", cMapPacked: true });
+  let timer: number | undefined;
+  try {
+    const check = (async () => {
+      const page = await (await task.promise).getPage(1);
+      const viewport = page.getViewport({ scale: 0.35 });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.ceil(viewport.width));
+      canvas.height = Math.max(1, Math.ceil(viewport.height));
+      const context = canvas.getContext("2d");
+      if (!context) return true;
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: context, viewport }).promise;
+      return paintedRatio(context.getImageData(0, 0, canvas.width, canvas.height).data) >= BLANK_PAGE_RATIO;
+    })();
+    const timeout = new Promise<boolean>((resolve) => {
+      timer = window.setTimeout(() => resolve(true), PAGE_CHECK_TIMEOUT_MS);
+    });
+    return await Promise.race([check, timeout]);
+  } catch {
+    return true;
+  } finally {
+    window.clearTimeout(timer);
+    void Promise.resolve(task.destroy()).catch(() => {});
+  }
 }
 
 export function supportsWebGL(): boolean {

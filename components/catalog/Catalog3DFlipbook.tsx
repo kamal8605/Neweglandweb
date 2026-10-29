@@ -3,9 +3,10 @@
 import dynamic from "next/dynamic";
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from "react";
 import { BookOpen, Download, LoaderCircle, Maximize2, Minimize2, RotateCcw, X } from "lucide-react";
-import { loadFlipbookEngine, mountFlipbook, supportsWebGL } from "@/lib/flipbook3d";
+import { firstPageRenders, loadFlipbookEngine, mountFlipbook, supportsWebGL } from "@/lib/flipbook3d";
 
-// Without WebGL the 3D engine cannot run; those devices keep the 2D page-curl viewer.
+// Without WebGL the 3D engine cannot run, and neither can it draw PDFs whose images its pdf.js cannot decode
+// (JPEG 2000, for example); those cases use the 2D page-curl viewer.
 const CatalogFlipbook = dynamic(() => import("./CatalogFlipbook"), { ssr: false });
 
 interface Props {
@@ -25,11 +26,12 @@ function subscribeFullscreen(onChange: () => void) {
 
 export default function Catalog3DFlipbook({ file, title, onClose }: Props) {
   const [webgl] = useState(supportsWebGL);
-  if (!webgl) return <CatalogFlipbook file={file} title={title} onClose={onClose} />;
-  return <Viewer file={file} title={title} onClose={onClose} />;
+  const [pdfNeeds2d, setPdfNeeds2d] = useState(false);
+  if (!webgl || pdfNeeds2d) return <CatalogFlipbook file={file} title={title} onClose={onClose} />;
+  return <Viewer file={file} title={title} onClose={onClose} onUnsupportedPdf={() => setPdfNeeds2d(true)} />;
 }
 
-function Viewer({ file, title, onClose }: Props) {
+function Viewer({ file, title, onClose, onUnsupportedPdf }: Props & { onUnsupportedPdf: () => void }) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -41,6 +43,7 @@ function Viewer({ file, title, onClose }: Props) {
   const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
     if (event.key === "Escape") onClose();
   });
+  const switchTo2d = useEffectEvent(() => onUnsupportedPdf());
 
   // Lock page scroll, close on Escape and return focus to the catalog cover afterwards.
   useEffect(() => {
@@ -67,8 +70,13 @@ function Viewer({ file, title, onClose }: Props) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     loadFlipbookEngine()
-      .then(() => {
+      .then(() => firstPageRenders(file))
+      .then((renders) => {
         if (cancelled || !hostRef.current) return;
+        if (!renders) {
+          switchTo2d();
+          return;
+        }
         unmount = mountFlipbook(hostRef.current, file, {
           reducedMotion,
           onReady: () => {

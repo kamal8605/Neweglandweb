@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { FLIPBOOK_BASE, buildClientLocale, initSkin, pdfJsFiles, shouldUseStablePdfJs } from "./flipbook3d";
+import { describe, expect, it, vi } from "vitest";
+import { FLIPBOOK_BASE, buildClientLocale, firstPageRenders, initSkin, paintedRatio, pdfJsFiles, shouldUseStablePdfJs } from "./flipbook3d";
 
 const locale = buildClientLocale("https://shop.example", { html: "<div class=\"main\"></div>", styles: ["/*fa*/", "/*skin*/"] });
 
@@ -47,5 +47,32 @@ describe("3D FlipBook configuration", () => {
       locale.templates["short-white-book-view"].html, ...locale.templates["short-white-book-view"].styles,
     ].map((path) => path.replace(/^\/?(vendor\/)?(3d-flipbook\/)?/, ""));
     for (const path of files) expect(existsSync(join(process.cwd(), "public", FLIPBOOK_BASE, path)), path).toBe(true);
+  });
+});
+
+describe("first-page check (PDFs the engine's pdf.js cannot draw)", () => {
+  const white = [255, 255, 255, 255];
+  const dark = [10, 20, 30, 255];
+
+  it("measures the share of non-white pixels", () => {
+    expect(paintedRatio([...white, ...white, ...white, ...white])).toBe(0);
+    expect(paintedRatio([...white, ...dark, ...white, ...white])).toBe(0.25);
+    expect(paintedRatio([...dark, ...dark])).toBe(1);
+    expect(paintedRatio([])).toBe(0);
+    // Near-white (scanned paper, anti-aliasing) does not count as content.
+    expect(paintedRatio([250, 250, 250, 255, 246, 246, 246, 255])).toBe(0);
+  });
+
+  it("lets the engine decide when the check cannot run", async () => {
+    // No pdf.js global / worker on the page (or a failing load): never block the 3D viewer.
+    vi.stubGlobal("window", { PDFJS_LOCALE: undefined });
+    await expect(firstPageRenders("https://api.example/catalog.pdf")).resolves.toBe(true);
+    vi.stubGlobal("window", {
+      PDFJS_LOCALE: { pdfJsWorker: "/w.js", pdfJsCMapUrl: "/c/" },
+      pdfjsLib: { GlobalWorkerOptions: { workerSrc: "" }, getDocument: () => ({ promise: Promise.reject(new Error("network")), destroy: () => undefined }) },
+      setTimeout, clearTimeout,
+    });
+    await expect(firstPageRenders("https://api.example/catalog.pdf")).resolves.toBe(true);
+    vi.unstubAllGlobals();
   });
 });
