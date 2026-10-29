@@ -63,7 +63,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-background/15 bg-foreground text-background">
-      <div className="mx-auto max-w-[1780px] px-5 pb-8 pt-8 sm:px-6 md:px-10 md:pt-10 xl:px-12 xl:pt-12">
+      <div className="site-container pb-8 pt-8 md:pt-10 xl:pt-12">
         {/* Phones/tablets: brand row + accordions (1 column, 2 columns from md). Laptop (xl+): one row of columns. */}
         <div className="grid grid-cols-1 items-start gap-x-12 md:grid-cols-2 xl:grid-cols-[1.35fr_.85fr_.9fr_1.15fr_1.35fr] xl:gap-x-12 2xl:gap-x-16">
           <div className="border-b border-background/15 pb-6 md:col-span-2 md:flex md:items-start md:gap-10 md:pb-8 xl:col-span-1 xl:block xl:border-0 xl:pb-0">

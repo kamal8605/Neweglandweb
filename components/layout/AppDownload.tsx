@@ -17,7 +17,7 @@ export function GetAppButton() {
   const links = useAppLinks();
   if (!links) return null;
   return (
-    <Link href="/get-our-app" className="hidden min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-xs font-bold uppercase tracking-[0.08em] text-primary-foreground no-underline shadow-sm transition hover:-translate-y-0.5 hover:bg-primary/90 lg:inline-flex">
+    <Link href="/get-our-app" className="hidden min-h-11 shrink-0 items-center gap-2 rounded-md border border-input bg-background px-4 text-[13px] font-semibold text-foreground no-underline shadow-xs transition-colors hover:border-primary/40 hover:bg-accent [&>svg]:text-primary xl:inline-flex">
       <Download size={16} aria-hidden="true" /> Get our app
     </Link>
   );

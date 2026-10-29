@@ -9,8 +9,8 @@ export function NicotineWarning() {
   const text = nicotineWarning(site);
   if (!text) return null;
   return (
-    <div className="bg-foreground px-4 py-2 text-center text-background">
-      <p className="mx-auto max-w-[1500px] text-[11px] font-bold uppercase leading-snug tracking-[0.04em] sm:text-xs lg:text-sm">{text}</p>
+    <div className="bg-foreground py-2 text-center text-background">
+      <p className="site-container text-[11px] font-bold uppercase leading-snug tracking-[0.04em] sm:text-xs lg:text-[13px]">{text}</p>
     </div>
   );
 }

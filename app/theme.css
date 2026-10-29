@@ -5,13 +5,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
-.category-track {
+.category-track,
+.scroll-track {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.category-track::-webkit-scrollbar {
+.category-track::-webkit-scrollbar,
+.scroll-track::-webkit-scrollbar {
   display: none;
+}
+
+/* One content width for header, navigation, homepage sections and footer, so their edges line up
+   (the homepage's original 1513px product grid with px-3 / md:px-6 gutters). */
+@utility site-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1513px;
+  padding-inline: 0.75rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 1.5rem;
+  }
 }
 
 /* Legacy storefront aliases mapped to the selected shadcn Nova preset. */
@@ -337,6 +352,15 @@ html[data-theme="pallet"] {
 @media (max-width: 767px) {
   .typing-cursor {
     border-right-width: 3px;
+  }
+}
+
+/* Catalog hero heading on wide screens: up to 3rem, scaled down to the text column (an @container) so the longest
+   phrase (--heading-chars, ~0.57em per bold character plus the caret) stays on one line; below 2.25rem it wraps. */
+@media (min-width: 80rem) {
+  .catalog-heading {
+    font-size: clamp(2.25rem, calc((100cqi - 0.75rem) / (var(--heading-chars, 15) * 0.57)), 3rem);
+    line-height: 1;
   }
 }
 
