@@ -6,6 +6,7 @@ import Image from "next/image";
 import { StockDot } from "./StockDot";
 import { QtyStepper } from "./QtyStepper";
 import { PriceGate } from "./PriceGate";
+import { useCanViewSku } from "@/hooks/useCanViewSku";
 import { type Product } from "@/hooks/useProducts";
 import { imageVariant } from "@/lib/imageVariants";
 
@@ -50,6 +51,7 @@ export function ProductGrid({
   onQtyChange,
 }: ProductGridProps) {
   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
+  const showSku = useCanViewSku();
 
   function setQty(productId: number, qty: number) {
     const next = { ...qtyMap, [productId]: qty };
@@ -157,7 +159,7 @@ export function ProductGrid({
                 {p.name}
               </Link>
 
-              <span className="font-mono text-[10.5px] text-muted-foreground">{p.sku}</span>
+              {showSku && <span className="font-mono text-[10.5px] text-muted-foreground">{p.sku}</span>}
 
               <div className="mt-auto pt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                 {renderPrice(p)}

@@ -9,6 +9,7 @@ import { imageVariant, type ImageVariants } from "@/lib/imageVariants";
 import { type Product } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useCanViewSku } from "@/hooks/useCanViewSku";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PriceGate } from "@/components/shared/PriceGate";
 import { StockDot } from "@/components/shared/StockDot";
@@ -213,6 +214,7 @@ function SimpleAddToCart({ product }: { product: Product }) {
 function GroupedVariantTable({ product }: { product: Product }) {
   const children = product.children ?? [];
   const [qtys, setQtys] = useState<Record<number, number>>({});
+  const showSku = useCanViewSku();
   const { addItem } = useCart();
 
   const setQty = (id: number, qty: number) =>
@@ -260,7 +262,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
           <thead>
             <tr>
               <th className={TH}>Variant</th>
-              <th className={`${TH} hidden sm:table-cell`}>SKU</th>
+              {showSku && <th className={`${TH} hidden sm:table-cell`}>SKU</th>}
               <th className={`${TH} text-right`}>Price</th>
               <th className={`${TH} text-right`}>Stock</th>
               <th className={`${TH} text-right`}>Qty</th>
@@ -289,7 +291,7 @@ function GroupedVariantTable({ product }: { product: Product }) {
                       <span className="text-foreground">{child.name}</span>
                     </div>
                   </td>
-                  <td className={`${TD} hidden sm:table-cell text-muted-foreground`}>{child.sku}</td>
+                  {showSku && <td className={`${TD} hidden sm:table-cell text-muted-foreground`}>{child.sku}</td>}
                   <td className={`${TD} text-right`}>
                     <PriceGate pricesVisible={child.prices_visible}>
                       {child.on_sale && child.sale_price !== null ? (
@@ -368,6 +370,7 @@ function SpecStrip({ attributes }: { attributes?: Record<string, string> }) {
 function ProductDetail({ id }: { id: string }) {
   const { data: product, isLoading, isError } = useProduct(id);
   const { isAuthenticated } = useAuth();
+  const showSku = useCanViewSku();
   // Server-backed wishlist shared with every device (state comes from the account, not this page).
   const wishlistIds = useWishlistIds();
   const toggleWishlistItem = useToggleWishlist();
@@ -447,10 +450,12 @@ function ProductDetail({ id }: { id: string }) {
             {product.name}
           </h1>
 
-          {/* SKU */}
-          <div className="text-[10.5px] font-medium tracking-[0.08em] text-muted-foreground uppercase mt-2">
-            SKU · {product.sku}
-          </div>
+          {/* SKU (approved customers only) */}
+          {showSku && product.sku && (
+            <div className="text-[10.5px] font-medium tracking-[0.08em] text-muted-foreground uppercase mt-2">
+              SKU · {product.sku}
+            </div>
+          )}
 
           {/* Sale badge */}
           {product.on_sale && (

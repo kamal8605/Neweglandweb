@@ -7,6 +7,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { StockDot } from "./StockDot";
 import { QtyStepper } from "./QtyStepper";
 import { PriceGate } from "./PriceGate";
+import { useCanViewSku } from "@/hooks/useCanViewSku";
 import { type Product } from "@/hooks/useProducts";
 import { imageVariant } from "@/lib/imageVariants";
 
@@ -36,10 +37,10 @@ function ImagePlaceholder({ size = 36 }: { size?: number }) {
   );
 }
 
-function SkeletonRow({ showBrand }: { showBrand: boolean }) {
+function SkeletonRow({ showBrand, showSku }: { showBrand: boolean; showSku: boolean }) {
   return (
     <tr className="border-b border-border">
-      {[...Array(showBrand ? 8 : 7)].map((_, i) => (
+      {[...Array((showBrand ? 8 : 7) - (showSku ? 0 : 1))].map((_, i) => (
         <td key={i} className="px-2.5 py-2">
           <div className="h-4 animate-pulse rounded bg-muted" />
         </td>
@@ -59,6 +60,7 @@ export function ProductTable({
   onQtyChange,
 }: ProductTableProps) {
   const [qtyMap, setQtyMap] = useState<Record<number, number>>({});
+  const showSku = useCanViewSku();
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   function setQty(productId: number, qty: number) {
@@ -142,9 +144,11 @@ export function ProductTable({
           </td>
 
           {/* SKU */}
-          <td className={`${TD} w-24 hidden md:table-cell`}>
-            <span className="font-mono text-[11px] text-muted-foreground">{p.sku}</span>
-          </td>
+          {showSku && (
+            <td className={`${TD} w-24 hidden md:table-cell`}>
+              <span className="font-mono text-[11px] text-muted-foreground">{p.sku}</span>
+            </td>
+          )}
 
           {/* Product name */}
           <td className={TD}>
@@ -224,7 +228,7 @@ export function ProductTable({
           <tr>
             <th className={`${TH} w-5 sm:w-7`} />
             <th className={`${TH} w-14 hidden sm:table-cell`}>Img</th>
-            <th className={`${TH} w-24 hidden md:table-cell`}>SKU</th>
+            {showSku && <th className={`${TH} w-24 hidden md:table-cell`}>SKU</th>}
             <th className={TH}>Product</th>
             {showBrand && <th className={`${TH} w-32 hidden lg:table-cell`}>Brand</th>}
             <th className={`${TH} w-24 text-right`}>Price</th>
@@ -236,12 +240,12 @@ export function ProductTable({
         <tbody>
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonRow key={i} showBrand={showBrand} />
+              <SkeletonRow key={i} showBrand={showBrand} showSku={showSku} />
             ))
           ) : products.length === 0 ? (
             <tr>
               <td
-                colSpan={showBrand ? 9 : 8}
+                colSpan={(showBrand ? 9 : 8) - (showSku ? 0 : 1)}
                 className="px-4 py-12 text-center text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground"
               >
                 No products found
